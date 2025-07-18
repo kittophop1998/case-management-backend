@@ -2,30 +2,20 @@ package handler
 
 import (
 	"case-management/model"
-	"case-management/usecase"
-	"context"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-type UserHandler struct {
-	Repo usecase.CaseManagementRepository
-}
-
-func NewUserHandler(repo usecase.CaseManagementRepository) *UserHandler {
-	return &UserHandler{Repo: repo}
-}
-
-func (h *UserHandler) CreateUser(c *gin.Context) {
+func (h *Handler) CreateUser(c *gin.Context) {
 	var user model.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	id, err := h.Repo.CreateUser(context.Background(), &user)
+	id, err := h.UseCase.CreateUser(c, &user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -34,8 +24,8 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "User created", "user_id": id})
 }
 
-func (h *UserHandler) GetAllUsers(c *gin.Context) {
-	users, err := h.Repo.GetAllUsers(c)
+func (h *Handler) GetAllUsers(c *gin.Context) {
+	users, err := h.UseCase.GetAllUsers(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -43,7 +33,7 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
-func (h *UserHandler) GetUserByID(c *gin.Context) {
+func (h *Handler) GetUserByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil || id < 1 {
@@ -51,7 +41,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 		return
 	}
 
-	user, err := h.Repo.GetUserByID(c, uint(id))
+	user, err := h.UseCase.GetUserByID(c, uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
@@ -59,7 +49,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func (h *UserHandler) DeleteUserByID(c *gin.Context) {
+func (h *Handler) DeleteUserByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil || id < 1 {
@@ -67,7 +57,7 @@ func (h *UserHandler) DeleteUserByID(c *gin.Context) {
 		return
 	}
 
-	err = h.Repo.DeleteUserByID(c, uint(id))
+	err = h.UseCase.DeleteUserByID(c, uint(id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

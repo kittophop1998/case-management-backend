@@ -1,43 +1,57 @@
 package main
 
 import (
+	"case-management/appcore"
 	"case-management/appcore/appcore_cache"
+	"case-management/appcore/appcore_handler"
 	"case-management/appcore/appcore_logger"
 	"case-management/appcore/appcore_store"
 	"case-management/handler"
 	"case-management/model"
 	"case-management/repository"
+	"case-management/usecase"
 	"log/slog"
 	"os"
-
-	"github.com/gin-gonic/gin"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 func main() {
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	appcore_store.InitPostgresDBStore(logger)
-	db := appcore_store.DBStore
-	if db == nil {
-		logger.Error("DB is nil, cannot continue")
-		return
+
+	loc, _ := time.LoadLocation("UTC")
+	// handle err
+	time.Local = loc // -> this is setting the global timezone
+
+	serviceName := "caseManagement"
+	version := "v1.0.0"
+
+	// output current time zone
+	timeZone, offset := time.Now().Zone()
+	slog.Info("service time zone", "timeZone", timeZone, "offset", offset)
+	slog.Info("currentTime", "time", time.Now())
+
+	err := appcore_store.DBStore.AutoMigrate(&model.User{})
+
+	if err != nil {
+		panic(err.Error())
 	}
 
-	// Auto-migrate
-	if err := db.AutoMigrate(&model.User{}); err != nil {
-		logger.Error("Auto-migrate failed", slog.Any("error", err))
-		return
-	}
-
-	// สร้าง repository
-	authRepo := repository.New(appcore_store.DBStore, appcore_logger.Logger, appcore_cache.Cache)
+	caseManagementRepo := repository.New(appcore_store.DBStore, appcore_logger.Logger, appcore_cache.Cache)
+	caseManagementUseCase := usecase.New(caseManagementRepo, appcore_cache.Cache, appcore_logger.Logger)
+	caseManagementHandler := handler.NewHandler(caseManagementUseCase, appcore_logger.Logger)
 
 	// สร้าง handler
-	userHandler := handler.NewUserHandler(authRepo)
+	appCoreHandler := appcore_handler.NewHandler(serviceName, version, caseManagementHandler)
 
-	// Setup Gin และ Route
-	router := gin.Default()
-	handler.SetupRoutes(router, userHandler)
+	service := appcore.NewService(serviceName, version, appCoreHandler)
+	service.Run()
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	signal.Notify(c, syscall.SIGTERM)
 
-	// Run
-	router.Run(":8000")
+	sig := <-c
+	appcore_logger.Logger.Info("shutting down the server", "received signal", sig)
+	appcore_logger.Logger.Info("shutting down gracefully, press Ctrl+C again to force")
+	service.Stop()
 }

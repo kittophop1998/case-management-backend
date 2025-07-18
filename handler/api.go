@@ -1,10 +1,47 @@
 package handler
 
-import "github.com/gin-gonic/gin"
+import (
+	"case-management/appcore/appcore_router"
+)
 
-func SetupRoutes(r *gin.Engine, userHandler *UserHandler) {
-	r.POST("/users", userHandler.CreateUser)
-	r.GET("/users", userHandler.GetAllUsers)
-	r.GET("/users/:id", userHandler.GetUserByID)
-	r.DELETE("/users/:id", userHandler.DeleteUserByID)
+const (
+	// @todo remove this one (no need to use constant for url path [un-readable])
+	roleURL    = "/roles"
+	roleID     = "/roles/:id"
+	userID     = "/users/:id"
+	groupID    = "/groups/:id"
+	costID     = "/costs/:id"
+	customerID = "/customers/:id"
+)
+
+func (h *Handler) ModuleAPI(r *appcore_router.Router) {
+	api := r.Engine.Group("/api/v1")
+
+	// // 300 request / min
+	// normalRateLimiter := rate_limiter.NewRateLimiter(appcore_cache.Cache, &rate_limiter.RateLimit{
+	// 	Rate:  time.Minute,
+	// 	Limit: 100,
+	// })
+
+	// // 5 request / min
+	// otpRateLimiter := rate_limiter.NewRateLimiter(appcore_cache.Cache, &rate_limiter.RateLimit{
+	// 	Rate:  time.Minute,
+	// 	Limit: 5,
+	// })
+
+	// rateLimiter := rate_limiter.NewRateLimiter(appcore_cache.Cache, &rate_limiter.RateLimit{
+	// 	Rate:  time.Minute,
+	// 	Limit: 5,
+	// })
+
+	secureAPI := api.Group("/")
+	// secureAPI.Use(normalRateLimiter, appcore_handler.MiddlewareCheckAccessToken())
+	{
+		//user management
+		secureAPI.POST("/users", h.CreateUser)
+		secureAPI.GET("/users", h.GetAllUsers)
+		secureAPI.GET("/users/:id", h.GetUserByID)
+		secureAPI.DELETE("/users/:id", h.DeleteUserByID)
+	}
+
 }

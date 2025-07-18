@@ -2,27 +2,28 @@ package usecase
 
 import (
 	"case-management/model"
-	"context"
+
+	"github.com/gin-gonic/gin"
 )
 
-func (u *UseCase) CreateUser(ctx context.Context, user *model.User, userId uint) (uint, error) {
-	id, err := u.caseMangementRepository.CreateUser(ctx, user)
+func (u *UseCase) CreateUser(c *gin.Context, user *model.User) (uint, error) {
+	id, err := u.caseMangementRepository.CreateUser(c, user)
 	if err != nil {
 		return 0, err
 	}
 	return id, nil
 }
 
-func (u *UseCase) GetAllUsers(ctx context.Context) ([]*model.User, error) {
-	return u.caseMangementRepository.GetAllUsers(ctx)
+func (u *UseCase) GetAllUsers(c *gin.Context) ([]*model.User, error) {
+	return u.caseMangementRepository.GetAllUsers(c)
 }
 
-func (u *UseCase) GetUserByID(ctx context.Context, id uint) (*model.User, error) {
-	return u.caseMangementRepository.GetUserByID(ctx, id)
+func (u *UseCase) GetUserByID(c *gin.Context, id uint) (*model.User, error) {
+	return u.caseMangementRepository.GetUserByID(c, id)
 }
 
-func (u *UseCase) DeleteUserByID(ctx context.Context, id uint, deletedBy uint) error {
-	err := u.caseMangementRepository.DeleteUserByID(ctx, id)
+func (u *UseCase) DeleteUserByID(c *gin.Context, id uint) error {
+	err := u.caseMangementRepository.DeleteUserByID(c, id)
 	if err != nil {
 		return err
 	}

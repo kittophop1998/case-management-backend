@@ -3,11 +3,12 @@ package repository
 import (
 	"case-management/model"
 	"case-management/utils"
-	"context"
 	"log/slog"
+
+	"github.com/gin-gonic/gin"
 )
 
-func (a *authRepo) CreateUser(ctx context.Context, user *model.User) (uint, error) {
+func (a *authRepo) CreateUser(c *gin.Context, user *model.User) (uint, error) {
 	a.Logger.Info("Creating user", slog.String("username", user.Username))
 
 	// Hash password
@@ -28,24 +29,24 @@ func (a *authRepo) CreateUser(ctx context.Context, user *model.User) (uint, erro
 	return user.Id, nil
 }
 
-func (r *authRepo) GetAllUsers(ctx context.Context) ([]*model.User, error) {
+func (r *authRepo) GetAllUsers(c *gin.Context) ([]*model.User, error) {
 	var users []*model.User
-	if err := r.DB.WithContext(ctx).Find(&users).Error; err != nil {
+	if err := r.DB.WithContext(c).Find(&users).Error; err != nil {
 		return nil, err
 	}
 	return users, nil
 }
 
-func (r *authRepo) GetUserByID(ctx context.Context, id uint) (*model.User, error) {
+func (r *authRepo) GetUserByID(c *gin.Context, id uint) (*model.User, error) {
 	var user model.User
-	if err := r.DB.WithContext(ctx).First(&user, id).Error; err != nil {
+	if err := r.DB.WithContext(c).First(&user, id).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
 
-func (r *authRepo) DeleteUserByID(ctx context.Context, id uint) error {
-	if err := r.DB.WithContext(ctx).Delete(&model.User{}, id).Error; err != nil {
+func (r *authRepo) DeleteUserByID(c *gin.Context, id uint) error {
+	if err := r.DB.WithContext(c).Delete(&model.User{}, id).Error; err != nil {
 		return err
 	}
 	return nil
