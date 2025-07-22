@@ -1,3 +1,18 @@
+// @title           Case Management API
+// @version         1.0
+// @description     This is a sample server for managing cases.
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   SYE
+// @contact.url    https://aeon.co.th
+// @contact.email  sye@aeon.co.th
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host            localhost:8000
+// @BasePath        /api/v1
+
 package main
 
 import (
