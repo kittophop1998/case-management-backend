@@ -14,7 +14,11 @@ import (
 	"net/http"
 	"time"
 
+	_ "case-management/docs"
+
 	requestID "github.com/sumit-tembe/gin-requestid"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -121,6 +125,7 @@ func initGinAPI(h *appcore_handler.ApiHandler) *http.Server {
 
 	v := r.Group("/api")
 	v.GET("/ping", h.HealthCheck)
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	h.Module.ModuleAPI(r)
 

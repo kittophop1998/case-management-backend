@@ -1,4 +1,43 @@
+definitions:
+  model.User:
+    properties:
+      centerId:
+        type: string
+      createDatetime:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      isActive:
+        type: string
+      roleId:
+        type: string
+      team:
+        type: string
+      updateDatetime:
+        type: string
+      userName:
+        type: string
+    type: object
 info:
   contact: {}
-paths: {}
+paths:
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+      summary: Get all users
+      tags:
+      - Users
 swagger: "2.0"

@@ -24,6 +24,14 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "User created", "userId": id})
 }
 
+// GetAllUsers godoc
+// @Summary Get all users
+// @Description Retrieve all users
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Success 200 {array} model.User
+// @Router  /users [get]
 func (h *Handler) GetAllUsers(c *gin.Context) {
 	users, err := h.UseCase.GetAllUsers(c)
 	if err != nil {
