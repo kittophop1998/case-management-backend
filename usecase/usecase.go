@@ -10,9 +10,9 @@ import (
 
 type UseCase struct {
 	// mu                      sync.Mutex
-	Cache                   *redis.Client
-	Logger                  *slog.Logger
-	caseMangementRepository CaseManagementRepository
+	Cache                    *redis.Client
+	Logger                   *slog.Logger
+	caseManagementRepository CaseManagementRepository
 }
 
 type CaseManagementRepository interface {
@@ -22,12 +22,12 @@ type CaseManagementRepository interface {
 	DeleteUserByID(c *gin.Context, id uint) error
 }
 
-func New(caseMangementRepository CaseManagementRepository,
+func New(caseManagementRepository CaseManagementRepository,
 	cache *redis.Client,
 	logger *slog.Logger) *UseCase {
 	return &UseCase{
-		caseMangementRepository: caseMangementRepository,
-		Cache:                   cache,
-		Logger:                  logger,
+		caseManagementRepository: caseManagementRepository,
+		Cache:                    cache,
+		Logger:                   logger,
 	}
 }
