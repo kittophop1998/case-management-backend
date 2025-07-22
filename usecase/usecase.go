@@ -16,10 +16,10 @@ type UseCase struct {
 }
 
 type CaseManagementRepository interface {
-	CreateUser(c *gin.Context, user *model.User) (uint, error)
+	CreateUser(c *gin.Context, user *model.User) (string, error)
 	GetAllUsers(c *gin.Context) ([]*model.User, error)
-	GetUserByID(c *gin.Context, id uint) (*model.User, error)
-	DeleteUserByID(c *gin.Context, id uint) error
+	GetUserByID(c *gin.Context, id string) (*model.User, error)
+	DeleteUserByID(c *gin.Context, id string) error
 }
 
 func New(caseManagementRepository CaseManagementRepository,

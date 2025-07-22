@@ -21,7 +21,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "User created", "user_id": id})
+	c.JSON(http.StatusCreated, gin.H{"message": "User created", "userId": id})
 }
 
 func (h *Handler) GetAllUsers(c *gin.Context) {
@@ -41,7 +41,7 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 		return
 	}
 
-	user, err := h.UseCase.GetUserByID(c, uint(id))
+	user, err := h.UseCase.GetUserByID(c, idParam)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
@@ -57,7 +57,7 @@ func (h *Handler) DeleteUserByID(c *gin.Context) {
 		return
 	}
 
-	err = h.UseCase.DeleteUserByID(c, uint(id))
+	err = h.UseCase.DeleteUserByID(c, idParam)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
