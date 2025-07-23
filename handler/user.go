@@ -2,6 +2,7 @@ package handler
 
 import (
 	"case-management/appcore/appcore_handler"
+	"case-management/appcore/appcore_internal/appcore_model"
 	"case-management/model"
 	"net/http"
 	"strconv"
@@ -21,17 +22,22 @@ import (
 func (h *Handler) CreateUser(c *gin.Context) {
 	var user model.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(
+			err.Error(),
+			errorSystem,
+		))
 		return
 	}
 
 	id, err := h.UseCase.CreateUser(c, &user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, appcore_handler.NewResponseError(
+			err.Error(),
+			"error",
+		))
 		return
 	}
 
-	// c.JSON(http.StatusCreated, gin.H{"message": "User created", "userId": id})
 	c.JSON(http.StatusCreated, appcore_handler.NewResponseCreated(id))
 }
 
@@ -44,12 +50,46 @@ func (h *Handler) CreateUser(c *gin.Context) {
 // @Success 200 {array} model.User
 // @Router  /users [get]
 func (h *Handler) GetAllUsers(c *gin.Context) {
-	users, err := h.UseCase.GetAllUsers(c)
+	limit, err := getLimit(c)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(err.Error(), errorInvalidRequest))
 		return
 	}
-	c.JSON(http.StatusOK, appcore_handler.NewResponseObject(users))
+
+	page, err := getPage(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(err.Error(), errorInvalidRequest))
+		return
+	}
+
+	sort := c.DefaultQuery("sort", "created_at desc")
+	role := c.Query("role")
+	team := c.Query("team")
+	center := c.Query("center")
+
+	isActiveStr := c.Query("is_active")
+	var isActive *bool = nil
+
+	if isActiveStr != "" {
+		val := isActiveStr == "true"
+		isActive = &val
+	}
+
+	filter := model.UserFilter{
+		IsActive: isActive,
+		Sort:     sort,
+		Role:     role,
+		Team:     team,
+		Center:   center,
+	}
+
+	users, total, err := h.UseCase.GetAllUsers(c, page, limit, filter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, appcore_handler.NewResponseError(err.Error(), errorSystem))
+		return
+	}
+
+	c.JSON(http.StatusOK, appcore_model.NewPaginatedResponse(users, page, limit, total))
 }
 
 // GetUserByID godoc
@@ -65,13 +105,19 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil || id < 1 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(
+			err.Error(),
+			errorInvalidRequest,
+		))
 		return
 	}
 
 	user, err := h.UseCase.GetUserByID(c, idParam)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		c.JSON(http.StatusNotFound, appcore_handler.NewResponseError(
+			err.Error(),
+			"user not found",
+		))
 		return
 	}
 	c.JSON(http.StatusOK, appcore_handler.NewResponseObject(user))
@@ -89,13 +135,19 @@ func (h *Handler) DeleteUserByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil || id < 1 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(
+			err.Error(),
+			errorInvalidRequest,
+		))
 		return
 	}
 
 	err = h.UseCase.DeleteUserByID(c, idParam)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, appcore_handler.NewResponseError(
+			err.Error(),
+			errorSystem,
+		))
 		return
 	}
 
@@ -105,4 +157,30 @@ func (h *Handler) DeleteUserByID(c *gin.Context) {
 			Status: "success",
 		},
 	))
+}
+
+func (h *Handler) UpdateUser(c *gin.Context) {
+	var input model.UserFilter
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(
+			err.Error(),
+			errorInvalidRequest,
+		))
+		return
+	}
+
+	idParam := c.Param("id")
+	userID, err := strconv.ParseUint(idParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError("invalid user ID", "invalid_request"))
+		return
+	}
+
+	err = h.UseCase.UpdateUser(c, uint(userID), input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, appcore_handler.NewResponseError(err.Error(), "error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "user updated successfully"})
 }

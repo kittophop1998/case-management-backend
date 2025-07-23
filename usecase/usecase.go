@@ -17,9 +17,12 @@ type UseCase struct {
 
 type CaseManagementRepository interface {
 	CreateUser(c *gin.Context, user *model.User) (uint, error)
-	GetAllUsers(c *gin.Context) ([]*model.User, error)
+	GetAllUsers(c *gin.Context, limit, offset int, filter model.UserFilter) ([]*model.User, error)
 	GetUserByID(c *gin.Context, id string) (*model.User, error)
 	DeleteUserByID(c *gin.Context, id string) error
+	CountUsers(c *gin.Context) (int, error)
+	CountUsersWithFilter(c *gin.Context, filter model.UserFilter) (int, error)
+	UpdateUser(c *gin.Context, userID uint, input model.UserFilter) error
 }
 
 func New(caseManagementRepository CaseManagementRepository,

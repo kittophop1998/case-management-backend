@@ -68,3 +68,22 @@ func Paginate[T any](ctx context.Context, modelPointer *[]T, pagination *Paginat
 		}
 	}
 }
+
+type PaginatedResponse struct {
+	Data       interface{} `json:"data"`
+	Page       int         `json:"page"`
+	Limit      int         `json:"limit"`
+	Total      int         `json:"total"`
+	TotalPages int         `json:"totalPages"`
+}
+
+func NewPaginatedResponse(data interface{}, page, limit, total int) PaginatedResponse {
+	totalPages := (total + limit - 1) / limit // ปัดขึ้น
+	return PaginatedResponse{
+		Data:       data,
+		Page:       page,
+		Limit:      limit,
+		Total:      total,
+		TotalPages: totalPages,
+	}
+}

@@ -158,45 +158,7 @@
             }
         },
         "model.User": {
-            "type": "object",
-            "properties": {
-                "centerId": {
-                    "type": "string",
-                    "example": "Team A"
-                },
-                "createDatetime": {
-                    "type": "string",
-                    "example": "2025-07-17T09:00:00Z"
-                },
-                "email": {
-                    "type": "string",
-                    "example": "user@example.com"
-                },
-                "id": {
-                    "type": "string",
-                    "example": "1"
-                },
-                "isActive": {
-                    "type": "string",
-                    "example": "true"
-                },
-                "roleId": {
-                    "type": "string",
-                    "example": "ROLE_ADMIN"
-                },
-                "team": {
-                    "type": "string",
-                    "example": "CEN123456"
-                },
-                "updateDatetime": {
-                    "type": "string",
-                    "example": "2025-07-17T09:00:00Z"
-                },
-                "userName": {
-                    "type": "string",
-                    "example": "john.doe"
-                }
-            }
+            "type": "object"
         }
     }
 }

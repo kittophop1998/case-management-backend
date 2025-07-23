@@ -2,7 +2,9 @@ package repository
 
 import (
 	"case-management/model"
+	"errors"
 	"log/slog"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,12 +22,71 @@ func (a *authRepo) CreateUser(c *gin.Context, user *model.User) (uint, error) {
 	return user.ID, nil
 }
 
-func (r *authRepo) GetAllUsers(c *gin.Context) ([]*model.User, error) {
+func (r *authRepo) GetAllUsers(c *gin.Context, limit, offset int, filter model.UserFilter) ([]*model.User, error) {
 	var users []*model.User
-	if err := r.DB.WithContext(c).Find(&users).Error; err != nil {
+
+	query := r.DB.Debug().WithContext(c).Model(&model.User{}).
+		Preload("Role").Preload("Center").
+		Joins("LEFT JOIN roles ON roles.id = users.role_id").
+		Joins("LEFT JOIN centers ON centers.id = users.center_id")
+
+	if filter.IsActive != nil {
+		query = query.Where("users.is_active = ?", *filter.IsActive)
+	}
+	if filter.Role != "" {
+		query = query.Where("roles.name = ?", filter.Role)
+	}
+	if filter.Team != "" {
+		query = query.Where("users.team = ?", filter.Team)
+	}
+	if filter.Center != "" {
+		query = query.Where("TRIM(centers.name) = ?", strings.TrimSpace(filter.Center))
+
+	}
+	if filter.Sort != "" {
+		query = query.Order(filter.Sort)
+	}
+
+	if err := query.Limit(limit).Offset(offset).Find(&users).Error; err != nil {
 		return nil, err
 	}
+
 	return users, nil
+}
+
+func (r *authRepo) CountUsersWithFilter(c *gin.Context, filter model.UserFilter) (int, error) {
+	var count int64
+	query := r.DB.WithContext(c).Model(&model.User{}).
+		Joins("LEFT JOIN roles ON roles.id = users.role_id").
+		Joins("LEFT JOIN centers ON centers.id = users.center_id")
+
+	if filter.IsActive != nil {
+		query = query.Where("users.is_active = ?", *filter.IsActive)
+	}
+	if filter.Role != "" {
+		query = query.Where("roles.name = ?", filter.Role)
+	}
+	if filter.Team != "" {
+		query = query.Where("users.team = ?", filter.Team)
+	}
+	if filter.Center != "" {
+
+		query = query.Where("centers.name ILIKE ?", strings.TrimSpace(filter.Center))
+	}
+
+	if err := query.Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return int(count), nil
+}
+
+func (r *authRepo) CountUsers(c *gin.Context) (int, error) {
+	var count int64
+	if err := r.DB.WithContext(c).Model(&model.User{}).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return int(count), nil
 }
 
 func (r *authRepo) GetUserByID(c *gin.Context, id string) (*model.User, error) {
@@ -40,5 +101,64 @@ func (r *authRepo) DeleteUserByID(c *gin.Context, id string) error {
 	if err := r.DB.WithContext(c).Delete(&model.User{}, id).Error; err != nil {
 		return err
 	}
+	return nil
+}
+
+// func (r *authRepo) UpdateUser(c *gin.Context, userID uint, input model.UserFilter) error {
+// 	var role model.Role
+// 	if err := r.DB.WithContext(c).Where("name = ?", input.Role).First(&role).Error; err != nil {
+// 		return fmt.Errorf("role not found: %w", err)
+// 	}
+
+// 	// หา Center ID จากชื่อ Center
+// 	var center model.Center
+// 	if err := r.DB.WithContext(c).Where("name = ?", input.Center).First(&center).Error; err != nil {
+// 		return fmt.Errorf("center not found: %w", err)
+// 	}
+
+// 	// เตรียมข้อมูลที่ต้องการอัพเดต
+// 	updateData := map[string]interface{}{
+// 		"name":      input.Name,
+// 		"is_active": input.IsActive,
+// 		"role_id":   role.ID,
+// 		"team":      input.Team,
+// 		"center_id": center.ID,
+// 	}
+
+// 	// อัพเดต user ตาม userID
+// 	if err := r.DB.WithContext(c).Model(&model.User{}).Where("id = ?", userID).Updates(updateData).Error; err != nil {
+// 		return err
+// 	}
+
+// 	return nil
+// }
+
+func (r *authRepo) UpdateUser(c *gin.Context, userID uint, input model.UserFilter) error {
+	updateData := map[string]interface{}{}
+
+	if input.Name != "" {
+		updateData["name"] = input.Name
+	}
+	if input.IsActive != nil {
+		updateData["is_active"] = *input.IsActive
+	}
+	if input.RoleID != 0 {
+		updateData["role_id"] = input.RoleID
+	}
+	if input.Team != "" {
+		updateData["team"] = input.Team
+	}
+	if input.CenterID != 0 {
+		updateData["center_id"] = input.CenterID
+	}
+
+	if len(updateData) == 0 {
+		return errors.New("no valid fields to update")
+	}
+
+	if err := r.DB.WithContext(c).Model(&model.User{}).Where("id = ?", userID).Updates(updateData).Error; err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -11,7 +11,24 @@ import (
 
 type MockRepository struct{}
 
-func (m *MockRepository) GetAllUsers(c *gin.Context) ([]*model.User, error) {
+// func (m *MockRepository) GetAllUsers(*gin.Context, int, int) ([]*model.User, error) {
+// 	return []*model.User{
+// 		{
+// 			Model: gorm.Model{
+// 				ID:        1,
+// 				CreatedAt: time.Now(),
+// 				UpdatedAt: time.Now(),
+// 			},
+// 			UserName: "john_doe",
+// 			Email:    "john.doe@example.com",
+// 			Team:     "Inbound",
+// 			IsActive: "ACTIVE",
+// 		},
+// 	}, nil
+// }
+
+func (m *MockRepository) GetAllUsers(c *gin.Context, limit, offset int, filter model.UserFilter) ([]*model.User, error) {
+	val := true
 	return []*model.User{
 		{
 			Model: gorm.Model{
@@ -21,10 +38,8 @@ func (m *MockRepository) GetAllUsers(c *gin.Context) ([]*model.User, error) {
 			},
 			UserName: "john_doe",
 			Email:    "john.doe@example.com",
-			RoleId:   "1",
 			Team:     "Inbound",
-			CenterId: "CEN001",
-			IsActive: "ACTIVE",
+			IsActive: &val,
 		},
 	}, nil
 }
@@ -34,14 +49,13 @@ func (m *MockRepository) GetUserByID(c *gin.Context, id string) (*model.User, er
 	if err != nil {
 		return nil, err
 	}
+	val := true
 	return &model.User{
 		Model:    gorm.Model{ID: uint(uid)},
 		UserName: "Mock_User",
 		Email:    "mock.user@example.com",
-		RoleId:   "1",
 		Team:     "Inbound",
-		CenterId: "Center001",
-		IsActive: "ACTIVE",
+		IsActive: &val,
 	}, nil
 }
 
@@ -50,5 +64,17 @@ func (m *MockRepository) CreateUser(c *gin.Context, user *model.User) (uint, err
 }
 
 func (m *MockRepository) DeleteUserByID(c *gin.Context, id string) error {
+	return nil
+}
+
+func (m *MockRepository) CountUsers(*gin.Context) (int, error) {
+	return 0, nil
+}
+
+func (m *MockRepository) CountUsersWithFilter(c *gin.Context, filter model.UserFilter) (int, error) {
+	return 0, nil
+}
+
+func (m *MockRepository) UpdateUser(c *gin.Context, userID uint, input model.UserFilter) error {
 	return nil
 }
