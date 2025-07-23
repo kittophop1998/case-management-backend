@@ -6,10 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (u *UseCase) CreateUser(c *gin.Context, user *model.User) (string, error) {
+func (u *UseCase) CreateUser(c *gin.Context, user *model.User) (uint, error) {
 	id, err := u.caseManagementRepository.CreateUser(c, user)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 	return id, nil
 }

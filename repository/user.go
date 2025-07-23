@@ -7,17 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (a *authRepo) CreateUser(c *gin.Context, user *model.User) (string, error) {
+func (a *authRepo) CreateUser(c *gin.Context, user *model.User) (uint, error) {
 	a.Logger.Info("Creating user", slog.String("username", user.UserName))
 
 	// Save to DB
 	if err := a.DB.Create(user).Error; err != nil {
 		a.Logger.Error("Failed to create user", slog.Any("error", err))
-		return "", err
+		return 0, err
 	}
 
-	a.Logger.Info("User created successfully", slog.String("user_id", user.Id))
-	return user.Id, nil
+	a.Logger.Info("User created successfully", slog.Any("user_id", user.ID))
+	return user.ID, nil
 }
 
 func (r *authRepo) GetAllUsers(c *gin.Context) ([]*model.User, error) {
