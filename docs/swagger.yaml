@@ -1,27 +1,61 @@
+basePath: /api/v1
 definitions:
+  model.CreateUserResponse:
+    properties:
+      message:
+        type: string
+      userId:
+        type: integer
+    type: object
+  model.DeleteUserResponse:
+    properties:
+      message:
+        example: User deleted successfully
+        type: string
+    type: object
   model.User:
     properties:
       centerId:
+        example: Team A
         type: string
       createDatetime:
+        example: "2025-07-17T09:00:00Z"
         type: string
       email:
+        example: user@example.com
         type: string
       id:
+        example: "1"
         type: string
       isActive:
+        example: "true"
         type: string
       roleId:
+        example: ROLE_ADMIN
         type: string
       team:
+        example: CEN123456
         type: string
       updateDatetime:
+        example: "2025-07-17T09:00:00Z"
         type: string
       userName:
+        example: john.doe
         type: string
     type: object
+host: localhost:8000
 info:
-  contact: {}
+  contact:
+    email: sye@aeon.co.th
+    name: SYE
+    url: https://aeon.co.th
+  description: This is a sample server for managing cases.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Case Management API
+  version: "1.0"
 paths:
   /users:
     get:
@@ -38,6 +72,66 @@ paths:
               $ref: '#/definitions/model.User'
             type: array
       summary: Get all users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the provided JSON body
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.CreateUserResponse'
+      summary: Create a new user
+      tags:
+      - Users
+  /users/{id}:
+    delete:
+      description: Delete a user by its ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.DeleteUserResponse'
+      summary: Delete user by ID
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: Retrieve user information by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+      summary: Get user by ID
       tags:
       - Users
 swagger: "2.0"
