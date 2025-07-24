@@ -86,7 +86,7 @@ func (u *UseCase) Login(ctx context.Context, userData model.LoginRequest) (*mode
 	accessLog := model.AccessLogs{
 		Username:      username,
 		LogonDatetime: time.Now(),
-		LogonResult:   "successs",
+		LogonResult:   "success",
 	}
 
 	isSave := u.SaveAccressLog(ctx, accessLog) //แก้ด้วย
@@ -116,9 +116,9 @@ func (u *UseCase) Login(ctx context.Context, userData model.LoginRequest) (*mode
 	return &login, nil
 }
 
-func (uc *UseCase) SaveAccressLog(ctx context.Context, accessLog model.AccessLogs) error {
+func (u *UseCase) SaveAccressLog(ctx context.Context, accessLog model.AccessLogs) error {
 
-	err := uc.SaveAccressLog(ctx, accessLog) //แก้ด้วย
+	err := u.caseManagementRepository.SaveAccressLog(ctx, accessLog) //แก้ด้วย
 
 	if err != nil {
 		return appcore_handler.ErrInternalServer

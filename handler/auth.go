@@ -32,14 +32,21 @@ func (h *Handler) Login(c *gin.Context) {
 	resp, err := h.UseCase.Login(c.Request.Context(), userData)
 	if err != nil {
 
+		username := ""
+		if resp != nil {
+			if resp.User.Username != "" {
+				username = resp.User.Username
+			}
+		}
+
 		accessLog := model.AccessLogs{
-			Username:      resp.User.Username,
+			Username:      username,
 			LogonDatetime: time.Now(),
 			LogonResult:   "failed",
 		}
 
-		// err := h.authUsecase.SaveAccressLog(c.Request.Context(), accessLog)
-		if err := h.UseCase.SaveAccressLog(c.Request.Context(), accessLog); err != nil {
+		// err := h.authUsecase.SaveAccessLog(c.Request.Context(), accessLog)
+		if err := h.UseCase.SaveAccessLog(c.Request.Context(), accessLog); err != nil {
 			appcore_handler.HandleError(c, err)
 			return
 		}
@@ -54,7 +61,7 @@ func (h *Handler) Login(c *gin.Context) {
 		LogonResult:   "success",
 	}
 
-	if err := h.UseCase.SaveAccressLog(c.Request.Context(), accessLog); err != nil {
+	if err := h.UseCase.SaveAccessLog(c.Request.Context(), accessLog); err != nil {
 		appcore_handler.HandleError(c, err)
 		return
 	}

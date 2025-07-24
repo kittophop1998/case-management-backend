@@ -12,7 +12,9 @@ import (
 
 func (r *authRepo) SaveAccressLog(ctx context.Context, accessLog model.AccessLogs) error {
 
-	r.DB.Save(&accessLog)
+	if err := r.DB.Save(&accessLog).Error; err != nil {
+		return err
+	}
 
 	return nil
 }

@@ -11,6 +11,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	ColUserName = 0
+	ColEmail    = 1
+	ColTeam     = 2
+	ColIsActive = 3
+	ColCenterID = 4
+	ColRoleID   = 5
+	ColName     = 6
+)
+
 func (u *UseCase) CreateUser(c *gin.Context, user *model.User) (uint, error) {
 	id, err := u.caseManagementRepository.CreateUser(c, user)
 	if err != nil {
@@ -71,16 +81,15 @@ func (u *UseCase) ImportUsersFromCSV(c context.Context, file io.Reader) error {
 			return fmt.Errorf("error reading csv: %v", err)
 		}
 
-		isActive := record[3] == "true"
-
+		isActive := record[ColIsActive] == "true"
 		user := model.User{
-			UserName: record[0],
-			Email:    record[1],
-			Team:     record[2],
+			UserName: record[ColUserName],
+			Email:    record[ColEmail],
+			Team:     record[ColTeam],
 			IsActive: &isActive,
-			CenterID: parseUint(record[4]),
-			RoleID:   parseUint(record[5]),
-			Name:     record[6],
+			CenterID: parseUint(record[ColCenterID]),
+			RoleID:   parseUint(record[ColRoleID]),
+			Name:     record[ColName],
 		}
 		users = append(users, user)
 	}

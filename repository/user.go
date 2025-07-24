@@ -172,7 +172,7 @@ func (r *authRepo) GetUser(ctx context.Context, username string) (*model.User, e
 	var user model.User
 
 	log.Println("user:", username)
-	if err := r.DB.WithContext(ctx).Table(tableUser).Where("username = ?", username).Find(&user).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Table(tableUser).Where("username = ?", username).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			details := map[string]string{
 				"db": "ไม่พบผู้ใช้ในระบบ",
