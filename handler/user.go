@@ -184,3 +184,26 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "user updated successfully"})
 }
+
+func (h *Handler) ImportCSV(c *gin.Context) {
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot get file"})
+		return
+	}
+
+	src, err := file.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot open file"})
+		return
+	}
+	defer src.Close()
+
+	err = h.UseCase.ImportUsersFromCSV(c, src)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "import success"})
+}

@@ -30,6 +30,7 @@ type CaseManagementRepository interface {
 	GetUserMetrix(ctx context.Context, role string) (*model.UserMetrix, error)
 	GetUser(ctx context.Context, username string) (*model.User, error)
 	GenerateToken(ttl time.Duration, metadata *appcore_model.Metadata) (signedToken string, err error)
+	BulkInsertUsers(c context.Context, users []model.User) error
 }
 
 func New(caseManagementRepository CaseManagementRepository,

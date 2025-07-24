@@ -204,3 +204,8 @@ func (r *authRepo) GetUser(ctx context.Context, username string) (*model.User, e
 
 	return &user, nil
 }
+
+func (r *authRepo) BulkInsertUsers(c context.Context, users []model.User) error {
+	tx := r.DB.WithContext(c).Create(&users)
+	return tx.Error
+}

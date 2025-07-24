@@ -54,3 +54,7 @@ func (m *MockRepository) SaveAccressLog(ctx context.Context, accessLog model.Acc
 func (m *MockRepository) GenerateToken(ttl time.Duration, metadata *appcore_model.Metadata) (signedToken string, err error) {
 	return "", nil
 }
+
+func (m *MockRepository) BulkInsertUsers(c context.Context, users []model.User) error {
+	return nil
+}
