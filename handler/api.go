@@ -43,7 +43,20 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		secureAPI.GET("/users/:id", h.GetUserByID)
 		secureAPI.DELETE("/users/:id", h.DeleteUserByID)
 		secureAPI.PUT("/users/:id", h.UpdateUser)
+		secureAPI.POST("/users/import", h.ImportCSV)
 
 	}
+
+	authRoutes := api.Group("/auth")
+	{
+		authRoutes.POST("/login", h.Login)
+	}
+
+	//refresh token api
+	// refreshTokenAPI := api.Group("/")
+	// refreshTokenAPI.Use(normalRateLimiter, h.MiddlewareCheckRefreshToken())
+	// {
+	// refreshTokenAPI.POST("/refresh", h.RefreshAccessToken)
+	// }
 
 }
