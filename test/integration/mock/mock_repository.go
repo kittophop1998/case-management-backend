@@ -47,7 +47,7 @@ func (m *MockRepository) GetUserMetrix(ctx context.Context, role string) (*model
 	return nil, nil
 }
 
-func (m *MockRepository) SaveAccressLog(ctx context.Context, accessLog model.AccessLogs) error {
+func (m *MockRepository) SaveAccessLog(ctx context.Context, accessLog model.AccessLogs) error {
 	return nil
 }
 

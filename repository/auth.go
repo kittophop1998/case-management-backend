@@ -10,7 +10,7 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func (r *authRepo) SaveAccressLog(ctx context.Context, accessLog model.AccessLogs) error {
+func (r *authRepo) SaveAccessLog(ctx context.Context, accessLog model.AccessLogs) error {
 
 	if err := r.DB.Save(&accessLog).Error; err != nil {
 		return err
