@@ -46,7 +46,9 @@ func main() {
 	slog.Info("service time zone", "timeZone", timeZone, "offset", offset)
 	slog.Info("currentTime", "time", time.Now())
 
-	err := appcore_store.DBStore.AutoMigrate(&model.User{})
+	err := appcore_store.DBStore.AutoMigrate(&model.User{},
+		&model.Role{},
+		&model.User{})
 
 	if err != nil {
 		panic(err.Error())

@@ -14,34 +14,6 @@ definitions:
         type: string
     type: object
   model.User:
-    properties:
-      centerId:
-        example: Team A
-        type: string
-      createDatetime:
-        example: "2025-07-17T09:00:00Z"
-        type: string
-      email:
-        example: user@example.com
-        type: string
-      id:
-        example: "1"
-        type: string
-      isActive:
-        example: "true"
-        type: string
-      roleId:
-        example: ROLE_ADMIN
-        type: string
-      team:
-        example: CEN123456
-        type: string
-      updateDatetime:
-        example: "2025-07-17T09:00:00Z"
-        type: string
-      userName:
-        example: john.doe
-        type: string
     type: object
 host: localhost:8000
 info:

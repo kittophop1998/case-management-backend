@@ -42,6 +42,8 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		secureAPI.GET("/users", h.GetAllUsers)
 		secureAPI.GET("/users/:id", h.GetUserByID)
 		secureAPI.DELETE("/users/:id", h.DeleteUserByID)
+		secureAPI.PUT("/users/:id", h.UpdateUser)
+
 	}
 
 }
