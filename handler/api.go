@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"case-management/appcore/appcore_handler"
 	"case-management/appcore/appcore_router"
 )
 
@@ -44,12 +45,12 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		secureAPI.DELETE("/users/:id", h.DeleteUserByID)
 		secureAPI.PUT("/users/:id", h.UpdateUser)
 		secureAPI.POST("/users/import", h.ImportCSV)
-
 	}
 
 	authRoutes := api.Group("/auth")
 	{
 		authRoutes.POST("/login", h.Login)
+		authRoutes.GET("/profile", appcore_handler.MiddlewareCheckAccessToken(), h.Profile)
 	}
 
 	//refresh token api
