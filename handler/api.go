@@ -46,4 +46,16 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 
 	}
 
+	authRoutes := api.Group("/auth")
+	{
+		authRoutes.POST("/login", h.Login)
+	}
+
+	//refresh token api
+	// refreshTokenAPI := api.Group("/")
+	// refreshTokenAPI.Use(normalRateLimiter, h.MiddlewareCheckRefreshToken())
+	// {
+	// refreshTokenAPI.POST("/refresh", h.RefreshAccessToken)
+	// }
+
 }

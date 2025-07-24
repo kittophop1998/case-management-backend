@@ -12,7 +12,7 @@ const (
 	// errorInvalidLevelID          string = "invalid level id"
 	// errorInvalidLimit            string = "limit number is incorrect"
 	// errorInvalidPage             string = "page number is incorrect"
-	// errorInvalidTokenMsg         string = "invalid token"
+	errorInvalidTokenMsg string = "invalid token"
 	// errorInvalidRoleID           string = "invalid role id"
 	// errorInvalidPartnerID        string = "invalid partner id"
 	// errorInvalidGroupID          string = "invalid group id"
