@@ -8,20 +8,20 @@ var Config *Configurations
 
 // Configurations wraps all the config variables required by the service
 type Configurations struct {
-	//develop or production
+	// Development or Production
 	Mode string
 
-	//Gin Mode
+	// Gin Mode
 	GinIsReleaseMode bool
 
-	//database
+	// Database
 	PostgresConnString string
 
-	//Redis
+	// Redis
 	RedisUrl  string
 	RedisPass string
 
-	// //Message Broker
+	// Message Broker
 	MemphisHost     string
 	MemphisUsername string
 	MemphisPassword string
@@ -38,6 +38,12 @@ type Configurations struct {
 
 	// CRON Scheduler
 	RunCronScheduler bool
+
+	// System-i
+	SystemIWebsiteURL string
+
+	// Treasure Data
+	TreasureDataWebsiteURL string
 
 	//Otel
 	IsObserve bool
@@ -60,23 +66,27 @@ func InitConfigurations() {
 	viper.SetDefault("MINIO_SECRET_KEY", "minioadmin")
 	viper.SetDefault("MINIO_BUCKET_NAME", "miniobucket")
 	viper.SetDefault("SECRET_KEY", "")
+	viper.SetDefault("SYSTEM_I_URL", "")
+	viper.SetDefault("TREASURE_DATA_URL", "")
 
 	Config = &Configurations{
-		Mode:               viper.GetString("mode"),
-		GinIsReleaseMode:   viper.GetBool("GIN_IS_RELEASE_MODE"),
-		PostgresConnString: viper.GetString("POSTGRES_URL"),
-		RedisUrl:           viper.GetString("REDIS_URL"),
-		RedisPass:          viper.GetString("REDIS_PASS"),
-		MemphisHost:        viper.GetString("MEMPHIS_HOST"),
-		MemphisUsername:    viper.GetString("MEMPHIS_USERNAME"),
-		MemphisPassword:    viper.GetString("MEMPHIS_PASSWORD"),
-		MinioURL:           viper.GetString("MINIO_URL"),
-		MinioSSL:           viper.GetBool("MINIO_SSL"),
-		MinioAccessKey:     viper.GetString("MINIO_ACCESS_KEY"),
-		MinioSecretKey:     viper.GetString("MINIO_SECRET_KEY"),
-		MinioBucketName:    viper.GetString("MINIO_BUCKET_NAME"),
-		SecretKey:          viper.GetString("SECRET_KEY"),
-		RunCronScheduler:   viper.GetBool("RUN_CRON_SCHEDULER"),
-		IsObserve:          viper.GetBool("IS_OBSERVE"),
+		Mode:                   viper.GetString("mode"),
+		GinIsReleaseMode:       viper.GetBool("GIN_IS_RELEASE_MODE"),
+		PostgresConnString:     viper.GetString("POSTGRES_URL"),
+		RedisUrl:               viper.GetString("REDIS_URL"),
+		RedisPass:              viper.GetString("REDIS_PASS"),
+		MemphisHost:            viper.GetString("MEMPHIS_HOST"),
+		MemphisUsername:        viper.GetString("MEMPHIS_USERNAME"),
+		MemphisPassword:        viper.GetString("MEMPHIS_PASSWORD"),
+		MinioURL:               viper.GetString("MINIO_URL"),
+		MinioSSL:               viper.GetBool("MINIO_SSL"),
+		MinioAccessKey:         viper.GetString("MINIO_ACCESS_KEY"),
+		MinioSecretKey:         viper.GetString("MINIO_SECRET_KEY"),
+		MinioBucketName:        viper.GetString("MINIO_BUCKET_NAME"),
+		SecretKey:              viper.GetString("SECRET_KEY"),
+		RunCronScheduler:       viper.GetBool("RUN_CRON_SCHEDULER"),
+		IsObserve:              viper.GetBool("IS_OBSERVE"),
+		SystemIWebsiteURL:      viper.GetString("SYSTEM_I_URL"),
+		TreasureDataWebsiteURL: viper.GetString("TREASURE_DATA_URL"),
 	}
 }

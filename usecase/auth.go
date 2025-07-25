@@ -134,3 +134,15 @@ func (u *UseCase) buildLoginResponse(user *model.User, metrix *model.UserMetrixR
 		},
 	}
 }
+
+func (u *UseCase) StoreToken(c *gin.Context, accessToken string) error {
+	return u.caseManagementRepository.StoreToken(c, accessToken)
+}
+
+func (u *UseCase) ValidateToken(signedToken string) (*appcore_model.JwtClaims, error) {
+	return u.caseManagementRepository.ValidateToken(signedToken)
+}
+
+func (u *UseCase) DeleteToken(c *gin.Context, accessToken string) error {
+	return u.caseManagementRepository.DeleteToken(c, accessToken)
+}
