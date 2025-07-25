@@ -58,3 +58,15 @@ func (m *MockRepository) GenerateToken(ttl time.Duration, metadata *appcore_mode
 func (m *MockRepository) BulkInsertUsers(c context.Context, users []model.User) error {
 	return nil
 }
+
+func (m *MockRepository) StoreToken(c *gin.Context, accessToken string) error {
+	return nil
+}
+
+func (m *MockRepository) ValidateToken(signedToken string) (claims *appcore_model.JwtClaims, err error) {
+	return nil, nil
+}
+
+func (m *MockRepository) DeleteToken(c *gin.Context, accessToken string) error {
+	return nil
+}

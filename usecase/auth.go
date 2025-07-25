@@ -7,6 +7,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"gopkg.in/ldap.v2"
 )
 
@@ -104,4 +105,16 @@ func (u *UseCase) mapToLoginResponse(username string, metrix model.UserMetrixRes
 
 func (u *UseCase) GenerateToken(ttl time.Duration, metadata *appcore_model.Metadata) (string, error) {
 	return u.caseManagementRepository.GenerateToken(ttl, metadata)
+}
+
+func (u *UseCase) StoreToken(c *gin.Context, accessToken string) error {
+	return u.caseManagementRepository.StoreToken(c, accessToken)
+}
+
+func (u *UseCase) ValidateToken(signedToken string) (*appcore_model.JwtClaims, error) {
+	return u.caseManagementRepository.ValidateToken(signedToken)
+}
+
+func (u *UseCase) DeleteToken(c *gin.Context, accessToken string) error {
+	return u.caseManagementRepository.DeleteToken(c, accessToken)
 }

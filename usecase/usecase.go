@@ -31,6 +31,9 @@ type CaseManagementRepository interface {
 	GetUser(ctx context.Context, username string) (*model.User, error)
 	GenerateToken(ttl time.Duration, metadata *appcore_model.Metadata) (signedToken string, err error)
 	BulkInsertUsers(c context.Context, users []model.User) error
+	StoreToken(c *gin.Context, accessToken string) error
+	ValidateToken(signedToken string) (claims *appcore_model.JwtClaims, err error)
+	DeleteToken(c *gin.Context, accessToken string) error
 }
 
 func New(caseManagementRepository CaseManagementRepository,
