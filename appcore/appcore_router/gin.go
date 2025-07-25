@@ -27,7 +27,7 @@ func New() *Router {
 		MaxAge:           12 * time.Hour,
 	}
 	//config.AllowAllOrigins = true
-	//config.AllowCredentials = true
+	// config.AllowCredentials = true
 	config.AddAllowHeaders("authorization")
 	r.Use(cors.New(config))
 

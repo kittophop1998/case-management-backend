@@ -48,6 +48,7 @@ func main() {
 
 	err := appcore_store.DBStore.AutoMigrate(&model.User{},
 		&model.Role{},
+		&model.AccessLogs{},
 		&model.User{})
 
 	if err != nil {

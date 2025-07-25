@@ -45,6 +45,8 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		secureAPI.DELETE("/users/:id", h.DeleteUserByID)
 		secureAPI.PUT("/users/:id", h.UpdateUser)
 		secureAPI.POST("/users/import", h.ImportCSV)
+		secureAPI.GET("/import/status", h.GetImportStatus)
+
 	}
 
 	authRoutes := api.Group("/auth")
