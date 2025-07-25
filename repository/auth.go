@@ -14,12 +14,7 @@ import (
 )
 
 func (r *authRepo) SaveAccessLog(ctx context.Context, accessLog model.AccessLogs) error {
-
-	if err := r.DB.Save(&accessLog).Error; err != nil {
-		return err
-	}
-
-	return nil
+	return r.DB.WithContext(ctx).Create(&accessLog).Error
 }
 
 func (a *authRepo) GenerateToken(ttl time.Duration, metadata *appcore_model.Metadata) (signedToken string, err error) {

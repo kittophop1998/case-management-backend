@@ -21,6 +21,7 @@ import (
 	"case-management/appcore/appcore_handler"
 	"case-management/appcore/appcore_logger"
 	"case-management/appcore/appcore_store"
+	appcore_migation "case-management/appcore/appcore_store/appcore_migration"
 	"case-management/handler"
 	"case-management/model"
 	"case-management/repository"
@@ -46,12 +47,10 @@ func main() {
 	slog.Info("service time zone", "timeZone", timeZone, "offset", offset)
 	slog.Info("currentTime", "time", time.Now())
 
-	err := appcore_store.DBStore.AutoMigrate(&model.User{},
-		&model.Role{},
-		&model.User{})
-
-	if err != nil {
-		panic(err.Error())
+	// Initialize Migration
+	if err := appcore_migation.Migrate(); err != nil {
+		slog.Error("migration failed", "error", err)
+		os.Exit(1)
 	}
 
 	// ! Seeder

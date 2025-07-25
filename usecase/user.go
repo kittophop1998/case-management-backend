@@ -10,6 +10,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 const (
@@ -128,7 +129,7 @@ func (u *UseCase) ImportUsersFromCSVWithProgress(c context.Context, file io.Read
 			Team:     record[ColTeam],
 			IsActive: &isActive,
 			CenterID: utils.ParseUint(record[ColCenterID]),
-			RoleID:   utils.ParseUint(record[ColRoleID]),
+			RoleID:   uuid.MustParse(record[ColRoleID]),
 			Name:     record[ColName],
 		}
 

@@ -28,22 +28,6 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	// Temporary hardcoded check
-	if req.Username == "admin" && req.Password == "admin" {
-		c.JSON(http.StatusOK, appcore_handler.NewResponseObject(
-			model.LoginResponse{
-				User: model.UserResponse{
-					Username: "admin",
-					UserMetrix: model.UserMetrixResponse{
-						Role: "admin",
-					},
-				},
-			},
-		))
-
-		return
-	}
-
 	// Main login use case
 	resp, err := h.UseCase.Login(c, req)
 	success := err == nil

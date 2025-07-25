@@ -5,7 +5,6 @@ import (
 	"case-management/model"
 	"context"
 	"errors"
-	"log"
 	"log/slog"
 	"strings"
 
@@ -145,33 +144,9 @@ func (r *authRepo) UpdateUser(c *gin.Context, userID uint, input model.UserFilte
 	return nil
 }
 
-func (r *authRepo) GetUserMetrix(ctx context.Context, role string) (*model.UserMetrix, error) {
-	var userMetrix model.UserMetrix
-
-	if err := r.DB.WithContext(ctx).Table(tableUserMetrix).Where("role = ?", role).Find(&userMetrix).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			details := map[string]string{
-				"db": "ไม่พบผู้ใช้ในระบบ",
-			}
-			appErr := appcore_handler.NewAppError(
-				appcore_handler.ErrNotFound.Code,
-				appcore_handler.ErrNotFound.Message,
-				appcore_handler.ErrNotFound.HTTPStatus,
-				details,
-			)
-			return nil, appErr
-		}
-
-		return nil, appcore_handler.ErrInternalServer
-	}
-
-	return &userMetrix, nil
-}
-
 func (r *authRepo) GetUser(ctx context.Context, username string) (*model.User, error) {
 	var user model.User
 
-	log.Println("user:", username)
 	if err := r.DB.WithContext(ctx).Table(tableUser).Where("username = ?", username).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			details := map[string]string{
@@ -187,19 +162,6 @@ func (r *authRepo) GetUser(ctx context.Context, username string) (*model.User, e
 		}
 
 		return nil, appcore_handler.ErrInternalServer
-	}
-
-	if (user == model.User{}) {
-		details := map[string]string{
-			"db": "ไม่พบผู้ใช้ในระบบ",
-		}
-		appErr := appcore_handler.NewAppError(
-			appcore_handler.ErrNotFound.Code,
-			appcore_handler.ErrNotFound.Message,
-			appcore_handler.ErrNotFound.HTTPStatus,
-			details,
-		)
-		return nil, appErr
 	}
 
 	return &user, nil
