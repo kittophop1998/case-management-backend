@@ -139,10 +139,12 @@ func (u *UseCase) ImportUsersFromCSVWithProgress(c context.Context, file io.Read
 		}
 
 		successCount++
-		progress := int(float64(successCount) / float64(total) * 100)
-		utils.SetProgress(taskID, progress)
+		if total > 0 { // Ensure safe division
+			progress := int(float64(successCount) / float64(total) * 100)
+			utils.SetProgress(taskID, progress)
+		}
 	}
 
-	utils.SetProgress(taskID, 100) // จบ process
+	utils.SetProgress(taskID, 100)
 	return nil
 }

@@ -230,11 +230,12 @@ func (h *Handler) ImportCSV(c *gin.Context) {
 		taskID = uuid.NewString()
 	}
 
+	cCopy := c.Copy()
 	go func() {
-		err := h.UseCase.ImportUsersFromCSVWithProgress(c, src, taskID)
+		err := h.UseCase.ImportUsersFromCSVWithProgress(cCopy, src, taskID)
 		if err != nil {
 			log.Printf("Import error: %v", err)
-			utils.SetProgress(taskID, 100) // จบด้วย error ก็ให้ progress เต็มไว้ก่อน
+			utils.SetProgress(taskID, 100)
 		}
 	}()
 

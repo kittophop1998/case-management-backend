@@ -8,7 +8,7 @@ var Config *Configurations
 
 // Configurations wraps all the config variables required by the service
 type Configurations struct {
-	// Develop or Production
+	// Development or Production
 	Mode string
 
 	// Gin Mode

@@ -54,7 +54,7 @@ func SSEProgress(c *gin.Context) {
 
 func SetProgress(taskID string, value int) {
 	ctx := context.Background()
-	appcore_cache.Cache.Set(ctx, taskID, value, 10*time.Minute) // expire หลัง 10 นาที
+	appcore_cache.Cache.Set(ctx, taskID, value, 10*time.Minute)
 }
 
 func GetProgress(taskID string) int {
