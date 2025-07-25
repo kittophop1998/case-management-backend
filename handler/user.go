@@ -19,7 +19,7 @@ import (
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param user body model.User true "User data"
+// @Param user body model.CreateUserRequest true "User data"
 // @Success 201 {object} model.CreateUserResponse
 // @Router /users [post]
 func (h *Handler) CreateUser(c *gin.Context) {

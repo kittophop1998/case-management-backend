@@ -68,7 +68,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/model.CreateUserRequest"
                         }
                     }
                 ],
@@ -114,10 +114,7 @@ const docTemplate = `{
                     "202": {
                         "description": "Accepted",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.MessageResponse"
                         }
                     }
                 }
@@ -233,7 +230,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "type": "string",
@@ -244,14 +241,53 @@ const docTemplate = `{
                 }
             }
         },
+        "model.CreateUserRequest": {
+            "type": "object",
+            "properties": {
+                "agentId": {
+                    "type": "string",
+                    "example": "12337"
+                },
+                "centerId": {
+                    "type": "string",
+                    "example": "b94eee08-8324-4d4f-b166-d82775553a7e"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "Janet@exam.com"
+                },
+                "isActive": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "operatorId": {
+                    "type": "string",
+                    "example": "1233"
+                },
+                "roleId": {
+                    "type": "string",
+                    "example": "538cd6c5-4cb3-4463-b7d5-ac6645815476"
+                },
+                "team": {
+                    "type": "string",
+                    "example": "Inbound"
+                },
+                "userName": {
+                    "type": "string",
+                    "example": "Janet Adebayo"
+                }
+            }
+        },
         "model.CreateUserResponse": {
             "type": "object",
             "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "userId": {
-                    "type": "integer"
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },
@@ -282,7 +318,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "type": "string",
@@ -300,7 +336,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/model.Center"
                 },
                 "centerID": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "createdAt": {
                     "type": "string"
@@ -313,7 +349,7 @@ const docTemplate = `{
                     "example": "user@example.com"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "isActive": {
                     "type": "boolean"
@@ -326,7 +362,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/model.Role"
                 },
                 "roleID": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "team": {
                     "type": "string",
@@ -347,8 +383,8 @@ const docTemplate = `{
                 "center": {
                     "type": "string"
                 },
-                "centerId": {
-                    "type": "integer"
+                "centerID": {
+                    "type": "string"
                 },
                 "isActive": {
                     "type": "boolean"
@@ -359,8 +395,8 @@ const docTemplate = `{
                 "role": {
                     "type": "string"
                 },
-                "roleId": {
-                    "type": "integer"
+                "roleID": {
+                    "type": "string"
                 },
                 "sort": {
                     "type": "string"
@@ -368,8 +404,8 @@ const docTemplate = `{
                 "team": {
                     "type": "string"
                 },
-                "teamId": {
-                    "type": "integer"
+                "teamID": {
+                    "type": "string"
                 }
             }
         }
