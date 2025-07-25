@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"time"
 
-	"encore.dev/types/uuid"
+	"github.com/google/uuid"
 )
 
 type Model struct {
-	ID        uint      `gorm:"primaryKey" json:"id"`
+	ID        uuid.UUID `json:"id" gorm:"type:uuid;default:uuid_generate_v4()"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 	DeletedAt time.Time `gorm:"index" json:"deletedAt"`
@@ -16,27 +16,27 @@ type Model struct {
 
 type User struct {
 	Model
-	UserName string `gorm:"type:varchar(50)" json:"userName" example:"john.doe"`
-	Email    string `gorm:"type:varchar(100)" json:"email" example:"user@example.com"`
-	Team     string `gorm:"type:varchar(50)" json:"team" example:"CEN123456"`
-	IsActive *bool  `json:"isActive"`
-	CenterID uint   `json:"centerID,omitempty"`
-	Center   Center `gorm:"foreignKey:CenterID" json:"center"`
-	RoleID   uint   `json:"roleID,omitempty"`
-	Role     Role   `gorm:"foreignKey:RoleID" json:"role"`
-	Name     string `gorm:"type:varchar(100)" json:"name" example:"John Doe"`
+	UserName string    `gorm:"type:varchar(50)" json:"userName" example:"john.doe"`
+	Email    string    `gorm:"type:varchar(100)" json:"email" example:"user@example.com"`
+	Team     string    `gorm:"type:varchar(50)" json:"team" example:"CEN123456"`
+	IsActive *bool     `json:"isActive"`
+	CenterID uuid.UUID `json:"centerID,omitempty" gorm:"type:uuid;default:uuid_generate_v4()"`
+	Center   Center    `gorm:"foreignKey:CenterID" json:"center"`
+	RoleID   uuid.UUID `json:"roleID,omitempty" gorm:"type:uuid;default:uuid_generate_v4()"`
+	Role     Role      `gorm:"foreignKey:RoleID" json:"role"`
+	Name     string    `gorm:"type:varchar(100)" json:"name" example:"John Doe"`
 }
 
 type UserFilter struct {
-	Name     string `gorm:"type:varchar(100)" json:"name"`
-	Sort     string `json:"sort"`
-	IsActive *bool  `json:"isActive"`
-	Role     string `json:"role"`
-	Team     string `json:"team"`
-	Center   string `json:"center"`
-	RoleID   uint   `json:"roleId"`
-	TeamID   uint   `json:"teamId"`
-	CenterID uint   `json:"centerId"`
+	Name     string    `gorm:"type:varchar(100)" json:"name"`
+	Sort     string    `json:"sort"`
+	IsActive *bool     `json:"isActive"`
+	Role     string    `json:"role"`
+	Team     string    `json:"team"`
+	Center   string    `json:"center"`
+	RoleID   uuid.UUID `json:"roleID,omitempty" gorm:"type:uuid;default:uuid_generate_v4()"`
+	TeamID   uuid.UUID `json:"teamID,omitempty" gorm:"type:uuid;default:uuid_generate_v4()"`
+	CenterID uuid.UUID `json:"centerID,omitempty" gorm:"type:uuid;default:uuid_generate_v4()"`
 }
 
 type Role struct {

@@ -10,19 +10,24 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+
 	"gorm.io/gorm"
 )
 
 const tableUserMetrix = "user_metrixes"
 const tableUser = "users"
 
-func (a *authRepo) CreateUser(c *gin.Context, user *model.User) (uint, error) {
+func (a *authRepo) CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error) {
 	a.Logger.Info("Creating user", slog.String("username", user.UserName))
 
-	// Save to DB
+	if user.ID == uuid.Nil {
+		user.ID = uuid.New()
+	}
+
 	if err := a.DB.Create(user).Error; err != nil {
 		a.Logger.Error("Failed to create user", slog.Any("error", err))
-		return 0, err
+		return uuid.Nil, err
 	}
 
 	a.Logger.Info("User created successfully", slog.Any("user_id", user.ID))
@@ -124,13 +129,13 @@ func (r *authRepo) UpdateUser(c *gin.Context, userID uint, input model.UserFilte
 	if input.IsActive != nil {
 		updateData["is_active"] = *input.IsActive
 	}
-	if input.RoleID != 0 {
+	if input.RoleID != uuid.Nil {
 		updateData["role_id"] = input.RoleID
 	}
 	if input.Team != "" {
 		updateData["team"] = input.Team
 	}
-	if input.CenterID != 0 {
+	if input.CenterID != uuid.Nil {
 		updateData["center_id"] = input.CenterID
 	}
 

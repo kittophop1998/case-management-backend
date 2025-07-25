@@ -6,6 +6,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,7 +21,7 @@ func (m *MockRepository) GetUserByID(c *gin.Context, id string) (*model.User, er
 	return nil, nil
 }
 
-func (m *MockRepository) CreateUser(c *gin.Context, user *model.User) (uint, error) {
+func (m *MockRepository) CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error) {
 	return user.ID, nil
 }
 

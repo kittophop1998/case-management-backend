@@ -57,6 +57,8 @@ func main() {
 
 	// ! Seeder
 	model.SeedRoles(appcore_store.DBStore)
+	model.SeedCenters(appcore_store.DBStore)
+	model.SeedUsers(appcore_store.DBStore)
 
 	caseManagementRepo := repository.New(appcore_store.DBStore, appcore_logger.Logger, appcore_cache.Cache)
 	caseManagementUseCase := usecase.New(caseManagementRepo, appcore_cache.Cache, appcore_logger.Logger)

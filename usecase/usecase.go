@@ -7,6 +7,8 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 )
@@ -19,7 +21,8 @@ type UseCase struct {
 }
 
 type CaseManagementRepository interface {
-	CreateUser(c *gin.Context, user *model.User) (uint, error)
+	// CreateUser(c *gin.Context, user *model.User) (uint, error)
+	CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error)
 	GetAllUsers(c *gin.Context, limit, offset int, filter model.UserFilter) ([]*model.User, error)
 	GetUserByID(c *gin.Context, id string) (*model.User, error)
 	DeleteUserByID(c *gin.Context, id string) error
