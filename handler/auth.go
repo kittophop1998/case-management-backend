@@ -4,72 +4,54 @@ import (
 	"case-management/appcore/appcore_handler"
 	"case-management/model"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (h *Handler) Login(c *gin.Context) {
+	var req model.LoginRequest
 
-	var userLogin model.LoginRequest
-	reqID := c.GetHeader("X-Request-ID")
-
-	if reqID == "" {
+	// Validate required header
+	if reqID := c.GetHeader("X-Request-ID"); reqID == "" {
 		appcore_handler.HandleError(c, appcore_handler.ErrFilterRequired)
 		return
 	}
 
-	if err := c.ShouldBindJSON(&userLogin); err != nil {
+	// Validate body
+	if err := c.ShouldBindJSON(&req); err != nil {
 		appcore_handler.HandleError(c, appcore_handler.ErrBadRequest)
 		return
 	}
 
-	if userLogin.Username == "" || userLogin.Password == "" {
+	if req.Username == "" || req.Password == "" {
 		appcore_handler.HandleError(c, appcore_handler.ErrRequiredParam)
 		return
 	}
 
-	if userLogin.Username == "admin" && userLogin.Password == "admin" {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Login successful",
-			"user":    userLogin.Username,
-		})
+	// Temporary hardcoded check
+	if req.Username == "admin" && req.Password == "admin" {
+		c.JSON(http.StatusOK, appcore_handler.NewResponseObject(
+			model.LoginResponse{
+				User: model.UserResponse{
+					Username: "admin",
+					UserMetrix: model.UserMetrixResponse{
+						Role: "admin",
+					},
+				},
+			},
+		))
+
 		return
 	}
 
-	resp, err := h.UseCase.Login(c.Request.Context(), userLogin)
+	// Main login use case
+	resp, err := h.UseCase.Login(c, req)
+	success := err == nil
+
+	// Log access (even on failure)
+	_ = h.UseCase.SaveAccessLog(c.Request.Context(), req.Username, success)
+
 	if err != nil {
-
-		username := ""
-		if resp != nil {
-			if resp.User.Username != "" {
-				username = resp.User.Username
-			}
-		}
-
-		accessLog := model.AccessLogs{
-			Username:      username,
-			LogonDatetime: time.Now(),
-			LogonResult:   "failed",
-		}
-
-		// err := h.authUsecase.SaveAccessLog(c.Request.Context(), accessLog)
-		if err := h.UseCase.SaveAccessLog(c.Request.Context(), accessLog); err != nil {
-			appcore_handler.HandleError(c, err)
-			return
-		}
-
-		appcore_handler.HandleError(c, err)
-		return
-	}
-
-	accessLog := model.AccessLogs{
-		Username:      resp.User.Username,
-		LogonDatetime: time.Now(),
-		LogonResult:   "success",
-	}
-
-	if err := h.UseCase.SaveAccessLog(c.Request.Context(), accessLog); err != nil {
 		appcore_handler.HandleError(c, err)
 		return
 	}

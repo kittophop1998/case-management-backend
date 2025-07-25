@@ -5,48 +5,64 @@ import (
 	"case-management/appcore/appcore_internal/appcore_model"
 	"case-management/model"
 	"context"
+	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"gopkg.in/ldap.v2"
 )
 
-func (u *UseCase) Login(ctx context.Context, userLogin model.LoginRequest) (*model.LoginResponse, error) {
-	username := userLogin.Username
-	password := userLogin.Password
-
-	// --- Optional LDAP Authentication (currently disabled) ---
-	if err := u.authenticateWithLDAP(username, password); err != nil {
+func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.LoginResponse, error) {
+	// Optional LDAP authentication
+	if err := u.authenticateWithLDAP(req.Username, req.Password); err != nil {
 		return nil, err
 	}
 
-	userResp, err := u.caseManagementRepository.GetUser(ctx, username)
+	user, err := u.caseManagementRepository.GetUser(ctx, req.Username)
 	if err != nil {
 		return nil, err
 	}
 
-	userMetrixResp, err := u.caseManagementRepository.GetUserMetrix(ctx, userResp.Role.Name)
+	userMetrix, err := u.caseManagementRepository.GetUserMetrix(ctx, user.Role.Name)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := u.logAccessSuccess(ctx, username); err != nil {
+	// Convert userMetrix to UserMetrixResponse
+	userMetrixResp := &model.UserMetrixResponse{
+		Role:        userMetrix.Role,
+		Create:      userMetrix.Create,
+		Update:      userMetrix.Update,
+		Delete:      userMetrix.Delete,
+		CreateEvent: userMetrix.CreateEvent,
+		UpdateEvent: userMetrix.UpdateEvent,
+		DeleteEvent: userMetrix.DeleteEvent,
+	}
+
+	if err := u.SaveAccessLog(ctx, req.Username, true); err != nil {
 		return nil, err
 	}
 
-	userMetrix := model.UserMetrixResponse{
-		Role:        userMetrixResp.Role,
-		Create:      userMetrixResp.Create,
-		Update:      userMetrixResp.Update,
-		Delete:      userMetrixResp.Delete,
-		CreateEvent: userMetrixResp.CreateEvent,
-		UpdateEvent: userMetrixResp.UpdateEvent,
-		DeleteEvent: userMetrixResp.DeleteEvent,
+	// Generate JWT token and set in cookie
+	token, err := u.GenerateToken(24*time.Hour, &appcore_model.Metadata{
+		UserID:   user.ID,
+		Username: req.Username,
+	})
+	if err != nil {
+		return nil, err
 	}
-	userResponse := u.mapToLoginResponse(username, userMetrix)
-	return &userResponse, nil
+
+	if err := u.setAccessTokenCookie(ctx, token); err != nil {
+		return nil, err
+	}
+
+	// Map and return response
+
+	resp := u.buildLoginResponse(user, userMetrixResp)
+	return &resp, nil
 }
 
-// Optional LDAP authentication logic
+// LDAP authentication
 func (u *UseCase) authenticateWithLDAP(username, password string) error {
 	conn, err := ldap.Dial("tcp", "192.168.129.239:389")
 	if err != nil {
@@ -54,54 +70,67 @@ func (u *UseCase) authenticateWithLDAP(username, password string) error {
 	}
 	defer conn.Close()
 
-	userBind := "HEADOFFICE\\" + username
-	if err := conn.Bind(userBind, password); err != nil {
-		detail := map[string]string{"ldap": "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"}
+	if err := conn.Bind("HEADOFFICE\\"+username, password); err != nil {
 		return appcore_handler.NewAppError(
 			appcore_handler.ErrNotFound.Code,
 			appcore_handler.ErrNotFound.Message,
 			appcore_handler.ErrNotFound.HTTPStatus,
-			detail,
+			map[string]string{"ldap": "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"},
 		)
 	}
 	return nil
 }
 
-func (u *UseCase) logAccessSuccess(ctx context.Context, username string) error {
-	accessLog := model.AccessLogs{
+// Save Log Access
+func (u *UseCase) SaveAccessLog(ctx context.Context, username string, success bool) error {
+	logResult := "success"
+	if !success {
+		logResult = "failed"
+	}
+
+	return u.caseManagementRepository.SaveAccessLog(ctx, model.AccessLogs{
 		Username:      username,
 		LogonDatetime: time.Now(),
-		LogonResult:   "success",
-	}
-	return u.SaveAccessLog(ctx, accessLog)
+		LogonResult:   logResult,
+	})
 }
 
-func (u *UseCase) SaveAccessLog(ctx context.Context, accessLog model.AccessLogs) error {
-	if err := u.caseManagementRepository.SaveAccessLog(ctx, accessLog); err != nil {
-		return appcore_handler.ErrInternalServer
-	}
+// Set access token in cookie
+func (u *UseCase) setAccessTokenCookie(c *gin.Context, token string) error {
+	isSecure := gin.Mode() == gin.ReleaseMode
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "access_token",
+		Value:    token,
+		Path:     "/",
+		MaxAge:   86400, // 1 วัน
+		HttpOnly: true,
+		Secure:   isSecure,
+		SameSite: http.SameSiteLaxMode,
+		Domain:   "localhost", // หรือเว้นว่างถ้าไม่ได้ข้ามโดเมน
+	})
 	return nil
 }
 
-func (u *UseCase) mapToLoginResponse(username string, metrix model.UserMetrixResponse) model.LoginResponse {
-	userMetrix := model.UserMetrixResponse{
-		Role:        metrix.Role,
-		Create:      metrix.Create,
-		Update:      metrix.Update,
-		Delete:      metrix.Delete,
-		CreateEvent: metrix.CreateEvent,
-		UpdateEvent: metrix.UpdateEvent,
-		DeleteEvent: metrix.DeleteEvent,
-	}
-
-	user := model.UserResponse{
-		Username:   username,
-		UserMetrix: userMetrix,
-	}
-
-	return model.LoginResponse{User: user}
-}
-
+// Token generation (pass-through)
 func (u *UseCase) GenerateToken(ttl time.Duration, metadata *appcore_model.Metadata) (string, error) {
 	return u.caseManagementRepository.GenerateToken(ttl, metadata)
+}
+
+// Build response from user + metrix
+func (u *UseCase) buildLoginResponse(user *model.User, metrix *model.UserMetrixResponse) model.LoginResponse {
+	return model.LoginResponse{
+		User: model.UserResponse{
+			Username: user.UserName,
+			UserMetrix: model.UserMetrixResponse{
+				Role:        metrix.Role,
+				Create:      metrix.Create,
+				Update:      metrix.Update,
+				Delete:      metrix.Delete,
+				CreateEvent: metrix.CreateEvent,
+				UpdateEvent: metrix.UpdateEvent,
+				DeleteEvent: metrix.DeleteEvent,
+			},
+		},
+	}
 }
