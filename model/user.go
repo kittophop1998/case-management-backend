@@ -5,14 +5,13 @@ import (
 	"time"
 
 	"encore.dev/types/uuid"
-	"gorm.io/gorm"
 )
 
 type Model struct {
-	ID        uint           `gorm:"primaryKey" json:"id"`
-	CreatedAt time.Time      `json:"createdAt"`
-	UpdatedAt time.Time      `json:"updatedAt"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"deletedAt"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	DeletedAt time.Time `gorm:"index" json:"deletedAt"`
 }
 
 type User struct {
@@ -21,11 +20,11 @@ type User struct {
 	Email    string `gorm:"type:varchar(100)" json:"email" example:"user@example.com"`
 	Team     string `gorm:"type:varchar(50)" json:"team" example:"CEN123456"`
 	IsActive *bool  `json:"isActive"`
-	CenterID uint   `json:"-"` // ไม่แสดงใน response
+	CenterID uint   `json:"centerID,omitempty"`
 	Center   Center `gorm:"foreignKey:CenterID" json:"center"`
-	RoleID   uint   `json:"-"` // ไม่แสดงใน response
+	RoleID   uint   `json:"roleID,omitempty"`
 	Role     Role   `gorm:"foreignKey:RoleID" json:"role"`
-	Name     string `gorm:"type:varchar(100)" json:"name"`
+	Name     string `gorm:"type:varchar(100)" json:"name" example:"John Doe"`
 }
 
 type UserFilter struct {
@@ -42,12 +41,12 @@ type UserFilter struct {
 
 type Role struct {
 	Model
-	Name string `gorm:"type:varchar(100)" json:"name"`
+	Name string `gorm:"type:varchar(100)" json:"name" example:"Admin"`
 }
 
 type Center struct {
 	Model
-	Name string `gorm:"type:varchar(100)" json:"name"`
+	Name string `gorm:"type:varchar(100)" json:"name" example:"Bangkok Center"`
 }
 
 type AccessLogs struct {
@@ -94,6 +93,13 @@ type UserMetrix struct {
 	DeleteBy       string    `gorm:"type:varchar(20)" json:"deleteBy"`
 }
 
+type ImportStatus struct {
+	Progress   int      `json:"progress"`
+	Errors     []string `json:"errors"`
+	Total      int      `json:"total"`
+	Successful int      `json:"successful"`
+}
+
 func (User) TableName() string {
 	return "users"
 }
@@ -108,4 +114,8 @@ func (Center) TableName() string {
 
 func (UserMetrix) TableName() string {
 	return "user_metrixes"
+}
+
+func (AccessLogs) TableName() string {
+	return "access_logs"
 }

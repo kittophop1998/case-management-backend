@@ -26,7 +26,7 @@ type Configurations struct {
 	MemphisUsername string
 	MemphisPassword string
 
-	//Storage
+	// Storage
 	MinioURL        string
 	MinioSSL        bool
 	MinioAccessKey  string
@@ -45,8 +45,14 @@ type Configurations struct {
 	// Treasure Data
 	TreasureDataWebsiteURL string
 
-	//Otel
+	// Otel
 	IsObserve bool
+
+	// IDap
+	IDapIP string
+
+	// Protocol
+	TCPProtocol string
 }
 
 // NewConfigurations returns a new Configuration object
@@ -68,6 +74,8 @@ func InitConfigurations() {
 	viper.SetDefault("SECRET_KEY", "")
 	viper.SetDefault("SYSTEM_I_URL", "")
 	viper.SetDefault("TREASURE_DATA_URL", "")
+	viper.SetDefault("IDAP_IP", "192.168.129.239:389")
+	viper.SetDefault("TCP_PROTOCOL", "tcp")
 
 	Config = &Configurations{
 		Mode:                   viper.GetString("mode"),
@@ -88,5 +96,7 @@ func InitConfigurations() {
 		IsObserve:              viper.GetBool("IS_OBSERVE"),
 		SystemIWebsiteURL:      viper.GetString("SYSTEM_I_URL"),
 		TreasureDataWebsiteURL: viper.GetString("TREASURE_DATA_URL"),
+		IDapIP:                 viper.GetString("IDAP_IP"),
+		TCPProtocol:            viper.GetString("TCP_PROTOCOL"),
 	}
 }

@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"case-management/appcore/appcore_config"
 	"case-management/appcore/appcore_handler"
 	"case-management/appcore/appcore_internal/appcore_model"
 	"case-management/model"
@@ -49,7 +50,7 @@ func (u *UseCase) Login(ctx context.Context, userLogin model.LoginRequest) (*mod
 
 // Optional LDAP authentication logic
 func (u *UseCase) authenticateWithLDAP(username, password string) error {
-	conn, err := ldap.Dial("tcp", "192.168.129.239:389")
+	conn, err := ldap.Dial(appcore_config.Config.TCPProtocol, appcore_config.Config.IDapIP)
 	if err != nil {
 		return appcore_handler.ErrInternalServer
 	}

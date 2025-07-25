@@ -162,6 +162,16 @@ func (h *Handler) DeleteUserByID(c *gin.Context) {
 	))
 }
 
+// UpdateUser godoc
+// @Summary Update user by ID
+// @Description Update user information by its ID
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Param user body model.UserFilter true "User update payload"
+// @Success 200 {object} model.MessageResponse
+// @Router /users/{id} [put]
 func (h *Handler) UpdateUser(c *gin.Context) {
 	var input model.UserFilter
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -211,6 +221,16 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 // 	c.JSON(http.StatusOK, gin.H{"message": "import success"})
 // }
 
+// ImportCSV godoc
+// @Summary Import users from CSV file
+// @Description Import user data from a CSV file asynchronously and track progress via task ID
+// @Tags Users
+// @Accept multipart/form-data
+// @Produce json
+// @Param file formData file true "CSV file to upload"
+// @Param taskID query string false "Optional task ID to track import progress"
+// @Success 202 {object} model.MessageResponse
+// @Router /users/import [post]
 func (h *Handler) ImportCSV(c *gin.Context) {
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -244,4 +264,16 @@ func (h *Handler) ImportCSV(c *gin.Context) {
 		"taskID":  taskID,
 	})
 
+}
+
+func (h *Handler) GetImportStatus(c *gin.Context) {
+	taskID := c.Query("taskID")
+	log.Printf("GetImportStatus called with taskID=%s", taskID)
+	if taskID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing taskID"})
+		return
+	}
+
+	status := utils.GetImportStatus(taskID)
+	c.JSON(http.StatusOK, status)
 }
