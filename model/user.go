@@ -63,14 +63,6 @@ type AccessLogs struct {
 	LogonResult   string          `gorm:"type:varchar(10)" json:"logonResult"`
 }
 
-type LoginRequest struct {
-	UserData string `json:"userData"`
-}
-
-type LoginResponse struct {
-	User UserResponse `json:"user"`
-}
-
 type UserResponse struct {
 	Username   string             `json:"username"`
 	UserMetrix UserMetrixResponse `json:"userMetrix"`

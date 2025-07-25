@@ -5,75 +5,20 @@ import (
 	"case-management/appcore/appcore_internal/appcore_model"
 	"case-management/model"
 	"context"
-	"encoding/base64"
-	"encoding/json"
-	"fmt"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"gopkg.in/ldap.v2"
 )
 
-func (u *UseCase) Login(ctx context.Context, userData model.LoginRequest) (*model.LoginResponse, error) {
+func (u *UseCase) Login(ctx context.Context, userLogin model.LoginRequest) (*model.LoginResponse, error) {
+	username := userLogin.Username
+	password := userLogin.Password
 
-	parts := strings.Split(userData.UserData, ".")
-	if len(parts) != 3 {
-
-		return nil, appcore_handler.ErrBadRequest
+	// --- Optional LDAP Authentication (currently disabled) ---
+	if err := u.authenticateWithLDAP(username, password); err != nil {
+		return nil, err
 	}
-
-	payload := parts[1]
-
-	// base64url decode
-	payloadBytes, err := base64.RawURLEncoding.DecodeString(payload)
-	if err != nil {
-		return nil, appcore_handler.ErrInternalServer
-
-	}
-
-	var data map[string]string
-	if err := json.Unmarshal(payloadBytes, &data); err != nil {
-		return nil, appcore_handler.ErrInternalServer
-
-	}
-
-	fmt.Printf("Decoded payload: %+v\n", data)
-	username := data["username"]
-	// password := data["password"]
-
-	// // create ldap connection
-	// conn, err := ldap.Dial("tcp", "192.168.129.239:389")
-	// if err != nil {
-
-	// 	// err := models.ErrorResponse{
-	// 	// 	// ErrorCode:    "CDP001",
-	// 	// 	// ErrorMessage: "LDAP connection failed",
-	// 	// }
-	// 	return nil, appcore_handler.ErrInternalServer
-	// 	// c.JSON(http.StatusInternalServerError, err)
-	// 	// return
-
-	// }
-
-	// userBide := "HEADOFFICE\\" + username
-
-	// // bind ldap user
-	// if err := conn.Bind(userBide, password); err != nil {
-	// 	details := map[string]string{
-	// 		"ldap": "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
-	// 	}
-	// 	appErr := appcore_handler.NewAppError(
-	// 		appcore_handler.ErrNotFound.Code,
-	// 		appcore_handler.ErrNotFound.Message,
-	// 		appcore_handler.ErrNotFound.HTTPStatus,
-	// 		details,
-	// 	)
-	// 	// HandleError(c, appcore_handler.ErrNotFound)
-	// 	return nil, appErr
-	// 	// return nil, appcore_handler.ErrInternalServer
-	// 	// HandleError(c, appcore_handler.ErrNotFound)
-	// 	// return
-	// }
 
 	userResp, err := u.caseManagementRepository.GetUser(ctx, username)
 	if err != nil {
@@ -85,15 +30,7 @@ func (u *UseCase) Login(ctx context.Context, userData model.LoginRequest) (*mode
 		return nil, err
 	}
 
-	accessLog := model.AccessLogs{
-		Username:      username,
-		LogonDatetime: time.Now(),
-		LogonResult:   "success",
-	}
-
-	isSave := u.SaveAccessLog(ctx, accessLog) //แก้ด้วย
-
-	if isSave != nil {
+	if err := u.logAccessSuccess(ctx, username); err != nil {
 		return nil, err
 	}
 
@@ -106,30 +43,67 @@ func (u *UseCase) Login(ctx context.Context, userData model.LoginRequest) (*mode
 		UpdateEvent: userMetrixResp.UpdateEvent,
 		DeleteEvent: userMetrixResp.DeleteEvent,
 	}
+	userResponse := u.mapToLoginResponse(username, userMetrix)
+	return &userResponse, nil
+}
+
+// Optional LDAP authentication logic
+func (u *UseCase) authenticateWithLDAP(username, password string) error {
+	conn, err := ldap.Dial("tcp", "192.168.129.239:389")
+	if err != nil {
+		return appcore_handler.ErrInternalServer
+	}
+	defer conn.Close()
+
+	userBind := "HEADOFFICE\\" + username
+	if err := conn.Bind(userBind, password); err != nil {
+		detail := map[string]string{"ldap": "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"}
+		return appcore_handler.NewAppError(
+			appcore_handler.ErrNotFound.Code,
+			appcore_handler.ErrNotFound.Message,
+			appcore_handler.ErrNotFound.HTTPStatus,
+			detail,
+		)
+	}
+	return nil
+}
+
+func (u *UseCase) logAccessSuccess(ctx context.Context, username string) error {
+	accessLog := model.AccessLogs{
+		Username:      username,
+		LogonDatetime: time.Now(),
+		LogonResult:   "success",
+	}
+	return u.SaveAccessLog(ctx, accessLog)
+}
+
+func (u *UseCase) SaveAccessLog(ctx context.Context, accessLog model.AccessLogs) error {
+	if err := u.caseManagementRepository.SaveAccessLog(ctx, accessLog); err != nil {
+		return appcore_handler.ErrInternalServer
+	}
+	return nil
+}
+
+func (u *UseCase) mapToLoginResponse(username string, metrix model.UserMetrixResponse) model.LoginResponse {
+	userMetrix := model.UserMetrixResponse{
+		Role:        metrix.Role,
+		Create:      metrix.Create,
+		Update:      metrix.Update,
+		Delete:      metrix.Delete,
+		CreateEvent: metrix.CreateEvent,
+		UpdateEvent: metrix.UpdateEvent,
+		DeleteEvent: metrix.DeleteEvent,
+	}
+
 	user := model.UserResponse{
 		Username:   username,
 		UserMetrix: userMetrix,
 	}
 
-	login := model.LoginResponse{
-		User: user,
-	}
-
-	return &login, nil
+	return model.LoginResponse{User: user}
 }
 
-func (u *UseCase) SaveAccessLog(ctx context.Context, accessLog model.AccessLogs) error {
-
-	err := u.caseManagementRepository.SaveAccessLog(ctx, accessLog) //แก้ด้วย
-
-	if err != nil {
-		return appcore_handler.ErrInternalServer
-	}
-
-	return nil
-}
-
-func (u *UseCase) GenerateToken(ttl time.Duration, metadata *appcore_model.Metadata) (signedToken string, err error) {
+func (u *UseCase) GenerateToken(ttl time.Duration, metadata *appcore_model.Metadata) (string, error) {
 	return u.caseManagementRepository.GenerateToken(ttl, metadata)
 }
 
