@@ -5,6 +5,7 @@ import (
 	"case-management/model"
 	"context"
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -81,7 +82,11 @@ func ParseUint(s string) uint {
 
 func SetImportStatus(taskID string, status model.ImportStatus) {
 	ctx := context.Background()
-	jsonData, _ := json.Marshal(status)
+	jsonData, err := json.Marshal(status)
+	if err != nil {
+		fmt.Printf("Error marshaling ImportStatus for taskID %s: %v\n", taskID, err)
+		return
+	}
 	appcore_cache.Cache.Set(ctx, taskID, jsonData, 10*time.Minute)
 }
 
@@ -92,6 +97,9 @@ func GetImportStatus(taskID string) model.ImportStatus {
 		return model.ImportStatus{}
 	}
 	var status model.ImportStatus
-	json.Unmarshal([]byte(val), &status)
+	if err := json.Unmarshal([]byte(val), &status); err != nil {
+		fmt.Printf("Error unmarshaling ImportStatus for taskID %s: %v\n", taskID, err)
+		return model.ImportStatus{}
+	}
 	return status
 }
