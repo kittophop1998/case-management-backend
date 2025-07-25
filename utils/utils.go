@@ -7,7 +7,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/google/uuid"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -78,6 +81,10 @@ func ParseUint(s string) uint {
 		return 0
 	}
 	return uint(val)
+}
+
+func ParseUUID(s string) (uuid.UUID, error) {
+	return uuid.Parse(strings.TrimSpace(s))
 }
 
 func SetImportStatus(taskID string, status model.ImportStatus) {

@@ -7,19 +7,47 @@ definitions:
       deletedAt:
         type: string
       id:
-        type: integer
+        type: string
       name:
         example: Bangkok Center
         type: string
       updatedAt:
         type: string
     type: object
+  model.CreateUserRequest:
+    properties:
+      agentId:
+        example: "12337"
+        type: string
+      centerId:
+        example: b94eee08-8324-4d4f-b166-d82775553a7e
+        type: string
+      email:
+        example: Janet@exam.com
+        type: string
+      isActive:
+        example: true
+        type: boolean
+      operatorId:
+        example: "1233"
+        type: string
+      roleId:
+        example: 538cd6c5-4cb3-4463-b7d5-ac6645815476
+        type: string
+      team:
+        example: Inbound
+        type: string
+      userName:
+        example: Janet Adebayo
+        type: string
+    type: object
   model.CreateUserResponse:
     properties:
-      message:
-        type: string
-      userId:
-        type: integer
+      data:
+        properties:
+          id:
+            type: string
+        type: object
     type: object
   model.DeleteUserResponse:
     properties:
@@ -39,7 +67,7 @@ definitions:
       deletedAt:
         type: string
       id:
-        type: integer
+        type: string
       name:
         example: Admin
         type: string
@@ -51,7 +79,7 @@ definitions:
       center:
         $ref: '#/definitions/model.Center'
       centerID:
-        type: integer
+        type: string
       createdAt:
         type: string
       deletedAt:
@@ -60,7 +88,7 @@ definitions:
         example: user@example.com
         type: string
       id:
-        type: integer
+        type: string
       isActive:
         type: boolean
       name:
@@ -69,7 +97,7 @@ definitions:
       role:
         $ref: '#/definitions/model.Role'
       roleID:
-        type: integer
+        type: string
       team:
         example: CEN123456
         type: string
@@ -83,22 +111,22 @@ definitions:
     properties:
       center:
         type: string
-      centerId:
-        type: integer
+      centerID:
+        type: string
       isActive:
         type: boolean
       name:
         type: string
       role:
         type: string
-      roleId:
-        type: integer
+      roleID:
+        type: string
       sort:
         type: string
       team:
         type: string
-      teamId:
-        type: integer
+      teamID:
+        type: string
     type: object
 host: localhost:8000
 info:
@@ -141,7 +169,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/model.User'
+          $ref: '#/definitions/model.CreateUserRequest'
       produces:
       - application/json
       responses:
@@ -239,9 +267,7 @@ paths:
         "202":
           description: Accepted
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/model.MessageResponse'
       summary: Import users from CSV file
       tags:
       - Users
