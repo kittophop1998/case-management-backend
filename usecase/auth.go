@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (u *UseCase) Login(ctx context.Context, userData model.LoginRequest) (*model.LoginResponse, error) {
@@ -129,4 +131,16 @@ func (u *UseCase) SaveAccessLog(ctx context.Context, accessLog model.AccessLogs)
 
 func (u *UseCase) GenerateToken(ttl time.Duration, metadata *appcore_model.Metadata) (signedToken string, err error) {
 	return u.caseManagementRepository.GenerateToken(ttl, metadata)
+}
+
+func (u *UseCase) StoreToken(c *gin.Context, accessToken string) error {
+	return u.caseManagementRepository.StoreToken(c, accessToken)
+}
+
+func (u *UseCase) ValidateToken(signedToken string) (*appcore_model.JwtClaims, error) {
+	return u.caseManagementRepository.ValidateToken(signedToken)
+}
+
+func (u *UseCase) DeleteToken(c *gin.Context, accessToken string) error {
+	return u.caseManagementRepository.DeleteToken(c, accessToken)
 }

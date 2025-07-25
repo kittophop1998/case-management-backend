@@ -4,10 +4,13 @@ import (
 	"case-management/appcore/appcore_handler"
 	"case-management/appcore/appcore_internal/appcore_model"
 	"case-management/model"
+	"case-management/utils"
+	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // CreateUser godoc
@@ -185,6 +188,29 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "user updated successfully"})
 }
 
+// func (h *Handler) ImportCSV(c *gin.Context) {
+// 	file, err := c.FormFile("file")
+// 	if err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot get file"})
+// 		return
+// 	}
+
+// 	src, err := file.Open()
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot open file"})
+// 		return
+// 	}
+// 	defer src.Close()
+
+// 	err = h.UseCase.ImportUsersFromCSV(c, src)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+// 		return
+// 	}
+
+// 	c.JSON(http.StatusOK, gin.H{"message": "import success"})
+// }
+
 func (h *Handler) ImportCSV(c *gin.Context) {
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -199,11 +225,22 @@ func (h *Handler) ImportCSV(c *gin.Context) {
 	}
 	defer src.Close()
 
-	err = h.UseCase.ImportUsersFromCSV(c, src)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+	taskID := c.Query("taskID")
+	if taskID == "" {
+		taskID = uuid.NewString()
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "import success"})
+	go func() {
+		err := h.UseCase.ImportUsersFromCSVWithProgress(c, src, taskID)
+		if err != nil {
+			log.Printf("Import error: %v", err)
+			utils.SetProgress(taskID, 100) // จบด้วย error ก็ให้ progress เต็มไว้ก่อน
+		}
+	}()
+
+	c.JSON(http.StatusAccepted, gin.H{
+		"message": "import started",
+		"taskID":  taskID,
+	})
+
 }

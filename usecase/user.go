@@ -2,11 +2,12 @@ package usecase
 
 import (
 	"case-management/model"
+	"case-management/utils"
 	"context"
 	"encoding/csv"
 	"fmt"
 	"io"
-	"strconv"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -61,7 +62,43 @@ func (u *UseCase) UpdateUser(c *gin.Context, userID uint, input model.UserFilter
 	return u.caseManagementRepository.UpdateUser(c, userID, input)
 }
 
-func (u *UseCase) ImportUsersFromCSV(c context.Context, file io.Reader) error {
+// func (u *UseCase) ImportUsersFromCSV(c context.Context, file io.Reader) error {
+// 	reader := csv.NewReader(file)
+// 	reader.TrimLeadingSpace = true
+
+// 	// อ่าน header
+// 	_, err := reader.Read()
+// 	if err != nil {
+// 		return fmt.Errorf("cannot read csv header: %v", err)
+// 	}
+
+// 	var users []model.User
+// 	for {
+// 		record, err := reader.Read()
+// 		if err == io.EOF {
+// 			break
+// 		}
+// 		if err != nil {
+// 			return fmt.Errorf("error reading csv: %v", err)
+// 		}
+
+// 		isActive := record[ColIsActive] == "true"
+// 		user := model.User{
+// 			UserName: record[ColUserName],
+// 			Email:    record[ColEmail],
+// 			Team:     record[ColTeam],
+// 			IsActive: &isActive,
+// 			CenterID: parseUint(record[ColCenterID]),
+// 			RoleID:   parseUint(record[ColRoleID]),
+// 			Name:     record[ColName],
+// 		}
+// 		users = append(users, user)
+// 	}
+
+// 	return u.caseManagementRepository.BulkInsertUsers(c, users)
+// }
+
+func (u *UseCase) ImportUsersFromCSVWithProgress(c context.Context, file io.Reader, taskID string) error {
 	reader := csv.NewReader(file)
 	reader.TrimLeadingSpace = true
 
@@ -71,36 +108,41 @@ func (u *UseCase) ImportUsersFromCSV(c context.Context, file io.Reader) error {
 		return fmt.Errorf("cannot read csv header: %v", err)
 	}
 
-	var users []model.User
+	var successCount int
+	var total int
 	for {
 		record, err := reader.Read()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			return fmt.Errorf("error reading csv: %v", err)
+			log.Printf("error reading csv line: %v", err)
+			continue
 		}
-
+		total++
 		isActive := record[ColIsActive] == "true"
+
 		user := model.User{
 			UserName: record[ColUserName],
 			Email:    record[ColEmail],
 			Team:     record[ColTeam],
 			IsActive: &isActive,
-			CenterID: parseUint(record[ColCenterID]),
-			RoleID:   parseUint(record[ColRoleID]),
+			CenterID: utils.ParseUint(record[ColCenterID]),
+			RoleID:   utils.ParseUint(record[ColRoleID]),
 			Name:     record[ColName],
 		}
-		users = append(users, user)
+
+		err = u.caseManagementRepository.BulkInsertUsers(c, []model.User{user})
+		if err != nil {
+			log.Printf("failed to insert user %v: %v", user.Email, err)
+			continue
+		}
+
+		successCount++
+		progress := int(float64(successCount) / float64(total) * 100)
+		utils.SetProgress(taskID, progress)
 	}
 
-	return u.caseManagementRepository.BulkInsertUsers(c, users)
-}
-
-func parseUint(s string) uint {
-	val, err := strconv.ParseUint(s, 10, 32)
-	if err != nil {
-		return 0
-	}
-	return uint(val)
+	utils.SetProgress(taskID, 100) // จบ process
+	return nil
 }

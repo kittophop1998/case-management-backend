@@ -54,6 +54,9 @@ func main() {
 		panic(err.Error())
 	}
 
+	// ! Seeder
+	model.SeedRoles(appcore_store.DBStore)
+
 	caseManagementRepo := repository.New(appcore_store.DBStore, appcore_logger.Logger, appcore_cache.Cache)
 	caseManagementUseCase := usecase.New(caseManagementRepo, appcore_cache.Cache, appcore_logger.Logger)
 	caseManagementHandler := handler.NewHandler(caseManagementUseCase, appcore_logger.Logger)
