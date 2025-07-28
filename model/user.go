@@ -13,7 +13,7 @@ type User struct {
 	Email    string    `gorm:"type:varchar(100)" json:"email" example:"user@example.com"`
 	Team     string    `gorm:"type:varchar(50)" json:"team" example:"CEN123456"`
 	IsActive *bool     `json:"isActive"`
-	CenterID uint      `json:"-"` // ไม่แสดงใน response
+	CenterID uuid.UUID `json:"-"` // ไม่แสดงใน response
 	Center   Center    `gorm:"foreignKey:CenterID" json:"center"`
 	RoleID   uuid.UUID `json:"-"` // ไม่แสดงใน response
 	Role     Role      `gorm:"foreignKey:RoleID" json:"role"`
@@ -30,11 +30,6 @@ type UserFilter struct {
 	RoleID   uint   `json:"roleId"`
 	TeamID   uint   `json:"teamId"`
 	CenterID uint   `json:"centerId"`
-}
-
-type Center struct {
-	Model
-	Name string `gorm:"type:varchar(100)" json:"name"`
 }
 
 type AccessLogs struct {
@@ -74,10 +69,6 @@ type UserMetrix struct {
 
 func (User) TableName() string {
 	return "users"
-}
-
-func (Center) TableName() string {
-	return "centers"
 }
 
 func (UserMetrix) TableName() string {

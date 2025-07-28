@@ -65,7 +65,7 @@ func InitConfigurations() {
 	viper.SetDefault("MINIO_ACCESS_KEY", "minioadmin")
 	viper.SetDefault("MINIO_SECRET_KEY", "minioadmin")
 	viper.SetDefault("MINIO_BUCKET_NAME", "miniobucket")
-	viper.SetDefault("SECRET_KEY", "")
+	viper.SetDefault("SECRET_KEY", "case_management_secret_key")
 	viper.SetDefault("SYSTEM_I_URL", "")
 	viper.SetDefault("TREASURE_DATA_URL", "")
 

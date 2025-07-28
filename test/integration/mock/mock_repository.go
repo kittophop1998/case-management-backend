@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type MockRepository struct{}
@@ -15,11 +16,11 @@ func (m *MockRepository) GetAllUsers(c *gin.Context, limit, offset int, filter m
 	return nil, nil
 }
 
-func (m *MockRepository) GetUserByID(c *gin.Context, id string) (*model.User, error) {
+func (m *MockRepository) GetUserByID(c *gin.Context, id uuid.UUID) (*model.User, error) {
 	return nil, nil
 }
 
-func (m *MockRepository) CreateUser(c *gin.Context, user *model.User) (uint, error) {
+func (m *MockRepository) CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error) {
 	return user.ID, nil
 }
 
@@ -39,7 +40,7 @@ func (m *MockRepository) UpdateUser(c *gin.Context, userID uint, input model.Use
 	return nil
 }
 
-func (m *MockRepository) GetUser(ctx context.Context, username string) (*model.User, error) {
+func (m *MockRepository) GetUserByUserName(c *gin.Context, username string) (*model.User, error) {
 	return nil, nil
 }
 

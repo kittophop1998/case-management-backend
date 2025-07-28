@@ -9,19 +9,17 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
-const tableUserMetrix = "user_metrixes"
-const tableUser = "users"
-
-func (a *authRepo) CreateUser(c *gin.Context, user *model.User) (uint, error) {
+func (a *authRepo) CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error) {
 	a.Logger.Info("Creating user", slog.String("username", user.UserName))
 
 	// Save to DB
 	if err := a.DB.Create(user).Error; err != nil {
 		a.Logger.Error("Failed to create user", slog.Any("error", err))
-		return 0, err
+		return uuid.Nil, err
 	}
 
 	a.Logger.Info("User created successfully", slog.Any("user_id", user.ID))
@@ -95,15 +93,45 @@ func (r *authRepo) CountUsers(c *gin.Context) (int, error) {
 	return int(count), nil
 }
 
-func (r *authRepo) GetUserByID(c *gin.Context, id string) (*model.User, error) {
+func (r *authRepo) GetUserByID(c *gin.Context, id uuid.UUID) (*model.User, error) {
 	var user model.User
 	if err := r.DB.WithContext(c).
 		Preload("Role").
 		Preload("Center").
+		Preload("Role.Permissions").
 		Where("users.id = ?", id).
 		First(&user).Error; err != nil {
 		return nil, err
 	}
+
+	return &user, nil
+}
+
+func (r *authRepo) GetUserByUserName(c *gin.Context, username string) (*model.User, error) {
+	var user model.User
+
+	if err := r.DB.WithContext(c).
+		Preload("Role").
+		Preload("Center").
+		Preload("Role.Permissions").
+		Where("user_name = ?", username).
+		First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			details := map[string]string{
+				"db": "ไม่พบผู้ใช้ในระบบ",
+			}
+			appErr := appcore_handler.NewAppError(
+				appcore_handler.ErrNotFound.Code,
+				appcore_handler.ErrNotFound.Message,
+				appcore_handler.ErrNotFound.HTTPStatus,
+				details,
+			)
+			return nil, appErr
+		}
+
+		return nil, appcore_handler.ErrInternalServer
+	}
+
 	return &user, nil
 }
 
@@ -142,29 +170,6 @@ func (r *authRepo) UpdateUser(c *gin.Context, userID uint, input model.UserFilte
 	}
 
 	return nil
-}
-
-func (r *authRepo) GetUser(ctx context.Context, username string) (*model.User, error) {
-	var user model.User
-
-	if err := r.DB.WithContext(ctx).Table(tableUser).Where("username = ?", username).First(&user).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			details := map[string]string{
-				"db": "ไม่พบผู้ใช้ในระบบ",
-			}
-			appErr := appcore_handler.NewAppError(
-				appcore_handler.ErrNotFound.Code,
-				appcore_handler.ErrNotFound.Message,
-				appcore_handler.ErrNotFound.HTTPStatus,
-				details,
-			)
-			return nil, appErr
-		}
-
-		return nil, appcore_handler.ErrInternalServer
-	}
-
-	return &user, nil
 }
 
 func (r *authRepo) BulkInsertUsers(c context.Context, users []model.User) error {

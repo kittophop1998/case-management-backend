@@ -1,17 +1,20 @@
 package appcore_model
 
-import "github.com/golang-jwt/jwt"
+import (
+	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
+)
 
 type Metadata struct {
-	TokenID       string   `json:"token_id"`
-	UserID        uint     `json:"user_id"`
-	Email         string   `json:"email"`
-	PartnerID     uint     `json:"partner_id"`
-	ConsentStatus uint     `json:"consent_status"`
-	Username      string   `json:"username"`
-	Owner         string   `json:"owner"`
-	Permissions   []string `json:"permissions"`
-	Roles         []string `json:"roles"`
+	TokenId       string    `json:"tokenId"`
+	UserId        uuid.UUID `json:"userId"`
+	Email         string    `json:"email"`
+	PartnerID     uint      `json:"partner_id"`
+	ConsentStatus uint      `json:"consent_status"`
+	Username      string    `json:"username"`
+	Owner         string    `json:"owner"`
+	Permissions   []string  `json:"permissions"`
+	Roles         []string  `json:"roles"`
 }
 
 type JwtClaims struct {

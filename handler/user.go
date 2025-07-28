@@ -106,23 +106,24 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 // @Router       /users/{id} [get]
 func (h *Handler) GetUserByID(c *gin.Context) {
 	idParam := c.Param("id")
-	id, err := strconv.Atoi(idParam)
-	if err != nil || id < 1 {
+	uid, err := uuid.Parse(idParam)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(
-			err.Error(),
-			errorInvalidRequest,
+			"Invalid user ID format",
+			"invalid_uuid",
 		))
 		return
 	}
 
-	user, err := h.UseCase.GetUserByID(c, idParam)
+	user, err := h.UseCase.GetUserByID(c, uid)
 	if err != nil {
 		c.JSON(http.StatusNotFound, appcore_handler.NewResponseError(
-			err.Error(),
-			"user not found",
+			"User not found",
+			"user_not_found",
 		))
 		return
 	}
+
 	c.JSON(http.StatusOK, appcore_handler.NewResponseObject(user))
 }
 
@@ -162,6 +163,15 @@ func (h *Handler) DeleteUserByID(c *gin.Context) {
 	))
 }
 
+// UpdateUser godoc
+// @Summary Update user by ID
+// @Description Update user information by ID
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 string "User updated successfully"
+// @Router /users/{id} [put]
 func (h *Handler) UpdateUser(c *gin.Context) {
 	var input model.UserFilter
 	if err := c.ShouldBindJSON(&input); err != nil {

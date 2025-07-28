@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func (h *Handler) Login(c *gin.Context) {
@@ -44,13 +45,19 @@ func (h *Handler) Login(c *gin.Context) {
 }
 
 func (h *Handler) Profile(c *gin.Context) {
-	userId, exists := c.Get("user_id")
+	userId, exists := c.Get("userId")
 	if !exists {
 		appcore_handler.HandleError(c, appcore_handler.ErrBadRequest)
 		return
 	}
 
-	resp, err := h.UseCase.GetUserByID(c, userId.(string))
+	uid, ok := userId.(uuid.UUID)
+	if !ok {
+		appcore_handler.HandleError(c, appcore_handler.ErrBadRequest)
+		return
+	}
+
+	resp, err := h.UseCase.GetUserByID(c, uid)
 	if err != nil {
 		appcore_handler.HandleError(c, err)
 		return

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -19,15 +20,15 @@ type UseCase struct {
 }
 
 type CaseManagementRepository interface {
-	CreateUser(c *gin.Context, user *model.User) (uint, error)
+	CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error)
 	GetAllUsers(c *gin.Context, limit, offset int, filter model.UserFilter) ([]*model.User, error)
-	GetUserByID(c *gin.Context, id string) (*model.User, error)
+	GetUserByID(c *gin.Context, id uuid.UUID) (*model.User, error)
 	DeleteUserByID(c *gin.Context, id string) error
 	CountUsers(c *gin.Context) (int, error)
 	CountUsersWithFilter(c *gin.Context, filter model.UserFilter) (int, error)
 	UpdateUser(c *gin.Context, userID uint, input model.UserFilter) error
 	SaveAccessLog(ctx context.Context, accessLog model.AccessLogs) error
-	GetUser(ctx context.Context, username string) (*model.User, error)
+	GetUserByUserName(c *gin.Context, username string) (*model.User, error)
 	GenerateToken(ttl time.Duration, metadata *appcore_model.Metadata) (signedToken string, err error)
 	BulkInsertUsers(c context.Context, users []model.User) error
 	StoreToken(c *gin.Context, accessToken string) error

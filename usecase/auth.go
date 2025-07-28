@@ -9,11 +9,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"gopkg.in/ldap.v2"
 )
 
-func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.UserResponse, error) {
+func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.User, error) {
 	// Check if it's a hardcoded admin login
 	if isAdminLogin(req) {
 		return u.loginAsAdmin(ctx, req.Username)
@@ -25,14 +24,14 @@ func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.UserRe
 	}
 
 	// Fetch user from DB
-	user, err := u.caseManagementRepository.GetUser(ctx, req.Username)
+	user, err := u.caseManagementRepository.GetUserByUserName(ctx, req.Username)
 	if err != nil {
 		return nil, err
 	}
 
 	// Generate token and set cookie
 	token, err := u.GenerateToken(24*time.Hour, &appcore_model.Metadata{
-		UserID:   user.ID,
+		UserId:   user.ID,
 		Username: user.UserName,
 	})
 	if err != nil {
@@ -42,19 +41,19 @@ func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.UserRe
 		return nil, err
 	}
 
-	// Map to response
-	resp := &model.UserResponse{
-		Username: user.UserName,
-		RoleId:   user.Role.ID,
-		Role:     user.Role,
-	}
-	return resp, nil
+	return user, nil
 }
 
 // loginAsAdmin handles hardcoded admin login
-func (u *UseCase) loginAsAdmin(ctx *gin.Context, username string) (*model.UserResponse, error) {
+func (u *UseCase) loginAsAdmin(ctx *gin.Context, username string) (*model.User, error) {
+	// Check if the user exists
+	user, err := u.caseManagementRepository.GetUserByUserName(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+
 	token, err := u.GenerateToken(24*time.Hour, &appcore_model.Metadata{
-		UserID:   1,
+		UserId:   user.ID,
 		Username: username,
 	})
 	if err != nil {
@@ -64,15 +63,7 @@ func (u *UseCase) loginAsAdmin(ctx *gin.Context, username string) (*model.UserRe
 		return nil, err
 	}
 
-	adminRoleID := uuid.MustParse("00000000-0000-0000-0000-000000000001")
-	return &model.UserResponse{
-		Username: username,
-		RoleId:   adminRoleID,
-		Role: model.Role{
-			ID:   adminRoleID,
-			Name: "Admin",
-		},
-	}, nil
+	return user, nil
 }
 
 // isAdminLogin checks if login credentials match hardcoded admin
@@ -134,12 +125,15 @@ func (u *UseCase) setAccessTokenCookie(c *gin.Context, token string) error {
 func (u *UseCase) GenerateToken(ttl time.Duration, metadata *appcore_model.Metadata) (string, error) {
 	return u.caseManagementRepository.GenerateToken(ttl, metadata)
 }
+
 func (u *UseCase) StoreToken(c *gin.Context, token string) error {
 	return u.caseManagementRepository.StoreToken(c, token)
 }
+
 func (u *UseCase) ValidateToken(signedToken string) (*appcore_model.JwtClaims, error) {
 	return u.caseManagementRepository.ValidateToken(signedToken)
 }
+
 func (u *UseCase) DeleteToken(c *gin.Context, token string) error {
 	return u.caseManagementRepository.DeleteToken(c, token)
 }

@@ -23,10 +23,10 @@ const (
 	ColName     = 6
 )
 
-func (u *UseCase) CreateUser(c *gin.Context, user *model.User) (uint, error) {
+func (u *UseCase) CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error) {
 	id, err := u.caseManagementRepository.CreateUser(c, user)
 	if err != nil {
-		return 0, err
+		return uuid.Nil, err
 	}
 	return id, nil
 }
@@ -47,7 +47,7 @@ func (u *UseCase) GetAllUsers(c *gin.Context, page, limit int, filter model.User
 	return users, total, nil
 }
 
-func (u *UseCase) GetUserByID(c *gin.Context, id string) (*model.User, error) {
+func (u *UseCase) GetUserByID(c *gin.Context, id uuid.UUID) (*model.User, error) {
 	return u.caseManagementRepository.GetUserByID(c, id)
 }
 
@@ -128,7 +128,7 @@ func (u *UseCase) ImportUsersFromCSVWithProgress(c context.Context, file io.Read
 			Email:    record[ColEmail],
 			Team:     record[ColTeam],
 			IsActive: &isActive,
-			CenterID: utils.ParseUint(record[ColCenterID]),
+			CenterID: uuid.MustParse(record[ColCenterID]),
 			RoleID:   uuid.MustParse(record[ColRoleID]),
 			Name:     record[ColName],
 		}
