@@ -14,7 +14,7 @@ import (
 )
 
 func (a *authRepo) CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error) {
-	a.Logger.Info("Creating user", slog.String("username", user.UserName))
+	a.Logger.Info("Creating user", slog.String("username", user.Username))
 
 	// Save to DB
 	if err := a.DB.Create(user).Error; err != nil {
@@ -114,7 +114,7 @@ func (r *authRepo) GetUserByUserName(c *gin.Context, username string) (*model.Us
 		Preload("Role").
 		Preload("Center").
 		Preload("Role.Permissions").
-		Where("user_name = ?", username).
+		Where("username = ?", username).
 		First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			details := map[string]string{

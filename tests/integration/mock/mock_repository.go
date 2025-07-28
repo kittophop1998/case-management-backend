@@ -21,6 +21,14 @@ func (m *MockRepository) GetUserByID(c *gin.Context, id uuid.UUID) (*model.User,
 }
 
 func (m *MockRepository) CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error) {
+	if user.ID == uuid.Nil {
+		newID, err := uuid.NewUUID()
+		if err != nil {
+			return uuid.Nil, err
+		}
+		user.ID = newID
+	}
+
 	return user.ID, nil
 }
 

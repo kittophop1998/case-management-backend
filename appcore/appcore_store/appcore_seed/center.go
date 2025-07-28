@@ -20,7 +20,7 @@ func SeedCenter(db *gorm.DB) map[string]uuid.UUID {
 
 		err := db.Where("name = ?", center.Name).FirstOrCreate(&r, center).Error
 		if err != nil {
-			log.Printf("failed to seed role %s: %v", center.Name, err)
+			log.Printf("failed to seed center %s: %v", center.Name, err)
 		} else {
 			centerMaps[center.Name] = r.ID
 		}

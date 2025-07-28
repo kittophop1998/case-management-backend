@@ -14,7 +14,6 @@ func Migrate() error {
 		&model.Role{},
 		&model.User{},
 		&model.AccessLogs{},
-		&model.Role{},
 		&model.Permission{},
 		&model.RolePermission{},
 	); err != nil {

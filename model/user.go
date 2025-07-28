@@ -9,7 +9,7 @@ import (
 
 type User struct {
 	Model
-	UserName string    `gorm:"type:varchar(50)" json:"userName" example:"john.doe"`
+	Username string    `gorm:"type:varchar(50)" json:"username" example:"john.doe"`
 	Email    string    `gorm:"type:varchar(100)" json:"email" example:"user@example.com"`
 	Team     string    `gorm:"type:varchar(50)" json:"team" example:"CEN123456"`
 	IsActive *bool     `json:"isActive"`

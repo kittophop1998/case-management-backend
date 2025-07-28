@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"case-management/appcore/appcore_config"
 	"case-management/appcore/appcore_handler"
 	"case-management/appcore/appcore_internal/appcore_model"
 	"case-management/model"
@@ -32,7 +33,7 @@ func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.User, 
 	// Generate token and set cookie
 	token, err := u.GenerateToken(24*time.Hour, &appcore_model.Metadata{
 		UserId:   user.ID,
-		Username: user.UserName,
+		Username: user.Username,
 	})
 	if err != nil {
 		return nil, err
@@ -68,12 +69,12 @@ func (u *UseCase) loginAsAdmin(ctx *gin.Context, username string) (*model.User, 
 
 // isAdminLogin checks if login credentials match hardcoded admin
 func isAdminLogin(req model.LoginRequest) bool {
-	return req.Username == "admin" || req.Password == "admin"
+	return req.Username == "admin" && req.Password == "admin"
 }
 
 // authenticateWithLDAP authenticates via external LDAP
 func (u *UseCase) authenticateWithLDAP(username, password string) error {
-	conn, err := ldap.Dial("tcp", "192.168.129.239:389")
+	conn, err := ldap.Dial("tcp", appcore_config.Config.LdapURL)
 	if err != nil {
 		return appcore_handler.ErrInternalServer
 	}

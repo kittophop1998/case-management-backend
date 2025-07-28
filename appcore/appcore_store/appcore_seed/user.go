@@ -10,7 +10,7 @@ import (
 func SeedUser(db *gorm.DB, roleMap, centerMap map[string]uuid.UUID) {
 	users := []model.User{
 		{
-			UserName: "admin",
+			Username: "admin",
 			Team:     "BKK",
 			CenterID: centerMap["BKK"],
 			RoleID:   roleMap["Admin"],
@@ -19,7 +19,7 @@ func SeedUser(db *gorm.DB, roleMap, centerMap map[string]uuid.UUID) {
 
 	for _, user := range users {
 		var existingUser model.User
-		if err := db.Where("user_name = ?", user.UserName).First(&existingUser).Error; err != nil {
+		if err := db.Where("username = ?", user.Username).First(&existingUser).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
 				// User does not exist, create it
 				if err := db.Create(&user).Error; err != nil {

@@ -124,7 +124,7 @@ func (u *UseCase) ImportUsersFromCSVWithProgress(c context.Context, file io.Read
 		isActive := record[ColIsActive] == "true"
 
 		user := model.User{
-			UserName: record[ColUserName],
+			Username: record[ColUserName],
 			Email:    record[ColEmail],
 			Team:     record[ColTeam],
 			IsActive: &isActive,
