@@ -24,7 +24,7 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		userRoutes.GET("/:id", h.GetUserByID)
 		userRoutes.PUT("/:id", h.UpdateUser)
 		userRoutes.DELETE("/:id", h.DeleteUserByID)
-		userRoutes.POST("/import", h.ImportCSV)
+		// userRoutes.POST("/import", h.ImportCSV)
 	}
 
 	// Refresh token api

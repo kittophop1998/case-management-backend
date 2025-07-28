@@ -4,8 +4,6 @@ import (
 	"case-management/appcore/appcore_handler"
 	"case-management/appcore/appcore_internal/appcore_model"
 	"case-management/model"
-	"case-management/utils"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -231,49 +229,49 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 // @Param taskID query string false "Optional task ID to track import progress"
 // @Success 202 {object} model.MessageResponse
 // @Router /users/import [post]
-func (h *Handler) ImportCSV(c *gin.Context) {
-	file, err := c.FormFile("file")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot get file"})
-		return
-	}
+// func (h *Handler) ImportCSV(c *gin.Context) {
+// 	file, err := c.FormFile("file")
+// 	if err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot get file"})
+// 		return
+// 	}
 
-	src, err := file.Open()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot open file"})
-		return
-	}
-	defer src.Close()
+// 	src, err := file.Open()
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot open file"})
+// 		return
+// 	}
+// 	defer src.Close()
 
-	taskID := c.Query("taskID")
-	if taskID == "" {
-		taskID = uuid.NewString()
-	}
+// 	taskID := c.Query("taskID")
+// 	if taskID == "" {
+// 		taskID = uuid.NewString()
+// 	}
 
-	cCopy := c.Copy()
-	go func() {
-		err := h.UseCase.ImportUsersFromCSVWithProgress(cCopy, src, taskID)
-		if err != nil {
-			log.Printf("Import error: %v", err)
-			utils.SetProgress(taskID, 100)
-		}
-	}()
+// 	cCopy := c.Copy()
+// 	go func() {
+// 		err := h.UseCase.ImportUsersFromCSVWithProgress(cCopy, src, taskID)
+// 		if err != nil {
+// 			log.Printf("Import error: %v", err)
+// 			utils.SetProgress(taskID, 100)
+// 		}
+// 	}()
 
-	c.JSON(http.StatusAccepted, gin.H{
-		"message": "import started",
-		"taskID":  taskID,
-	})
+// 	c.JSON(http.StatusAccepted, gin.H{
+// 		"message": "import started",
+// 		"taskID":  taskID,
+// 	})
 
-}
+// }
 
-func (h *Handler) GetImportStatus(c *gin.Context) {
-	taskID := c.Query("taskID")
-	log.Printf("GetImportStatus called with taskID=%s", taskID)
-	if taskID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing taskID"})
-		return
-	}
+// func (h *Handler) GetImportStatus(c *gin.Context) {
+// 	taskID := c.Query("taskID")
+// 	log.Printf("GetImportStatus called with taskID=%s", taskID)
+// 	if taskID == "" {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "missing taskID"})
+// 		return
+// 	}
 
-	status := utils.GetImportStatus(taskID)
-	c.JSON(http.StatusOK, status)
-}
+// 	status := utils.GetImportStatus(taskID)
+// 	c.JSON(http.StatusOK, status)
+// }
