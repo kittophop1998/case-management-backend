@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 const (
@@ -23,16 +24,12 @@ const (
 	ColName     = 6
 )
 
-// func (u *UseCase) CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error) {
-// 	id, err := u.caseManagementRepository.CreateUser(c, user)
-// 	if err != nil {
-// 		return uuid.Nil, err
-// 	}
-// 	return id, nil
-// }
-
 func (u *UseCase) CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error) {
-	return u.caseManagementRepository.CreateUser(c, user)
+	id, err := u.caseManagementRepository.CreateUser(c, user)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return id, nil
 }
 
 func (u *UseCase) GetAllUsers(c *gin.Context, page, limit int, filter model.UserFilter) ([]*model.User, int, error) {
@@ -51,7 +48,7 @@ func (u *UseCase) GetAllUsers(c *gin.Context, page, limit int, filter model.User
 	return users, total, nil
 }
 
-func (u *UseCase) GetUserByID(c *gin.Context, id string) (*model.User, error) {
+func (u *UseCase) GetUserByID(c *gin.Context, id uuid.UUID) (*model.User, error) {
 	return u.caseManagementRepository.GetUserByID(c, id)
 }
 
@@ -260,12 +257,12 @@ func (u *UseCase) ImportUsersFromCSVWithProgress(c context.Context, file io.Read
 		}
 
 		user := model.User{
-			UserName: record[ColUserName],
+			Username: record[ColUserName],
 			Email:    record[ColEmail],
 			Team:     record[ColTeam],
 			IsActive: &isActive,
-			CenterID: centerID,
-			RoleID:   roleID,
+			CenterID: uuid.MustParse(record[ColCenterID]),
+			RoleID:   uuid.MustParse(record[ColRoleID]),
 			Name:     record[ColName],
 		}
 

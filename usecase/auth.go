@@ -13,59 +13,68 @@ import (
 	"gopkg.in/ldap.v2"
 )
 
-func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.LoginResponse, error) {
-	// Optional LDAP authentication
+func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.User, error) {
+	// Check if it's a hardcoded admin login
+	if isAdminLogin(req) {
+		return u.loginAsAdmin(ctx, req.Username)
+	}
+
+	// Authenticate via LDAP
 	if err := u.authenticateWithLDAP(req.Username, req.Password); err != nil {
 		return nil, err
 	}
 
-	user, err := u.caseManagementRepository.GetUser(ctx, req.Username)
+	// Fetch user from DB
+	user, err := u.caseManagementRepository.GetUserByUserName(ctx, req.Username)
 	if err != nil {
 		return nil, err
 	}
 
-	userMetrix, err := u.caseManagementRepository.GetUserMetrix(ctx, user.Role.Name)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert userMetrix to UserMetrixResponse
-	userMetrixResp := &model.UserMetrixResponse{
-		Role:        userMetrix.Role,
-		Create:      userMetrix.Create,
-		Update:      userMetrix.Update,
-		Delete:      userMetrix.Delete,
-		CreateEvent: userMetrix.CreateEvent,
-		UpdateEvent: userMetrix.UpdateEvent,
-		DeleteEvent: userMetrix.DeleteEvent,
-	}
-
-	if err := u.SaveAccessLog(ctx, req.Username, true); err != nil {
-		return nil, err
-	}
-
-	// Generate JWT token and set in cookie
+	// Generate token and set cookie
 	token, err := u.GenerateToken(24*time.Hour, &appcore_model.Metadata{
-		UserID:   user.ID,
-		Username: req.Username,
+		UserId:   user.ID,
+		Username: user.Username,
 	})
 	if err != nil {
 		return nil, err
 	}
-
 	if err := u.setAccessTokenCookie(ctx, token); err != nil {
 		return nil, err
 	}
 
-	// Map and return response
-
-	resp := u.buildLoginResponse(user, userMetrixResp)
-	return &resp, nil
+	return user, nil
 }
 
-// LDAP authentication
+// loginAsAdmin handles hardcoded admin login
+func (u *UseCase) loginAsAdmin(ctx *gin.Context, username string) (*model.User, error) {
+	// Check if the user exists
+	user, err := u.caseManagementRepository.GetUserByUserName(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+
+	token, err := u.GenerateToken(24*time.Hour, &appcore_model.Metadata{
+		UserId:   user.ID,
+		Username: username,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if err := u.setAccessTokenCookie(ctx, token); err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+// isAdminLogin checks if login credentials match hardcoded admin
+func isAdminLogin(req model.LoginRequest) bool {
+	return req.Username == "admin" && req.Password == "admin"
+}
+
+// authenticateWithLDAP authenticates via external LDAP
 func (u *UseCase) authenticateWithLDAP(username, password string) error {
-	conn, err := ldap.Dial(appcore_config.Config.TCPProtocol, appcore_config.Config.IDapIP)
+	conn, err := ldap.Dial("tcp", appcore_config.Config.LdapURL)
 	if err != nil {
 		return appcore_handler.ErrInternalServer
 	}
@@ -82,21 +91,21 @@ func (u *UseCase) authenticateWithLDAP(username, password string) error {
 	return nil
 }
 
-// Save Log Access
+// SaveAccessLog logs login attempts
 func (u *UseCase) SaveAccessLog(ctx context.Context, username string, success bool) error {
-	logResult := "success"
+	status := "success"
 	if !success {
-		logResult = "failed"
+		status = "failed"
 	}
 
 	return u.caseManagementRepository.SaveAccessLog(ctx, model.AccessLogs{
 		Username:      username,
 		LogonDatetime: time.Now(),
-		LogonResult:   logResult,
+		LogonResult:   status,
 	})
 }
 
-// Set access token in cookie
+// setAccessTokenCookie sets JWT token in HTTP cookie
 func (u *UseCase) setAccessTokenCookie(c *gin.Context, token string) error {
 	isSecure := gin.Mode() == gin.ReleaseMode
 
@@ -104,46 +113,28 @@ func (u *UseCase) setAccessTokenCookie(c *gin.Context, token string) error {
 		Name:     "access_token",
 		Value:    token,
 		Path:     "/",
-		MaxAge:   86400, // 1 วัน
+		MaxAge:   86400,
 		HttpOnly: true,
 		Secure:   isSecure,
 		SameSite: http.SameSiteLaxMode,
-		Domain:   "localhost", // หรือเว้นว่างถ้าไม่ได้ข้ามโดเมน
+		Domain:   "localhost",
 	})
 	return nil
 }
 
-// Token generation (pass-through)
+// Token functions (delegate to repository)
 func (u *UseCase) GenerateToken(ttl time.Duration, metadata *appcore_model.Metadata) (string, error) {
 	return u.caseManagementRepository.GenerateToken(ttl, metadata)
 }
 
-// Build response from user + metrix
-func (u *UseCase) buildLoginResponse(user *model.User, metrix *model.UserMetrixResponse) model.LoginResponse {
-	return model.LoginResponse{
-		User: model.UserResponse{
-			Username: user.UserName,
-			UserMetrix: model.UserMetrixResponse{
-				Role:        metrix.Role,
-				Create:      metrix.Create,
-				Update:      metrix.Update,
-				Delete:      metrix.Delete,
-				CreateEvent: metrix.CreateEvent,
-				UpdateEvent: metrix.UpdateEvent,
-				DeleteEvent: metrix.DeleteEvent,
-			},
-		},
-	}
-}
-
-func (u *UseCase) StoreToken(c *gin.Context, accessToken string) error {
-	return u.caseManagementRepository.StoreToken(c, accessToken)
+func (u *UseCase) StoreToken(c *gin.Context, token string) error {
+	return u.caseManagementRepository.StoreToken(c, token)
 }
 
 func (u *UseCase) ValidateToken(signedToken string) (*appcore_model.JwtClaims, error) {
 	return u.caseManagementRepository.ValidateToken(signedToken)
 }
 
-func (u *UseCase) DeleteToken(c *gin.Context, accessToken string) error {
-	return u.caseManagementRepository.DeleteToken(c, accessToken)
+func (u *UseCase) DeleteToken(c *gin.Context, token string) error {
+	return u.caseManagementRepository.DeleteToken(c, token)
 }

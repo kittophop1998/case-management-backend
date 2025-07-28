@@ -48,11 +48,8 @@ type Configurations struct {
 	// Otel
 	IsObserve bool
 
-	// IDap
-	IDapIP string
-
-	// Protocol
-	TCPProtocol string
+	// LDAP URL
+	LdapURL string
 }
 
 // NewConfigurations returns a new Configuration object
@@ -71,11 +68,10 @@ func InitConfigurations() {
 	viper.SetDefault("MINIO_ACCESS_KEY", "minioadmin")
 	viper.SetDefault("MINIO_SECRET_KEY", "minioadmin")
 	viper.SetDefault("MINIO_BUCKET_NAME", "miniobucket")
-	viper.SetDefault("SECRET_KEY", "")
+	viper.SetDefault("SECRET_KEY", "case_management_secret_key")
 	viper.SetDefault("SYSTEM_I_URL", "")
 	viper.SetDefault("TREASURE_DATA_URL", "")
-	viper.SetDefault("IDAP_IP", "192.168.129.239:389")
-	viper.SetDefault("TCP_PROTOCOL", "tcp")
+	viper.SetDefault("LDAP_URL", "192.168.129.239:389")
 
 	Config = &Configurations{
 		Mode:                   viper.GetString("mode"),
@@ -96,7 +92,6 @@ func InitConfigurations() {
 		IsObserve:              viper.GetBool("IS_OBSERVE"),
 		SystemIWebsiteURL:      viper.GetString("SYSTEM_I_URL"),
 		TreasureDataWebsiteURL: viper.GetString("TREASURE_DATA_URL"),
-		IDapIP:                 viper.GetString("IDAP_IP"),
-		TCPProtocol:            viper.GetString("TCP_PROTOCOL"),
+		LdapURL:                viper.GetString("LDAP_URL"),
 	}
 }

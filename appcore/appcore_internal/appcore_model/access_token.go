@@ -1,14 +1,13 @@
 package appcore_model
 
 import (
-	"github.com/google/uuid"
-
 	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
 )
 
 type Metadata struct {
-	TokenID       string    `json:"token_id"`
-	UserID        uuid.UUID `json:"user_id"`
+	TokenId       string    `json:"tokenId"`
+	UserId        uuid.UUID `json:"userId"`
 	Email         string    `json:"email"`
 	PartnerID     uint      `json:"partner_id"`
 	ConsentStatus uint      `json:"consent_status"`
