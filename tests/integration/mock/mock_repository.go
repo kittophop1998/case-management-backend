@@ -87,7 +87,24 @@ func (m *MockRepository) UpdateUser(c *gin.Context, userID uuid.UUID, input mode
 }
 
 func (m *MockRepository) GetAllLookups(ctx *gin.Context) (map[string]interface{}, error) {
-	return nil, nil
+	mockData := map[string]interface{}{
+		"teams": []model.Team{
+			{ID: uuid.New(), Name: "Inbound"},
+			{ID: uuid.New(), Name: "Outbound"},
+		},
+		"roles": []model.Role{
+			{ID: uuid.New(), Name: "Admin"},
+			{ID: uuid.New(), Name: "User"},
+		},
+		"centers": []model.Center{
+			{ID: uuid.New(), Name: "BKK"},
+		},
+		"permissions": []model.Permission{
+			{ID: uuid.New(), Name: "case.create"},
+			{ID: uuid.New(), Name: "case.view"},
+		},
+	}
+	return mockData, nil
 }
 
 func (m *MockRepository) GetUserByUserName(c *gin.Context, username string) (*model.User, error) {

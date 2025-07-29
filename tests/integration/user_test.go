@@ -36,6 +36,7 @@ func Setup() *gin.Engine {
 	router.POST("/users", h.CreateUser)
 	router.PUT("/users/:id", h.UpdateUser)
 	router.DELETE("/users/:id", h.DeleteUserByID)
+	router.GET("/lookups", h.GetAllLookups)
 
 	return router
 }
@@ -115,4 +116,21 @@ func TestUpdateUser_ReturnSuccess(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Contains(t, w.Body.String(), `"message":"user updated successfully"`)
+}
+
+func TestGetAllLookups_Success(t *testing.T) {
+	router := Setup()
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/lookups", nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	body := w.Body.String()
+	assert.Contains(t, body, `"teams"`)
+	assert.Contains(t, body, `"roles"`)
+	assert.Contains(t, body, `"centers"`)
+	assert.Contains(t, body, `"permissions"`)
 }
