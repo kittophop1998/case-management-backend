@@ -27,7 +27,7 @@ type CaseManagementRepository interface {
 	DeleteUserByID(c *gin.Context, id string) error
 	CountUsers(c *gin.Context) (int, error)
 	CountUsersWithFilter(c *gin.Context, filter model.UserFilter) (int, error)
-	UpdateUser(c *gin.Context, userID uint, input model.UserFilter) error
+	UpdateUser(c *gin.Context, userID uuid.UUID, input model.UserFilter) error
 	SaveAccessLog(ctx context.Context, accessLog model.AccessLogs) error
 	GetUserByUserName(c *gin.Context, username string) (*model.User, error)
 	GenerateToken(ttl time.Duration, metadata *appcore_model.Metadata) (signedToken string, err error)

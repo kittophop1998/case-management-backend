@@ -145,7 +145,7 @@ func (r *authRepo) DeleteUserByID(c *gin.Context, id string) error {
 	return nil
 }
 
-func (r *authRepo) UpdateUser(c *gin.Context, userID uint, input model.UserFilter) error {
+func (r *authRepo) UpdateUser(c *gin.Context, userID uuid.UUID, input model.UserFilter) error {
 	updateData := map[string]interface{}{}
 
 	if input.Name != "" {

@@ -2,7 +2,9 @@ package integration
 
 import (
 	"case-management/handler"
-	"case-management/test/integration/mock"
+	"case-management/tests/integration/mock"
+	"strings"
+
 	"case-management/usecase"
 	"log/slog"
 	"net/http"
@@ -10,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 )
@@ -29,6 +32,11 @@ func Setup() *gin.Engine {
 	// Gin router
 	router := gin.Default()
 	router.GET("/users", h.GetAllUsers)
+	router.GET("/users/:id", h.GetUserByID)
+	router.POST("/users", h.CreateUser)
+	router.PUT("/users/:id", h.UpdateUser)
+	router.DELETE("/users/:id", h.DeleteUserByID)
+
 	return router
 }
 
@@ -41,4 +49,70 @@ func TestGetAllUsers_ReturnSuccess(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Contains(t, w.Body.String(), "John Doe")
+}
+
+func TestGetUserByID_ReturnSuccess(t *testing.T) {
+	router := Setup()
+
+	id := uuid.New()
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/users/"+id.String(), nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Contains(t, w.Body.String(), "John Doe")
+}
+
+func TestCreateUser_ReturnSuccess(t *testing.T) {
+	router := Setup()
+
+	payload := `{
+		"username": "John Doe",
+		"email": "john.doe@example.com",
+		"name": "John Doe",
+		"team": "CEN123456",
+		"isActive": true
+	}`
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/users", strings.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+	assert.Contains(t, w.Body.String(), `"id"`)
+}
+
+func TestDeleteUserByID_ReturnSuccess(t *testing.T) {
+	router := Setup()
+
+	id := uuid.New().String()
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", "/users/"+id, nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Contains(t, w.Body.String(), `"status":"success"`)
+}
+
+func TestUpdateUser_ReturnSuccess(t *testing.T) {
+	router := Setup()
+
+	id := uuid.New()
+
+	updateJSON := `{
+		"name": "Updated Name",
+		"isActive": false,
+		"team": "Updated Team"
+	}`
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("PUT", "/users/"+id.String(), strings.NewReader(updateJSON))
+	req.Header.Set("Content-Type", "application/json")
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Contains(t, w.Body.String(), `"message":"user updated successfully"`)
 }

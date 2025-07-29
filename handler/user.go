@@ -5,7 +5,6 @@ import (
 	"case-management/appcore/appcore_internal/appcore_model"
 	"case-management/model"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -182,13 +181,13 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	}
 
 	idParam := c.Param("id")
-	userID, err := strconv.ParseUint(idParam, 10, 64)
+	userID, err := uuid.Parse(idParam)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError("invalid user ID", "invalid_request"))
 		return
 	}
 
-	err = h.UseCase.UpdateUser(c, uint(userID), input)
+	err = h.UseCase.UpdateUser(c, userID, input)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, appcore_handler.NewResponseError(err.Error(), "error"))
 		return

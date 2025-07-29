@@ -54,7 +54,7 @@ func (u *UseCase) DeleteUserByID(c *gin.Context, id string) error {
 	return nil
 }
 
-func (u *UseCase) UpdateUser(c *gin.Context, userID uint, input model.UserFilter) error {
+func (u *UseCase) UpdateUser(c *gin.Context, userID uuid.UUID, input model.UserFilter) error {
 	return u.caseManagementRepository.UpdateUser(c, userID, input)
 }
 

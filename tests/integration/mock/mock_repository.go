@@ -14,11 +14,48 @@ import (
 type MockRepository struct{}
 
 func (m *MockRepository) GetAllUsers(c *gin.Context, limit, offset int, filter model.UserFilter) ([]*model.User, error) {
-	return nil, nil
+	isActive := true
+	mockUsers := []*model.User{
+		{
+			Model: model.Model{
+				ID: uuid.New(),
+			},
+			Username: "John Doe",
+			Email:    "john.doe@example.com",
+			Name:     "Johnathan Doe",
+			Team:     "CEN123456",
+			IsActive: &isActive,
+			Center: model.Center{
+				ID:   uuid.New(),
+				Name: "Center 1",
+			},
+			Role: model.Role{
+				ID:   uuid.New(),
+				Name: "Admin",
+			},
+		},
+	}
+	return mockUsers, nil
 }
 
 func (m *MockRepository) GetUserByID(c *gin.Context, id uuid.UUID) (*model.User, error) {
-	return nil, nil
+	mockUser := &model.User{
+		Model: model.Model{
+			ID:        id,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		Username: "John Doe",
+		Email:    "john.doe@example.com",
+		Name:     "John",
+		Team:     "CEN123456",
+		IsActive: func(b bool) *bool { return &b }(true),
+		CenterID: uuid.New(),
+		RoleID:   uuid.New(),
+		Center:   model.Center{Name: "Center A"},
+		Role:     model.Role{Name: "Admin"},
+	}
+	return mockUser, nil
 }
 
 func (m *MockRepository) CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error) {
@@ -45,7 +82,7 @@ func (m *MockRepository) CountUsersWithFilter(c *gin.Context, filter model.UserF
 	return 0, nil
 }
 
-func (m *MockRepository) UpdateUser(c *gin.Context, userID uint, input model.UserFilter) error {
+func (m *MockRepository) UpdateUser(c *gin.Context, userID uuid.UUID, input model.UserFilter) error {
 	return nil
 }
 
