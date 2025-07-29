@@ -137,6 +137,7 @@ func (r *authRepo) GetUserByID(c *gin.Context, id uuid.UUID) (*model.User, error
 		Preload("Role").
 		Preload("Center").
 		Preload("Role.Permissions").
+		Preload("Team").
 		Where("users.id = ?", id).
 		First(&user).Error; err != nil {
 		return nil, err
