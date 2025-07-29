@@ -44,6 +44,12 @@ func (h *Handler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+func (h *Handler) Logout(c *gin.Context) {
+	h.UseCase.Logout(c)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
+}
+
 func (h *Handler) Profile(c *gin.Context) {
 	userId, exists := c.Get("userId")
 	if !exists {

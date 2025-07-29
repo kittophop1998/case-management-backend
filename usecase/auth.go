@@ -38,6 +38,33 @@ func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.User, 
 	return user, nil
 }
 
+func (u *UseCase) Logout(ctx *gin.Context) error {
+	// Clear cookies
+	http.SetCookie(ctx.Writer, &http.Cookie{
+		Name:     "access_token",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   gin.Mode() == gin.ReleaseMode,
+		SameSite: http.SameSiteLaxMode,
+		Domain:   "localhost",
+	})
+
+	http.SetCookie(ctx.Writer, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   gin.Mode() == gin.ReleaseMode,
+		SameSite: http.SameSiteLaxMode,
+		Domain:   "localhost",
+	})
+
+	return nil
+}
+
 func (u *UseCase) loginAsAdmin(ctx *gin.Context, username string) (*model.User, error) {
 	user, err := u.caseManagementRepository.GetUserByUserName(ctx, username)
 	if err != nil {
