@@ -13,6 +13,7 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 	{
 		authRoutes.POST("/login", h.Login)
 		authRoutes.GET("/profile", appcore_handler.MiddlewareCheckAccessToken(), h.Profile)
+		authRoutes.POST("/logout", appcore_handler.MiddlewareCheckAccessToken(), h.Logout)
 	}
 
 	healthcheckRoutes := api.Group("/health")

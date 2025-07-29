@@ -44,6 +44,15 @@ func (h *Handler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+func (h *Handler) Logout(c *gin.Context) {
+	if err := h.UseCase.Logout(c); err != nil {
+		appcore_handler.HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
+}
+
 func (h *Handler) Profile(c *gin.Context) {
 	userId, exists := c.Get("userId")
 	if !exists {
