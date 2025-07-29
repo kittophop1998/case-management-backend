@@ -308,13 +308,13 @@ const docTemplate = `{
         "model.User": {
             "type": "object",
             "properties": {
+                "agentId": {
+                    "type": "integer"
+                },
                 "center": {
                     "$ref": "#/definitions/model.Center"
                 },
                 "createdAt": {
-                    "type": "string"
-                },
-                "deletedAt": {
                     "type": "string"
                 },
                 "email": {

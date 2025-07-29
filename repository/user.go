@@ -139,7 +139,7 @@ func (r *authRepo) GetUserByUserName(c *gin.Context, username string) (*model.Us
 }
 
 func (r *authRepo) DeleteUserByID(c *gin.Context, id string) error {
-	if err := r.DB.WithContext(c).Delete(&model.User{}, id).Error; err != nil {
+	if err := r.DB.WithContext(c).Where("id = ?", id).Delete(&model.User{}).Error; err != nil {
 		return err
 	}
 	return nil

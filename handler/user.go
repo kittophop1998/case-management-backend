@@ -134,11 +134,12 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 // @Success 200 {object} model.DeleteUserResponse
 // @Router /users/{id} [delete]
 func (h *Handler) DeleteUserByID(c *gin.Context) {
+
 	idParam := c.Param("id")
-	id, err := strconv.Atoi(idParam)
-	if err != nil || id < 1 {
+	_, err := uuid.Parse(idParam)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(
-			err.Error(),
+			"invalid UUID format",
 			errorInvalidRequest,
 		))
 		return

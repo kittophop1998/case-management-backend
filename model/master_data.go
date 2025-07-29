@@ -10,7 +10,7 @@ type Permission struct {
 type Role struct {
 	ID          uuid.UUID    `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
 	Name        string       `gorm:"uniqueIndex;not null" json:"name"`
-	Permissions []Permission `gorm:"many2many:role_permissions"`
+	Permissions []Permission `gorm:"many2many:role_permissions" json:"permissions"`
 }
 
 type RolePermission struct {
