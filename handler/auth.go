@@ -45,7 +45,10 @@ func (h *Handler) Login(c *gin.Context) {
 }
 
 func (h *Handler) Logout(c *gin.Context) {
-	h.UseCase.Logout(c)
+	if err := h.UseCase.Logout(c); err != nil {
+		appcore_handler.HandleError(c, err)
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }
