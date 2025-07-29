@@ -1,5 +1,9 @@
 basePath: /api/v1
 definitions:
+  appcore_handler.ResponseObject:
+    properties:
+      data: {}
+    type: object
   model.Center:
     properties:
       id:
@@ -130,6 +134,21 @@ paths:
       summary: Show the status of server
       tags:
       - Health
+  /lookups:
+    get:
+      consumes:
+      - application/json
+      description: Get all teams, roles, centers, and permissions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/appcore_handler.ResponseObject'
+      summary: Get all lookup values
+      tags:
+      - Users
   /users:
     get:
       consumes:

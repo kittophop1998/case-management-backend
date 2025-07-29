@@ -1,4 +1,4 @@
-package appcoreseed
+package appcore_seed
 
 import (
 	"case-management/model"

@@ -20,6 +20,11 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		healthcheckRoutes.GET("", h.HealthCheck)
 	}
 
+	userLookUpsRoutes := api.Group("/lookups")
+	{
+		userLookUpsRoutes.GET("", h.GetAllLookups)
+	}
+
 	// User routes
 	userRoutes := api.Group("/users")
 	userRoutes.Use(appcore_handler.MiddlewareCheckAccessToken())

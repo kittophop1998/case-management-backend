@@ -35,6 +35,7 @@ type CaseManagementRepository interface {
 	StoreToken(c *gin.Context, accessToken string) error
 	ValidateToken(signedToken string) (claims *appcore_model.JwtClaims, err error)
 	DeleteToken(c *gin.Context, accessToken string) error
+	GetAllLookups(ctx *gin.Context) (map[string]interface{}, error)
 }
 
 func New(caseManagementRepository CaseManagementRepository,

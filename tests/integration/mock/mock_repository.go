@@ -86,6 +86,10 @@ func (m *MockRepository) UpdateUser(c *gin.Context, userID uuid.UUID, input mode
 	return nil
 }
 
+func (m *MockRepository) GetAllLookups(ctx *gin.Context) (map[string]interface{}, error) {
+	return nil, nil
+}
+
 func (m *MockRepository) GetUserByUserName(c *gin.Context, username string) (*model.User, error) {
 	return nil, nil
 }

@@ -196,6 +196,24 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "user updated successfully"})
 }
 
+// GetAllLookups godoc
+// @Summary Get all lookup values
+// @Description Get all teams, roles, centers, and permissions
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Success 200 {object} appcore_handler.ResponseObject
+// @Router /lookups [get]
+func (h *Handler) GetAllLookups(c *gin.Context) {
+	data, err := h.UseCase.GetAllLookups(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, appcore_handler.NewResponseError(err.Error(), "lookup_failed"))
+		return
+	}
+
+	c.JSON(http.StatusOK, appcore_handler.NewResponseObject(data))
+}
+
 // func (h *Handler) ImportCSV(c *gin.Context) {
 // 	file, err := c.FormFile("file")
 // 	if err != nil {

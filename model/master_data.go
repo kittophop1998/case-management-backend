@@ -23,6 +23,11 @@ type Center struct {
 	Name string    `gorm:"type:varchar(100)" json:"name"`
 }
 
+type Team struct {
+	ID   uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
+	Name string    `gorm:"type:varchar(100)" json:"name"`
+}
+
 func (RolePermission) TableName() string {
 	return "role_permissions"
 }
@@ -37,4 +42,8 @@ func (Role) TableName() string {
 
 func (Center) TableName() string {
 	return "centers"
+}
+
+func (Team) TableName() string {
+	return "teams"
 }

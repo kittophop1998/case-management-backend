@@ -50,6 +50,29 @@ const docTemplate = `{
                 }
             }
         },
+        "/lookups": {
+            "get": {
+                "description": "Get all teams, roles, centers, and permissions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get all lookup values",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/appcore_handler.ResponseObject"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "description": "Retrieve all users",
@@ -199,6 +222,12 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "appcore_handler.ResponseObject": {
+            "type": "object",
+            "properties": {
+                "data": {}
+            }
+        },
         "model.Center": {
             "type": "object",
             "properties": {

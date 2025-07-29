@@ -1,4 +1,4 @@
-package appcoreseed
+package appcore_seed
 
 import (
 	"log"
@@ -19,6 +19,9 @@ func SeedAll(db *gorm.DB) {
 
 	// Seed users
 	SeedUser(db, roleMap, centerMap)
+
+	// Seed teams
+	SeedTeam(db)
 
 	// Seed role_permissions
 	if err := SeedRolePermission(db); err != nil {

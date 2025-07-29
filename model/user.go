@@ -9,16 +9,17 @@ import (
 
 type User struct {
 	Model
-	AgentID  uint      `json:"agentId"`
-	Username string    `gorm:"type:varchar(50)" json:"username" example:"john.doe"`
-	Email    string    `gorm:"type:varchar(100)" json:"email" example:"user@example.com"`
-	Name     string    `gorm:"type:varchar(100)" json:"name"`
-	Team     string    `gorm:"type:varchar(50)" json:"team" example:"CEN123456"`
-	IsActive *bool     `json:"isActive"`
-	CenterID uuid.UUID `json:"-"` // ไม่แสดงใน response
-	Center   Center    `gorm:"foreignKey:CenterID" json:"center"`
-	RoleID   uuid.UUID `json:"-"` // ไม่แสดงใน response
-	Role     Role      `gorm:"foreignKey:RoleID" json:"role"`
+	AgentID    uint      `json:"agentId"`
+	Username   string    `gorm:"type:varchar(50)" json:"username" example:"john.doe"`
+	Email      string    `gorm:"type:varchar(100)" json:"email" example:"user@example.com"`
+	Name       string    `gorm:"type:varchar(100)" json:"name"`
+	Team       string    `gorm:"type:varchar(50)" json:"team" example:"CEN123456"`
+	IsActive   *bool     `json:"isActive"`
+	CenterID   uuid.UUID `json:"centerId"`
+	Center     Center    `gorm:"foreignKey:CenterID" json:"center"`
+	RoleID     uuid.UUID `json:"roleId"`
+	Role       Role      `gorm:"foreignKey:RoleID" json:"role"`
+	OperatorID uint      `json:"operatorId"`
 }
 
 type UserFilter struct {

@@ -21,7 +21,7 @@ import (
 	"case-management/appcore/appcore_handler"
 	"case-management/appcore/appcore_logger"
 	appcore_migation "case-management/appcore/appcore_migration"
-	appcoreseed "case-management/appcore/appcore_seed"
+	appcore_seed "case-management/appcore/appcore_seed"
 	"case-management/appcore/appcore_store"
 	"case-management/handler"
 	"case-management/repository"
@@ -54,7 +54,7 @@ func main() {
 	}
 
 	// Seeder
-	appcoreseed.SeedAll(appcore_store.DBStore)
+	appcore_seed.SeedAll(appcore_store.DBStore)
 
 	caseManagementRepo := repository.New(appcore_store.DBStore, appcore_logger.Logger, appcore_cache.Cache)
 	caseManagementUseCase := usecase.New(caseManagementRepo, appcore_cache.Cache, appcore_logger.Logger)

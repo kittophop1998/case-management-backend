@@ -58,6 +58,10 @@ func (u *UseCase) UpdateUser(c *gin.Context, userID uuid.UUID, input model.UserF
 	return u.caseManagementRepository.UpdateUser(c, userID, input)
 }
 
+func (u *UseCase) GetAllLookups(ctx *gin.Context) (map[string]interface{}, error) {
+	return u.caseManagementRepository.GetAllLookups(ctx)
+}
+
 // func (u *UseCase) ImportUsersFromCSV(c context.Context, file io.Reader) error {
 // 	reader := csv.NewReader(file)
 // 	reader.TrimLeadingSpace = true
