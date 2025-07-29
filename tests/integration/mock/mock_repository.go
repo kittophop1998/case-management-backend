@@ -23,7 +23,10 @@ func (m *MockRepository) GetAllUsers(c *gin.Context, limit, offset int, filter m
 			Username: "John Doe",
 			Email:    "john.doe@example.com",
 			Name:     "Johnathan Doe",
-			Team:     "CEN123456",
+			Team: model.Team{
+				ID:   uuid.New(),
+				Name: "Inbound",
+			},
 			IsActive: &isActive,
 			Center: model.Center{
 				ID:   uuid.New(),
@@ -48,7 +51,10 @@ func (m *MockRepository) GetUserByID(c *gin.Context, id uuid.UUID) (*model.User,
 		Username: "John Doe",
 		Email:    "john.doe@example.com",
 		Name:     "John",
-		Team:     "CEN123456",
+		Team: model.Team{
+			ID:   uuid.New(),
+			Name: "Inbound",
+		},
 		IsActive: func(b bool) *bool { return &b }(true),
 		CenterID: uuid.New(),
 		RoleID:   uuid.New(),

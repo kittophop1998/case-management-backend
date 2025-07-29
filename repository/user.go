@@ -33,23 +33,43 @@ func (r *authRepo) GetAllUsers(c *gin.Context, limit, offset int, filter model.U
 	var users []*model.User
 
 	query := r.DB.Debug().WithContext(c).Model(&model.User{}).
-		Preload("Role").Preload("Center").
+		Preload("Role").Preload("Center").Preload("Team").
 		Joins("LEFT JOIN roles ON roles.id = users.role_id").
-		Joins("LEFT JOIN centers ON centers.id = users.center_id")
+		Joins("LEFT JOIN centers ON centers.id = users.center_id").
+		Joins("LEFT JOIN teams ON teams.id = users.team_id")
 
 	if filter.IsActive != nil {
 		query = query.Where("users.is_active = ?", *filter.IsActive)
 	}
+
 	if filter.Role != "" {
 		query = query.Where("roles.name = ?", filter.Role)
 	}
-	if filter.Team != "" {
-		query = query.Where("users.team = ?", filter.Team)
+
+	if filter.RoleID != uuid.Nil {
+		query = query.Where("roles.id = ?", filter.RoleID)
 	}
+
+	if filter.Team.Name != "" {
+		query = query.Where("teams.name = ?", strings.TrimSpace(filter.Team.Name))
+	}
+
+	if filter.TeamID != uuid.Nil {
+		query = query.Where("teams.id = ?", filter.TeamID)
+	}
+
 	if filter.Center != "" {
 		query = query.Where("TRIM(centers.name) = ?", strings.TrimSpace(filter.Center))
-
 	}
+
+	if filter.CenterID != uuid.Nil {
+		query = query.Where("centers.id = ?", filter.CenterID)
+	}
+
+	if filter.Name != "" {
+		query = query.Where("users.name ILIKE ?", "%"+strings.TrimSpace(filter.Name)+"%")
+	}
+
 	if filter.Sort != "" {
 		query = query.Order(filter.Sort)
 	}
@@ -65,20 +85,35 @@ func (r *authRepo) CountUsersWithFilter(c *gin.Context, filter model.UserFilter)
 	var count int64
 	query := r.DB.WithContext(c).Model(&model.User{}).
 		Joins("LEFT JOIN roles ON roles.id = users.role_id").
-		Joins("LEFT JOIN centers ON centers.id = users.center_id")
+		Joins("LEFT JOIN centers ON centers.id = users.center_id").
+		Joins("LEFT JOIN teams ON teams.id = users.team_id")
 
 	if filter.IsActive != nil {
 		query = query.Where("users.is_active = ?", *filter.IsActive)
 	}
+
 	if filter.Role != "" {
 		query = query.Where("roles.name = ?", filter.Role)
 	}
-	if filter.Team != "" {
-		query = query.Where("users.team = ?", filter.Team)
-	}
-	if filter.Center != "" {
 
-		query = query.Where("centers.name ILIKE ?", strings.TrimSpace(filter.Center))
+	if filter.RoleID != uuid.Nil {
+		query = query.Where("roles.id = ?", filter.RoleID)
+	}
+
+	if filter.Team.Name != "" {
+		query = query.Where("teams.name = ?", strings.TrimSpace(filter.Team.Name))
+	}
+
+	if filter.TeamID != uuid.Nil {
+		query = query.Where("teams.id = ?", filter.TeamID)
+	}
+
+	if filter.Center != "" {
+		query = query.Where("centers.name ILIKE ?", "%"+strings.TrimSpace(filter.Center)+"%")
+	}
+
+	if filter.CenterID != uuid.Nil {
+		query = query.Where("centers.id = ?", filter.CenterID)
 	}
 
 	if err := query.Count(&count).Error; err != nil {
@@ -157,8 +192,11 @@ func (r *authRepo) UpdateUser(c *gin.Context, userID uuid.UUID, input model.User
 	if input.RoleID != uuid.Nil {
 		updateData["role_id"] = input.RoleID
 	}
-	if input.Team != "" {
-		updateData["team"] = input.Team
+	if input.Team.Name != "" {
+		updateData["team_id"] = input.TeamID
+	}
+	if input.TeamID != uuid.Nil {
+		updateData["team_id"] = input.TeamID
 	}
 	if input.CenterID != uuid.Nil {
 		updateData["center_id"] = input.CenterID

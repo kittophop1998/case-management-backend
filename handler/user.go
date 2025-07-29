@@ -63,29 +63,61 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 	}
 
 	sort := c.DefaultQuery("sort", "created_at desc")
+	name := c.Query("name")
 	role := c.Query("role")
-	team := c.Query("team")
+	teamName := c.Query("team")
 	center := c.Query("center")
+
+	roleIDStr := c.Query("roleID")
+	teamIDStr := c.Query("teamID")
+	centerIDStr := c.Query("centerID")
 
 	isActiveStr := c.Query("is_active")
 	var isActive *bool = nil
-
 	if isActiveStr != "" {
 		val := isActiveStr == "true"
 		isActive = &val
 	}
 
+	var roleID, teamID, centerID uuid.UUID
+	if roleIDStr != "" {
+		if id, err := uuid.Parse(roleIDStr); err == nil {
+			roleID = id
+		}
+	}
+	if teamIDStr != "" {
+		if id, err := uuid.Parse(teamIDStr); err == nil {
+			teamID = id
+		}
+	}
+	if centerIDStr != "" {
+		if id, err := uuid.Parse(centerIDStr); err == nil {
+			centerID = id
+		}
+	}
+
 	filter := model.UserFilter{
-		IsActive: isActive,
+		Name:     name,
 		Sort:     sort,
+		IsActive: isActive,
 		Role:     role,
-		Team:     team,
+		Team: model.Team{
+			Name: teamName,
+		},
 		Center:   center,
+		RoleID:   roleID,
+		TeamID:   teamID,
+		CenterID: centerID,
 	}
 
 	users, total, err := h.UseCase.GetAllUsers(c, page, limit, filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, appcore_handler.NewResponseError(err.Error(), errorSystem))
+		return
+	}
+
+	if len(users) == 0 {
+		c.JSON(http.StatusNotFound, appcore_handler.NewResponseError("record not found", "not_found"))
 		return
 	}
 

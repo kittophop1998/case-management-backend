@@ -13,7 +13,8 @@ type User struct {
 	Username   string    `gorm:"type:varchar(50)" json:"username" example:"john.doe"`
 	Email      string    `gorm:"type:varchar(100)" json:"email" example:"user@example.com"`
 	Name       string    `gorm:"type:varchar(100)" json:"name"`
-	Team       string    `gorm:"type:varchar(50)" json:"team" example:"CEN123456"`
+	TeamID     uuid.UUID `json:"teamId"`
+	Team       Team      `gorm:"foreignKey:TeamID" json:"team"`
 	IsActive   *bool     `json:"isActive"`
 	CenterID   uuid.UUID `json:"centerId"`
 	Center     Center    `gorm:"foreignKey:CenterID" json:"center"`
@@ -27,7 +28,7 @@ type UserFilter struct {
 	Sort     string    `json:"sort"`
 	IsActive *bool     `json:"isActive"`
 	Role     string    `json:"role"`
-	Team     string    `json:"team"`
+	Team     Team      `json:"team"`
 	Center   string    `json:"center"`
 	RoleID   uuid.UUID `json:"roleID,omitempty" gorm:"type:uuid;default:uuid_generate_v4()"`
 	TeamID   uuid.UUID `json:"teamID,omitempty" gorm:"type:uuid;default:uuid_generate_v4()"`
