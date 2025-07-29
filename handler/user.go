@@ -168,7 +168,7 @@ func (h *Handler) DeleteUserByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path int true "User ID"
-// @Success 200 string "User updated successfully"
+// @Success 200 {object} model.MessageResponse
 // @Router /users/{id} [put]
 func (h *Handler) UpdateUser(c *gin.Context) {
 	var input model.UserFilter

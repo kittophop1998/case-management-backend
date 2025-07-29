@@ -2,16 +2,9 @@ basePath: /api/v1
 definitions:
   model.Center:
     properties:
-      createdAt:
-        type: string
-      deletedAt:
-        type: string
       id:
         type: string
       name:
-        example: Bangkok Center
-        type: string
-      updatedAt:
         type: string
     type: object
   model.CreateUserRequest:
@@ -60,26 +53,28 @@ definitions:
       message:
         type: string
     type: object
-  model.Role:
+  model.Permission:
     properties:
-      createdAt:
-        type: string
-      deletedAt:
-        type: string
       id:
         type: string
       name:
-        example: Admin
         type: string
-      updatedAt:
+    type: object
+  model.Role:
+    properties:
+      id:
         type: string
+      name:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/model.Permission'
+        type: array
     type: object
   model.User:
     properties:
       center:
         $ref: '#/definitions/model.Center'
-      centerID:
-        type: string
       createdAt:
         type: string
       deletedAt:
@@ -92,40 +87,16 @@ definitions:
       isActive:
         type: boolean
       name:
-        example: John Doe
         type: string
       role:
         $ref: '#/definitions/model.Role'
-      roleID:
-        type: string
       team:
         example: CEN123456
         type: string
       updatedAt:
         type: string
-      userName:
+      username:
         example: john.doe
-        type: string
-    type: object
-  model.UserFilter:
-    properties:
-      center:
-        type: string
-      centerID:
-        type: string
-      isActive:
-        type: boolean
-      name:
-        type: string
-      role:
-        type: string
-      roleID:
-        type: string
-      sort:
-        type: string
-      team:
-        type: string
-      teamID:
         type: string
     type: object
 host: localhost:8000
@@ -142,6 +113,23 @@ info:
   title: Case Management API
   version: "1.0"
 paths:
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Get server health status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Show the status of server
+      tags:
+      - Health
   /users:
     get:
       consumes:
@@ -222,19 +210,13 @@ paths:
     put:
       consumes:
       - application/json
-      description: Update user information by its ID
+      description: Update user information by ID
       parameters:
       - description: User ID
         in: path
         name: id
         required: true
         type: integer
-      - description: User update payload
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/model.UserFilter'
       produces:
       - application/json
       responses:
@@ -243,32 +225,6 @@ paths:
           schema:
             $ref: '#/definitions/model.MessageResponse'
       summary: Update user by ID
-      tags:
-      - Users
-  /users/import:
-    post:
-      consumes:
-      - multipart/form-data
-      description: Import user data from a CSV file asynchronously and track progress
-        via task ID
-      parameters:
-      - description: CSV file to upload
-        in: formData
-        name: file
-        required: true
-        type: file
-      - description: Optional task ID to track import progress
-        in: query
-        name: taskID
-        type: string
-      produces:
-      - application/json
-      responses:
-        "202":
-          description: Accepted
-          schema:
-            $ref: '#/definitions/model.MessageResponse'
-      summary: Import users from CSV file
       tags:
       - Users
 swagger: "2.0"

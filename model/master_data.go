@@ -3,13 +3,13 @@ package model
 import "github.com/google/uuid"
 
 type Permission struct {
-	ID   uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	Name string    `gorm:"uniqueIndex;not null"`
+	ID   uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
+	Name string    `gorm:"uniqueIndex;not null" json:"name"`
 }
 
 type Role struct {
-	ID          uuid.UUID    `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	Name        string       `gorm:"uniqueIndex;not null"`
+	ID          uuid.UUID    `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
+	Name        string       `gorm:"uniqueIndex;not null" json:"name"`
 	Permissions []Permission `gorm:"many2many:role_permissions"`
 }
 
@@ -19,7 +19,7 @@ type RolePermission struct {
 }
 
 type Center struct {
-	ID   uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+	ID   uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
 	Name string    `gorm:"type:varchar(100)" json:"name"`
 }
 

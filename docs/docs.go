@@ -24,6 +24,32 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/health": {
+            "get": {
+                "description": "Get server health status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Show the status of server",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "description": "Retrieve all users",
@@ -82,44 +108,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/import": {
-            "post": {
-                "description": "Import user data from a CSV file asynchronously and track progress via task ID",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Import users from CSV file",
-                "parameters": [
-                    {
-                        "type": "file",
-                        "description": "CSV file to upload",
-                        "name": "file",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Optional task ID to track import progress",
-                        "name": "taskID",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "202": {
-                        "description": "Accepted",
-                        "schema": {
-                            "$ref": "#/definitions/model.MessageResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/users/{id}": {
             "get": {
                 "description": "Retrieve user information by ID",
@@ -152,7 +140,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "Update user information by its ID",
+                "description": "Update user information by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -170,15 +158,6 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "description": "User update payload",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.UserFilter"
-                        }
                     }
                 ],
                 "responses": {
@@ -223,20 +202,10 @@ const docTemplate = `{
         "model.Center": {
             "type": "object",
             "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
                 "name": {
-                    "type": "string",
-                    "example": "Bangkok Center"
-                },
-                "updatedAt": {
                     "type": "string"
                 }
             }
@@ -308,24 +277,31 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Role": {
+        "model.Permission": {
             "type": "object",
             "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
                 "name": {
-                    "type": "string",
-                    "example": "Admin"
-                },
-                "updatedAt": {
                     "type": "string"
+                }
+            }
+        },
+        "model.Role": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Permission"
+                    }
                 }
             }
         },
@@ -334,9 +310,6 @@ const docTemplate = `{
             "properties": {
                 "center": {
                     "$ref": "#/definitions/model.Center"
-                },
-                "centerID": {
-                    "type": "string"
                 },
                 "createdAt": {
                     "type": "string"
@@ -355,14 +328,10 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "name": {
-                    "type": "string",
-                    "example": "John Doe"
+                    "type": "string"
                 },
                 "role": {
                     "$ref": "#/definitions/model.Role"
-                },
-                "roleID": {
-                    "type": "string"
                 },
                 "team": {
                     "type": "string",
@@ -371,41 +340,9 @@ const docTemplate = `{
                 "updatedAt": {
                     "type": "string"
                 },
-                "userName": {
+                "username": {
                     "type": "string",
                     "example": "john.doe"
-                }
-            }
-        },
-        "model.UserFilter": {
-            "type": "object",
-            "properties": {
-                "center": {
-                    "type": "string"
-                },
-                "centerID": {
-                    "type": "string"
-                },
-                "isActive": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "roleID": {
-                    "type": "string"
-                },
-                "sort": {
-                    "type": "string"
-                },
-                "team": {
-                    "type": "string"
-                },
-                "teamID": {
-                    "type": "string"
                 }
             }
         }
