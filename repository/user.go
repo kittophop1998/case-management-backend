@@ -152,6 +152,7 @@ func (r *authRepo) GetUserByUserName(c *gin.Context, username string) (*model.Us
 		Preload("Role").
 		Preload("Center").
 		Preload("Role.Permissions").
+		Preload("Team").
 		Where("username = ?", username).
 		First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -246,4 +247,48 @@ func (r *authRepo) GetAllLookups(ctx *gin.Context) (map[string]interface{}, erro
 	result["permissions"] = permissions
 
 	return result, nil
+}
+
+func (r *authRepo) GetAllPermissionsWithRoles(ctx *gin.Context) ([]model.PermissionWithRolesResponse, error) {
+	var permissions []model.Permission
+
+	if err := r.DB.WithContext(ctx).
+		Preload("Roles").
+		Find(&permissions).Error; err != nil {
+		return nil, err
+	}
+
+	var result []model.PermissionWithRolesResponse
+	for _, p := range permissions {
+		var roleNames []string
+		for _, role := range p.Roles {
+			roleNames = append(roleNames, role.Name)
+		}
+
+		result = append(result, model.PermissionWithRolesResponse{
+			Permission: p.Key,
+			Label:      p.Name,
+			Roles:      roleNames,
+		})
+	}
+
+	return result, nil
+}
+
+func (r *authRepo) UpdatePermissionRoles(ctx *gin.Context, req model.UpdatePermissionRolesRequest) error {
+	var permission model.Permission
+	if err := r.DB.WithContext(ctx).Where("key = ?", req.Permission).First(&permission).Error; err != nil {
+		return err
+	}
+
+	var roles []model.Role
+	if err := r.DB.WithContext(ctx).Where("name IN ?", req.Roles).Find(&roles).Error; err != nil {
+		return err
+	}
+
+	if err := r.DB.Model(&permission).Association("Roles").Replace(roles); err != nil {
+		return err
+	}
+
+	return nil
 }

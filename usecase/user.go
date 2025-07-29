@@ -289,3 +289,11 @@ func (u *UseCase) GetAllLookups(ctx *gin.Context) (map[string]interface{}, error
 // 	})
 // 	return nil
 // }
+
+func (u *UseCase) GetAllPermissionsWithRoles(ctx *gin.Context) ([]model.PermissionWithRolesResponse, error) {
+	return u.caseManagementRepository.GetAllPermissionsWithRoles(ctx)
+}
+
+func (u *UseCase) UpdatePermissionRoles(ctx *gin.Context, req model.UpdatePermissionRolesRequest) error {
+	return u.caseManagementRepository.UpdatePermissionRoles(ctx, req)
+}

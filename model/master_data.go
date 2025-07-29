@@ -3,8 +3,11 @@ package model
 import "github.com/google/uuid"
 
 type Permission struct {
-	ID   uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
-	Name string    `gorm:"uniqueIndex;not null" json:"name"`
+	ID    uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
+	Key   string    `gorm:"uniqueIndex;not null" json:"key"`
+	Name  string    `gorm:"uniqueIndex;not null" json:"name"`
+	Roles []Role    `gorm:"many2many:role_permissions"`
+	Label string    `json:"label"`
 }
 
 type Role struct {

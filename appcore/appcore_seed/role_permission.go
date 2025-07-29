@@ -13,7 +13,9 @@ func SeedRolePermission(db *gorm.DB) error {
 	}
 
 	var perms []model.Permission
-	if err := db.Where("name IN ?", []string{"case.create", "case.view", "case.edit", "case.delete", "user.manage"}).Find(&perms).Error; err != nil {
+	if err := db.Where("key IN ?", []string{
+		"case.create", "case.view", "case.edit", "case.delete", "user.manage",
+	}).Find(&perms).Error; err != nil {
 		return err
 	}
 

@@ -36,6 +36,8 @@ type CaseManagementRepository interface {
 	ValidateToken(signedToken string) (claims *appcore_model.JwtClaims, err error)
 	DeleteToken(c *gin.Context, accessToken string) error
 	GetAllLookups(ctx *gin.Context) (map[string]interface{}, error)
+	GetAllPermissionsWithRoles(ctx *gin.Context) ([]model.PermissionWithRolesResponse, error)
+	UpdatePermissionRoles(ctx *gin.Context, req model.UpdatePermissionRolesRequest) error
 }
 
 func New(caseManagementRepository CaseManagementRepository,

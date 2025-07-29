@@ -7,9 +7,9 @@ import (
 )
 
 func SeedAll(db *gorm.DB) {
+
 	// Seed roles
 	roleMap := SeedRole(db)
-	// SeedRole(db)
 
 	// Seed centers
 	centerMap := SeedCenter(db)

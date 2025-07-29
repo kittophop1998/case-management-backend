@@ -19,6 +19,16 @@ type AccessTokenRequest struct {
 	Access_token string `json:"access_token" binding:"required"`
 }
 
+type UpdatePermissionRolesRequest struct {
+	Permission string   `json:"permission" binding:"required"`
+	Roles      []string `json:"roles" binding:"required"`
+}
+
+type PermissionWithRolesResponse struct {
+	Permission string   `json:"permission"`
+	Label      string   `json:"label"`
+	Roles      []string `json:"roles"`
+}
 type FormFilter struct {
 	Limit  int                    `json:"limit"`
 	Page   int                    `json:"page"`

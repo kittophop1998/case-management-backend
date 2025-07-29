@@ -25,6 +25,12 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		userLookUpsRoutes.GET("", h.GetAllLookups)
 	}
 
+	permissionsWithRolesRoutes := api.Group("/permissions")
+	{
+		permissionsWithRolesRoutes.GET("", h.GetPermissionsWithRoles)
+		permissionsWithRolesRoutes.PATCH("update", h.UpdatePermissionRoles)
+	}
+
 	// User routes
 	userRoutes := api.Group("/users")
 	userRoutes.Use(appcore_handler.MiddlewareCheckAccessToken())
