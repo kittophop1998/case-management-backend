@@ -279,7 +279,9 @@ func (r *authRepo) GetAllPermissionsWithRoles(ctx *gin.Context) ([]model.Permiss
 func (r *authRepo) UpdatePermissionRoles(ctx *gin.Context, req model.UpdatePermissionRolesRequest) error {
 	var permission model.Permission
 	if err := r.DB.WithContext(ctx).Where("key = ?", req.Permission).First(&permission).Error; err != nil {
-		return err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("permission key does not exist")
+		}
 	}
 
 	var roles []model.Role

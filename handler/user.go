@@ -330,7 +330,7 @@ func (h *Handler) GetPermissionsWithRoles(c *gin.Context) {
 	data, err := h.UseCase.GetAllPermissionsWithRoles(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "ไม่สามารถดึงข้อมูล permission ได้",
+			"error":   "Unable to fetch permission data",
 			"details": err.Error(),
 		})
 		return
