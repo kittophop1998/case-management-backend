@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"gopkg.in/ldap.v2"
 )
 
@@ -30,41 +31,49 @@ func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.User, 
 		return nil, err
 	}
 
-	// Generate token and set cookie
-	token, err := u.GenerateToken(24*time.Hour, &appcore_model.Metadata{
-		UserId:   user.ID,
-		Username: user.Username,
-	})
-	if err != nil {
-		return nil, err
-	}
-	if err := u.setAccessTokenCookie(ctx, token); err != nil {
+	if err := u.generateAndSetTokens(ctx, user.ID, user.Username); err != nil {
 		return nil, err
 	}
 
 	return user, nil
 }
 
-// loginAsAdmin handles hardcoded admin login
 func (u *UseCase) loginAsAdmin(ctx *gin.Context, username string) (*model.User, error) {
-	// Check if the user exists
 	user, err := u.caseManagementRepository.GetUserByUserName(ctx, username)
 	if err != nil {
 		return nil, err
 	}
 
-	token, err := u.GenerateToken(24*time.Hour, &appcore_model.Metadata{
-		UserId:   user.ID,
-		Username: username,
-	})
-	if err != nil {
-		return nil, err
-	}
-	if err := u.setAccessTokenCookie(ctx, token); err != nil {
+	if err := u.generateAndSetTokens(ctx, user.ID, username); err != nil {
 		return nil, err
 	}
 
 	return user, nil
+}
+
+func (u *UseCase) generateAndSetTokens(ctx *gin.Context, userID uuid.UUID, username string) error {
+	metadata := &appcore_model.Metadata{
+		UserId:   userID,
+		Username: username,
+	}
+
+	accessToken, err := u.GenerateToken(24*time.Hour, metadata)
+	if err != nil {
+		return err
+	}
+	if err := u.setAccessTokenCookie(ctx, accessToken); err != nil {
+		return err
+	}
+
+	refreshToken, err := u.GenerateToken(3*24*time.Hour, metadata)
+	if err != nil {
+		return err
+	}
+	if err := u.setRefreshTokenCookie(ctx, refreshToken); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // isAdminLogin checks if login credentials match hardcoded admin
@@ -114,6 +123,22 @@ func (u *UseCase) setAccessTokenCookie(c *gin.Context, token string) error {
 		Value:    token,
 		Path:     "/",
 		MaxAge:   86400,
+		HttpOnly: true,
+		Secure:   isSecure,
+		SameSite: http.SameSiteLaxMode,
+		Domain:   "localhost",
+	})
+	return nil
+}
+
+func (u *UseCase) setRefreshTokenCookie(c *gin.Context, token string) error {
+	isSecure := gin.Mode() == gin.ReleaseMode
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    token,
+		Path:     "/",
+		MaxAge:   3 * 24 * 60 * 60,
 		HttpOnly: true,
 		Secure:   isSecure,
 		SameSite: http.SameSiteLaxMode,
