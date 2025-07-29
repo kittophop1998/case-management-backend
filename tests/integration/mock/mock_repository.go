@@ -144,3 +144,11 @@ func (m *MockRepository) ValidateToken(signedToken string) (claims *appcore_mode
 func (m *MockRepository) DeleteToken(c *gin.Context, accessToken string) error {
 	return nil
 }
+
+func (m *MockRepository) GetAllPermissionsWithRoles(ctx *gin.Context) ([]model.PermissionWithRolesResponse, error) {
+	return nil, nil
+}
+
+func (m *MockRepository) UpdatePermissionRoles(ctx *gin.Context, req model.UpdatePermissionRolesRequest) error {
+	return nil
+}

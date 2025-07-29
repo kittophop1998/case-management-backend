@@ -325,3 +325,33 @@ func (h *Handler) GetAllLookups(c *gin.Context) {
 // 	status := utils.GetImportStatus(taskID)
 // 	c.JSON(http.StatusOK, status)
 // }
+
+func (h *Handler) GetPermissionsWithRoles(c *gin.Context) {
+	data, err := h.UseCase.GetAllPermissionsWithRoles(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Unable to fetch permission data",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": data,
+	})
+}
+
+func (h *Handler) UpdatePermissionRoles(c *gin.Context) {
+	var req model.UpdatePermissionRolesRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.UseCase.UpdatePermissionRoles(c, req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "updated successfully."})
+}
