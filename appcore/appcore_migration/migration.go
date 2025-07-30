@@ -17,6 +17,12 @@ func Migrate() error {
 		&model.Permission{},
 		&model.RolePermission{},
 		&model.Team{},
+		&model.Cases{},
+		&model.NoteTypes{},
+		&model.CaseTypes{},
+		&model.CaseStatus{},
+		&model.CasePriorities{},
+		&model.CaseNotes{},
 	); err != nil {
 		return err
 	}

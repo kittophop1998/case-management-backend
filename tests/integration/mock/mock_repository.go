@@ -145,10 +145,34 @@ func (m *MockRepository) DeleteToken(c *gin.Context, accessToken string) error {
 	return nil
 }
 
-func (m *MockRepository) GetAllPermissionsWithRoles(ctx *gin.Context) ([]model.PermissionWithRolesResponse, error) {
+func (m *MockRepository) GetAllPermissionsWithRoles(ctx *gin.Context, limit, offset int) ([]model.PermissionWithRolesResponse, error) {
 	return nil, nil
 }
 
 func (m *MockRepository) UpdatePermissionRoles(ctx *gin.Context, req model.UpdatePermissionRolesRequest) error {
 	return nil
+}
+
+func (m *MockRepository) CreateCase(ctx *gin.Context, c *model.Cases) (uuid.UUID, error) {
+	if c.ID == uuid.Nil {
+		newID, err := uuid.NewUUID()
+		if err != nil {
+			return uuid.Nil, err
+		}
+		c.ID = newID
+	}
+
+	return c.ID, nil
+}
+
+func (m *MockRepository) GetAllCases(c *gin.Context, limit, offset int, filter model.CaseFilter) ([]*model.Cases, error) {
+	return nil, nil
+}
+
+func (m *MockRepository) CountCasesWithFilter(c *gin.Context, filter model.CaseFilter) (int, error) {
+	return 0, nil
+}
+
+func (m *MockRepository) CountPermissions(ctx *gin.Context) (int, error) {
+	return 0, nil
 }

@@ -16,11 +16,6 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		authRoutes.POST("/logout", appcore_handler.MiddlewareCheckAccessToken(), h.Logout)
 	}
 
-	healthcheckRoutes := api.Group("/health")
-	{
-		healthcheckRoutes.GET("", h.HealthCheck)
-	}
-
 	userLookUpsRoutes := api.Group("/lookups")
 	{
 		userLookUpsRoutes.GET("", h.GetAllLookups)
@@ -42,6 +37,12 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		userRoutes.PUT("/:id", h.UpdateUser)
 		userRoutes.DELETE("/:id", h.DeleteUserByID)
 		// userRoutes.POST("/import", h.ImportCSV)
+	}
+
+	caseManagementRoutes := api.Group("/cases")
+	{
+		caseManagementRoutes.POST("", h.CreateCase)
+		caseManagementRoutes.GET("", h.GetAllCases)
 	}
 
 	// Refresh token api

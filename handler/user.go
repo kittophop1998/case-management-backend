@@ -314,7 +314,19 @@ func (h *Handler) GetAllLookups(c *gin.Context) {
 // }
 
 func (h *Handler) GetPermissionsWithRoles(c *gin.Context) {
-	data, err := h.UseCase.GetAllPermissionsWithRoles(c)
+	limit, err := getLimit(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(err.Error(), errorInvalidRequest))
+		return
+	}
+
+	page, err := getPage(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(err.Error(), errorInvalidRequest))
+		return
+	}
+
+	data, total, err := h.UseCase.GetAllPermissionsWithRoles(c, page, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Unable to fetch permission data",
@@ -323,9 +335,7 @@ func (h *Handler) GetPermissionsWithRoles(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": data,
-	})
+	c.JSON(http.StatusOK, appcore_model.NewPaginatedResponse(data, page, limit, total))
 }
 
 func (h *Handler) UpdatePermissionRoles(c *gin.Context) {
