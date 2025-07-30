@@ -41,10 +41,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.MessageResponse"
                         }
                     }
                 }
@@ -117,7 +114,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.CreateUserRequest"
+                            "$ref": "#/definitions/model.UserRequest"
                         }
                     }
                 ],
@@ -181,13 +178,22 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "User data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UserRequest"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.MessageResponse"
+                            "$ref": "#/definitions/model.CreateUserResponse"
                         }
                     }
                 }
@@ -239,43 +245,6 @@ const docTemplate = `{
                 }
             }
         },
-        "model.CreateUserRequest": {
-            "type": "object",
-            "properties": {
-                "agentId": {
-                    "type": "string",
-                    "example": "12337"
-                },
-                "centerId": {
-                    "type": "string",
-                    "example": "b94eee08-8324-4d4f-b166-d82775553a7e"
-                },
-                "email": {
-                    "type": "string",
-                    "example": "Janet@exam.com"
-                },
-                "isActive": {
-                    "type": "boolean",
-                    "example": true
-                },
-                "operatorId": {
-                    "type": "string",
-                    "example": "1233"
-                },
-                "roleId": {
-                    "type": "string",
-                    "example": "538cd6c5-4cb3-4463-b7d5-ac6645815476"
-                },
-                "team": {
-                    "type": "string",
-                    "example": "Inbound"
-                },
-                "userName": {
-                    "type": "string",
-                    "example": "Janet Adebayo"
-                }
-            }
-        },
         "model.CreateUserResponse": {
             "type": "object",
             "properties": {
@@ -312,8 +281,20 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "key": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Role"
+                    }
                 }
             }
         },
@@ -334,6 +315,17 @@ const docTemplate = `{
                 }
             }
         },
+        "model.Team": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "model.User": {
             "type": "object",
             "properties": {
@@ -342,6 +334,9 @@ const docTemplate = `{
                 },
                 "center": {
                     "$ref": "#/definitions/model.Center"
+                },
+                "centerId": {
+                    "type": "string"
                 },
                 "createdAt": {
                     "type": "string"
@@ -359,12 +354,20 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "operatorId": {
+                    "type": "integer"
+                },
                 "role": {
                     "$ref": "#/definitions/model.Role"
                 },
+                "roleId": {
+                    "type": "string"
+                },
                 "team": {
-                    "type": "string",
-                    "example": "CEN123456"
+                    "$ref": "#/definitions/model.Team"
+                },
+                "teamId": {
+                    "type": "string"
                 },
                 "updatedAt": {
                     "type": "string"
@@ -372,6 +375,43 @@ const docTemplate = `{
                 "username": {
                     "type": "string",
                     "example": "john.doe"
+                }
+            }
+        },
+        "model.UserRequest": {
+            "type": "object",
+            "properties": {
+                "agentId": {
+                    "type": "string",
+                    "example": "12337"
+                },
+                "centerId": {
+                    "type": "string",
+                    "example": "b94eee08-8324-4d4f-b166-d82775553a7e"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "Janet@exam.com"
+                },
+                "isActive": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "operatorId": {
+                    "type": "string",
+                    "example": "1233"
+                },
+                "roleId": {
+                    "type": "string",
+                    "example": "538cd6c5-4cb3-4463-b7d5-ac6645815476"
+                },
+                "team": {
+                    "type": "string",
+                    "example": "Inbound"
+                },
+                "userName": {
+                    "type": "string",
+                    "example": "Janet Adebayo"
                 }
             }
         }

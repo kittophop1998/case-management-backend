@@ -11,7 +11,94 @@ definitions:
       name:
         type: string
     type: object
-  model.CreateUserRequest:
+  model.CreateUserResponse:
+    properties:
+      data:
+        properties:
+          id:
+            type: string
+        type: object
+    type: object
+  model.DeleteUserResponse:
+    properties:
+      message:
+        example: User deleted successfully
+        type: string
+    type: object
+  model.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  model.Permission:
+    properties:
+      id:
+        type: string
+      key:
+        type: string
+      label:
+        type: string
+      name:
+        type: string
+      roles:
+        items:
+          $ref: '#/definitions/model.Role'
+        type: array
+    type: object
+  model.Role:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/model.Permission'
+        type: array
+    type: object
+  model.Team:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  model.User:
+    properties:
+      agentId:
+        type: integer
+      center:
+        $ref: '#/definitions/model.Center'
+      centerId:
+        type: string
+      createdAt:
+        type: string
+      email:
+        example: user@example.com
+        type: string
+      id:
+        type: string
+      isActive:
+        type: boolean
+      name:
+        type: string
+      operatorId:
+        type: integer
+      role:
+        $ref: '#/definitions/model.Role'
+      roleId:
+        type: string
+      team:
+        $ref: '#/definitions/model.Team'
+      teamId:
+        type: string
+      updatedAt:
+        type: string
+      username:
+        example: john.doe
+        type: string
+    type: object
+  model.UserRequest:
     properties:
       agentId:
         example: "12337"
@@ -36,71 +123,6 @@ definitions:
         type: string
       userName:
         example: Janet Adebayo
-        type: string
-    type: object
-  model.CreateUserResponse:
-    properties:
-      data:
-        properties:
-          id:
-            type: string
-        type: object
-    type: object
-  model.DeleteUserResponse:
-    properties:
-      message:
-        example: User deleted successfully
-        type: string
-    type: object
-  model.MessageResponse:
-    properties:
-      message:
-        type: string
-    type: object
-  model.Permission:
-    properties:
-      id:
-        type: string
-      name:
-        type: string
-    type: object
-  model.Role:
-    properties:
-      id:
-        type: string
-      name:
-        type: string
-      permissions:
-        items:
-          $ref: '#/definitions/model.Permission'
-        type: array
-    type: object
-  model.User:
-    properties:
-      agentId:
-        type: integer
-      center:
-        $ref: '#/definitions/model.Center'
-      createdAt:
-        type: string
-      email:
-        example: user@example.com
-        type: string
-      id:
-        type: string
-      isActive:
-        type: boolean
-      name:
-        type: string
-      role:
-        $ref: '#/definitions/model.Role'
-      team:
-        example: CEN123456
-        type: string
-      updatedAt:
-        type: string
-      username:
-        example: john.doe
         type: string
     type: object
 host: localhost:8000
@@ -128,9 +150,7 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/model.MessageResponse'
       summary: Show the status of server
       tags:
       - Health
@@ -176,7 +196,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/model.CreateUserRequest'
+          $ref: '#/definitions/model.UserRequest'
       produces:
       - application/json
       responses:
@@ -236,13 +256,19 @@ paths:
         name: id
         required: true
         type: integer
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.MessageResponse'
+            $ref: '#/definitions/model.CreateUserResponse'
       summary: Update user by ID
       tags:
       - Users

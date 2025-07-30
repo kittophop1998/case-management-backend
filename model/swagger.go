@@ -8,7 +8,7 @@ type CreateUserResponse struct {
 	} `json:"data"`
 }
 
-type CreateUserRequest struct {
+type UserRequest struct {
 	AgentID    string    `json:"agentId" example:"12337"`
 	UserName   string    `json:"userName" example:"Janet Adebayo"`
 	Email      string    `json:"email" example:"Janet@exam.com"`

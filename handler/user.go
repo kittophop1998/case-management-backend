@@ -16,7 +16,7 @@ import (
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param user body model.CreateUserRequest true "User data"
+// @Param user body model.UserRequest true "User data"
 // @Success 201 {object} model.CreateUserResponse
 // @Router /users [post]
 func (h *Handler) CreateUser(c *gin.Context) {
@@ -64,13 +64,9 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 
 	sort := c.DefaultQuery("sort", "created_at desc")
 	name := c.Query("name")
-	role := c.Query("role")
-	teamName := c.Query("team")
-	center := c.Query("center")
-
-	roleIDStr := c.Query("roleID")
-	teamIDStr := c.Query("teamID")
-	centerIDStr := c.Query("centerID")
+	roleIDStr := c.Query("roleId")
+	teamIDStr := c.Query("teamId")
+	centerIDStr := c.Query("centerId")
 
 	isActiveStr := c.Query("is_active")
 	var isActive *bool = nil
@@ -100,11 +96,6 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 		Name:     name,
 		Sort:     sort,
 		IsActive: isActive,
-		Role:     role,
-		Team: model.Team{
-			Name: teamName,
-		},
-		Center:   center,
 		RoleID:   roleID,
 		TeamID:   teamID,
 		CenterID: centerID,
@@ -200,7 +191,8 @@ func (h *Handler) DeleteUserByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path int true "User ID"
-// @Success 200 {object} model.MessageResponse
+// @Param user body model.UserRequest true "User data"
+// @Success 200 {object} model.CreateUserResponse
 // @Router /users/{id} [put]
 func (h *Handler) UpdateUser(c *gin.Context) {
 	var input model.UserFilter
