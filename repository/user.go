@@ -244,11 +244,13 @@ func (r *authRepo) GetAllLookups(ctx *gin.Context) (map[string]interface{}, erro
 	return result, nil
 }
 
-func (r *authRepo) GetAllPermissionsWithRoles(ctx *gin.Context) ([]model.PermissionWithRolesResponse, error) {
+func (r *authRepo) GetAllPermissionsWithRoles(ctx *gin.Context, limit, offset int) ([]model.PermissionWithRolesResponse, error) {
 	var permissions []model.Permission
 
-	if err := r.DB.WithContext(ctx).
+	if err := r.DB.Debug().WithContext(ctx).
 		Preload("Roles").
+		Limit(limit).
+		Offset(offset).
 		Find(&permissions).Error; err != nil {
 		return nil, err
 	}
@@ -288,4 +290,12 @@ func (r *authRepo) UpdatePermissionRoles(ctx *gin.Context, req model.UpdatePermi
 	}
 
 	return nil
+}
+
+func (r *authRepo) CountPermissions(ctx *gin.Context) (int, error) {
+	var count int64
+	if err := r.DB.WithContext(ctx).Model(&model.Permission{}).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return int(count), nil
 }

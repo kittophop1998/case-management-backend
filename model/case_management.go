@@ -5,11 +5,10 @@ import (
 	"time"
 
 	"encore.dev/types/uuid"
-	"gorm.io/gorm"
 )
 
 type Cases struct {
-	gorm.Model
+	Model
 	Title               string    `json:"title"`
 	CustomerId          string    `json:"customer_id"`
 	CreditCardAccountId string    `json:"credit_card_account_id"`
@@ -25,32 +24,41 @@ type Cases struct {
 	SLADate             time.Time `json:"sla_date"`
 }
 
+type CaseFilter struct {
+	Keyword     string     `form:"keyword" json:"keyword"`
+	StatusID    *uint      `form:"status_id" json:"status_id"`
+	PriorityID  *uint      `form:"priority_id" json:"priority_id"`
+	SLADateFrom *time.Time `form:"sla_date_from" json:"sla_date_from"`
+	SLADateTo   *time.Time `form:"sla_date_to" json:"sla_date_to"`
+	Sort        string     `form:"sort" json:"sort"`
+}
+
 type NoteTypes struct {
-	ID   uint   `json:"id" gorm:"primaryKey"`
-	Name string `json:"name"`
+	ID   uuid.UUID `gorm:"primaryKey;default:uuid_generate_v4()" json:"id"`
+	Name string    `json:"name"`
 }
 
 type CaseTypes struct {
-	ID          uint   `json:"id" gorm:"primaryKey"`
-	Name        string `json:"name"`
-	Description string `json:"description" gorm:"type:text"`
+	ID          uuid.UUID `gorm:"primaryKey;default:uuid_generate_v4()" json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description" gorm:"type:text"`
 }
 
 type CaseStatus struct {
-	ID             uint   `json:"id" gorm:"primaryKey"`
-	Name           string `json:"name"`
-	Description    string `json:"description" gorm:"type:text"`
-	IsClosedStatus bool   `json:"is_closed_status"`
+	ID             uuid.UUID `gorm:"primaryKey;default:uuid_generate_v4()" json:"id"`
+	Name           string    `json:"name"`
+	Description    string    `json:"description" gorm:"type:text"`
+	IsClosedStatus bool      `json:"is_closed_status"`
 }
 
 type CasePriorities struct {
-	ID          uint   `json:"id" gorm:"primaryKey"`
-	Name        string `json:"name"`
-	OrderNumber uint   `json:"order_number"`
+	ID          uuid.UUID `gorm:"primaryKey;default:uuid_generate_v4()" json:"id"`
+	Name        string    `json:"name"`
+	OrderNumber uint      `json:"order_number"`
 }
 
 type CaseNotes struct {
-	ID          uuid.UUID `json:"id" gorm:"type:uuid;default:uuid_generate_v4()"`
+	ID          uuid.UUID `gorm:"primaryKey;default:uuid_generate_v4()" json:"id"`
 	CaseId      uuid.UUID `json:"case_id" gorm:"type:uuid;default:uuid_generate_v4()"`
 	UserId      uuid.UUID `json:"user_id" gorm:"type:uuid;default:uuid_generate_v4()"`
 	NoteTypesId uint      `json:"note_types_id"`
@@ -95,4 +103,24 @@ type VerifyQuestionHistory struct {
 
 func (Cases) TableName() string {
 	return "cases"
+}
+
+func (NoteTypes) TableName() string {
+	return "note_types"
+}
+
+func (CaseTypes) TableName() string {
+	return "cases_types"
+}
+
+func (CaseStatus) TableName() string {
+	return "cases_status"
+}
+
+func (CasePriorities) TableName() string {
+	return "cases_priorities"
+}
+
+func (CaseNotes) TableName() string {
+	return "case_notes"
 }
