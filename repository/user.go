@@ -43,7 +43,8 @@ func (r *authRepo) GetAllUsers(c *gin.Context, limit, offset int, filter model.U
 		query = query.Where(
 			r.DB.Where("users.name ILIKE ?", kw).
 				Or("users.username ILIKE ?", kw).
-				Or("users.email ILIKE ?", kw),
+				Or("users.email ILIKE ?", kw).
+				Or("CAST(users.agent_id AS TEXT) ILIKE ?", kw),
 		)
 	}
 
