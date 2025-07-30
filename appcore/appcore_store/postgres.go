@@ -18,7 +18,7 @@ func InitPostgresDBStore(logger *slog.Logger) {
 	logger.Info("Init DB Store")
 	logger.Info("Connecting to database")
 
-	// dsn := appcore_config.Config.PostgresConnString
+	// dsn := appcore_config.Config.ProdPostgresURL
 	dsn := appcore_config.Config.PostgresConnString
 
 	// ✅ Parse the config using pgx/v5

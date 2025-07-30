@@ -1,6 +1,7 @@
 package appcore_config
 
 import (
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
@@ -50,10 +51,15 @@ type Configurations struct {
 
 	// LDAP URL
 	LdapURL string
+
+	// DB Cloud
+	ProdPostgresURL string
 }
 
 // NewConfigurations returns a new Configuration object
 func InitConfigurations() {
+	_ = godotenv.Load()
+
 	viper.AutomaticEnv()
 	viper.SetDefault("mode", "")
 	viper.SetDefault("GIN_IS_RELEASE_MODE", false)
@@ -93,5 +99,6 @@ func InitConfigurations() {
 		SystemIWebsiteURL:      viper.GetString("SYSTEM_I_URL"),
 		TreasureDataWebsiteURL: viper.GetString("TREASURE_DATA_URL"),
 		LdapURL:                viper.GetString("LDAP_URL"),
+		ProdPostgresURL:        viper.GetString("PROD_POSTGRES_URL"),
 	}
 }
