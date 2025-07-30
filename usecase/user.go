@@ -290,8 +290,20 @@ func (u *UseCase) GetAllLookups(ctx *gin.Context) (map[string]interface{}, error
 // 	return nil
 // }
 
-func (u *UseCase) GetAllPermissionsWithRoles(ctx *gin.Context) ([]model.PermissionWithRolesResponse, error) {
-	return u.caseManagementRepository.GetAllPermissionsWithRoles(ctx)
+func (u *UseCase) GetAllPermissionsWithRoles(ctx *gin.Context, page, limit int) ([]model.PermissionWithRolesResponse, int, error) {
+	offset := (page - 1) * limit
+
+	permissions, err := u.caseManagementRepository.GetAllPermissionsWithRoles(ctx, limit, offset)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	total, err := u.caseManagementRepository.CountPermissions(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return permissions, total, nil
 }
 
 func (u *UseCase) UpdatePermissionRoles(ctx *gin.Context, req model.UpdatePermissionRolesRequest) error {

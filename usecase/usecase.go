@@ -21,6 +21,7 @@ type UseCase struct {
 }
 
 type CaseManagementRepository interface {
+	// User
 	CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error)
 	GetAllUsers(c *gin.Context, limit, offset int, filter model.UserFilter) ([]*model.User, error)
 	GetUserByID(c *gin.Context, id uuid.UUID) (*model.User, error)
@@ -36,8 +37,14 @@ type CaseManagementRepository interface {
 	ValidateToken(signedToken string) (claims *appcore_model.JwtClaims, err error)
 	DeleteToken(c *gin.Context, accessToken string) error
 	GetAllLookups(ctx *gin.Context) (map[string]interface{}, error)
-	GetAllPermissionsWithRoles(ctx *gin.Context) ([]model.PermissionWithRolesResponse, error)
+	GetAllPermissionsWithRoles(ctx *gin.Context, limit, offset int) ([]model.PermissionWithRolesResponse, error)
 	UpdatePermissionRoles(ctx *gin.Context, req model.UpdatePermissionRolesRequest) error
+	CountPermissions(ctx *gin.Context) (int, error)
+
+	// Case Management
+	CreateCase(ctx *gin.Context, c *model.Cases) (uuid.UUID, error)
+	GetAllCases(c *gin.Context, limit, offset int, filter model.CaseFilter) ([]*model.Cases, error)
+	CountCasesWithFilter(c *gin.Context, filter model.CaseFilter) (int, error)
 }
 
 func New(caseManagementRepository CaseManagementRepository,

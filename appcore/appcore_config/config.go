@@ -59,7 +59,6 @@ type Configurations struct {
 // NewConfigurations returns a new Configuration object
 func InitConfigurations() {
 	_ = godotenv.Load()
-
 	viper.AutomaticEnv()
 	viper.SetDefault("mode", "")
 	viper.SetDefault("GIN_IS_RELEASE_MODE", false)
