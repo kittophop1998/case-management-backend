@@ -28,7 +28,7 @@ func (a *authRepo) CreateCase(ctx *gin.Context, c *model.Cases) (uuid.UUID, erro
 func (r *authRepo) GetAllCases(c *gin.Context, limit, offset int, filter model.CaseFilter) ([]*model.Cases, error) {
 	var cases []*model.Cases
 
-	query := r.DB.Debug().WithContext(c).Model(&model.Cases{})
+	query := r.DB.WithContext(c).Model(&model.Cases{})
 
 	if filter.Keyword != "" {
 		kw := "%" + strings.TrimSpace(filter.Keyword) + "%"
@@ -94,7 +94,6 @@ func (r *authRepo) CountCasesWithFilter(c *gin.Context, filter model.CaseFilter)
 		query = query.Where("sla_date <= ?", *filter.SLADateTo)
 	}
 
-	// นับแถวที่ตรงกับเงื่อนไข
 	if err := query.Count(&count).Error; err != nil {
 		return 0, err
 	}

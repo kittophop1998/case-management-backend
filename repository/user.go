@@ -32,7 +32,7 @@ func (a *authRepo) CreateUser(c *gin.Context, user *model.User) (uuid.UUID, erro
 func (r *authRepo) GetAllUsers(c *gin.Context, limit, offset int, filter model.UserFilter) ([]*model.User, error) {
 	var users []*model.User
 
-	query := r.DB.Debug().WithContext(c).Model(&model.User{}).
+	query := r.DB.WithContext(c).Model(&model.User{}).
 		Preload("Role").Preload("Center").Preload("Team").
 		Joins("LEFT JOIN roles ON roles.id = users.role_id").
 		Joins("LEFT JOIN centers ON centers.id = users.center_id").
@@ -247,7 +247,7 @@ func (r *authRepo) GetAllLookups(ctx *gin.Context) (map[string]interface{}, erro
 func (r *authRepo) GetAllPermissionsWithRoles(ctx *gin.Context, limit, offset int) ([]model.PermissionWithRolesResponse, error) {
 	var permissions []model.Permission
 
-	if err := r.DB.Debug().WithContext(ctx).
+	if err := r.DB.WithContext(ctx).
 		Preload("Roles").
 		Limit(limit).
 		Offset(offset).
