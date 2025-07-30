@@ -107,11 +107,6 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 		return
 	}
 
-	if len(users) == 0 {
-		c.JSON(http.StatusNotFound, appcore_handler.NewResponseError("record not found", "not_found"))
-		return
-	}
-
 	c.JSON(http.StatusOK, appcore_model.NewPaginatedResponse(users, page, limit, total))
 }
 
