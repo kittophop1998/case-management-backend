@@ -24,6 +24,7 @@ type User struct {
 }
 
 type UserFilter struct {
+	Keyword  string    `json:"keyword"`
 	Name     string    `gorm:"type:varchar(100)" json:"name"`
 	Sort     string    `json:"sort"`
 	IsActive *bool     `json:"isActive"`

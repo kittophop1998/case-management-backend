@@ -38,36 +38,29 @@ func (r *authRepo) GetAllUsers(c *gin.Context, limit, offset int, filter model.U
 		Joins("LEFT JOIN centers ON centers.id = users.center_id").
 		Joins("LEFT JOIN teams ON teams.id = users.team_id")
 
-	if filter.IsActive != nil {
-		query = query.Where("users.is_active = ?", *filter.IsActive)
+	if filter.Keyword != "" {
+		kw := "%" + strings.TrimSpace(filter.Keyword) + "%"
+		query = query.Where(
+			r.DB.Where("users.name ILIKE ?", kw).
+				Or("users.username ILIKE ?", kw).
+				Or("users.email ILIKE ?", kw),
+		)
 	}
 
-	if filter.Role != "" {
-		query = query.Where("roles.name = ?", filter.Role)
+	if filter.IsActive != nil {
+		query = query.Where("users.is_active = ?", *filter.IsActive)
 	}
 
 	if filter.RoleID != uuid.Nil {
 		query = query.Where("roles.id = ?", filter.RoleID)
 	}
 
-	if filter.Team.Name != "" {
-		query = query.Where("teams.name = ?", strings.TrimSpace(filter.Team.Name))
-	}
-
 	if filter.TeamID != uuid.Nil {
 		query = query.Where("teams.id = ?", filter.TeamID)
 	}
 
-	if filter.Center != "" {
-		query = query.Where("TRIM(centers.name) = ?", strings.TrimSpace(filter.Center))
-	}
-
 	if filter.CenterID != uuid.Nil {
 		query = query.Where("centers.id = ?", filter.CenterID)
-	}
-
-	if filter.Name != "" {
-		query = query.Where("users.name ILIKE ?", "%"+strings.TrimSpace(filter.Name)+"%")
 	}
 
 	if filter.Sort != "" {

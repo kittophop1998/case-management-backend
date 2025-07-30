@@ -63,7 +63,7 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 	}
 
 	sort := c.DefaultQuery("sort", "created_at desc")
-	name := c.Query("name")
+	keyword := c.Query("keyword")
 	roleIDStr := c.Query("roleId")
 	teamIDStr := c.Query("teamId")
 	centerIDStr := c.Query("centerId")
@@ -93,7 +93,7 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 	}
 
 	filter := model.UserFilter{
-		Name:     name,
+		Keyword:  keyword,
 		Sort:     sort,
 		IsActive: isActive,
 		RoleID:   roleID,
