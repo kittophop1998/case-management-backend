@@ -1,4 +1,4 @@
-package appcore_migation
+package appcore_migration
 
 import (
 	"case-management/appcore/appcore_store"

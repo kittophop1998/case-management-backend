@@ -18,8 +18,10 @@ import (
 // var taskProgress = make(map[string]int)
 // var mu sync.Mutex
 
+const bcryptCost = 12
+
 func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
 	return string(bytes), err
 }
 

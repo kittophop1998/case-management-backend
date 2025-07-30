@@ -20,7 +20,7 @@ import (
 	"case-management/appcore/appcore_cache"
 	"case-management/appcore/appcore_handler"
 	"case-management/appcore/appcore_logger"
-	appcore_migation "case-management/appcore/appcore_migration"
+	"case-management/appcore/appcore_migration"
 	appcore_seed "case-management/appcore/appcore_seed"
 	"case-management/appcore/appcore_store"
 	"case-management/handler"
@@ -48,7 +48,7 @@ func main() {
 	slog.Info("currentTime", "time", time.Now())
 
 	// Initialize Migration
-	if err := appcore_migation.Migrate(); err != nil {
+	if err := appcore_migration.Migrate(); err != nil {
 		slog.Error("migration failed", "error", err)
 		os.Exit(1)
 	}
