@@ -1,0 +1,23 @@
+# Binaries
+*.exe
+*.exe~
+bff-server
+
+# Test binary
+#*.test
+
+# Build results
+/bin/
+/vendor/
+
+# IDE settings
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Local config file
+#configs/config.yaml
+
+# Local config file
+#*.cer

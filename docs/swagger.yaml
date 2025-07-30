@@ -1,0 +1,275 @@
+basePath: /api/v1
+definitions:
+  appcore_handler.ResponseObject:
+    properties:
+      data: {}
+    type: object
+  model.Center:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  model.CreateUserResponse:
+    properties:
+      data:
+        properties:
+          id:
+            type: string
+        type: object
+    type: object
+  model.DeleteUserResponse:
+    properties:
+      message:
+        example: User deleted successfully
+        type: string
+    type: object
+  model.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  model.Permission:
+    properties:
+      id:
+        type: string
+      key:
+        type: string
+      label:
+        type: string
+      name:
+        type: string
+      roles:
+        items:
+          $ref: '#/definitions/model.Role'
+        type: array
+    type: object
+  model.Role:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/model.Permission'
+        type: array
+    type: object
+  model.Team:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  model.User:
+    properties:
+      agentId:
+        type: integer
+      center:
+        $ref: '#/definitions/model.Center'
+      centerId:
+        type: string
+      createdAt:
+        type: string
+      email:
+        example: user@example.com
+        type: string
+      id:
+        type: string
+      isActive:
+        type: boolean
+      name:
+        type: string
+      operatorId:
+        type: integer
+      role:
+        $ref: '#/definitions/model.Role'
+      roleId:
+        type: string
+      team:
+        $ref: '#/definitions/model.Team'
+      teamId:
+        type: string
+      updatedAt:
+        type: string
+      username:
+        example: john.doe
+        type: string
+    type: object
+  model.UserRequest:
+    properties:
+      agentId:
+        example: "12337"
+        type: string
+      centerId:
+        example: b94eee08-8324-4d4f-b166-d82775553a7e
+        type: string
+      email:
+        example: Janet@exam.com
+        type: string
+      isActive:
+        example: true
+        type: boolean
+      operatorId:
+        example: "1233"
+        type: string
+      roleId:
+        example: 538cd6c5-4cb3-4463-b7d5-ac6645815476
+        type: string
+      team:
+        example: Inbound
+        type: string
+      userName:
+        example: Janet Adebayo
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: sye@aeon.co.th
+    name: SYE
+    url: https://aeon.co.th
+  description: This is a sample server for managing cases.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Case Management API
+  version: "1.0"
+paths:
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Get server health status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+      summary: Show the status of server
+      tags:
+      - Health
+  /lookups:
+    get:
+      consumes:
+      - application/json
+      description: Get all teams, roles, centers, and permissions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/appcore_handler.ResponseObject'
+      summary: Get all lookup values
+      tags:
+      - Users
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+      summary: Get all users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the provided JSON body
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.CreateUserResponse'
+      summary: Create a new user
+      tags:
+      - Users
+  /users/{id}:
+    delete:
+      description: Delete a user by its ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.DeleteUserResponse'
+      summary: Delete user by ID
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: Retrieve user information by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+      summary: Get user by ID
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update user information by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.CreateUserResponse'
+      summary: Update user by ID
+      tags:
+      - Users
+swagger: "2.0"
