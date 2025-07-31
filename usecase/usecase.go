@@ -55,10 +55,12 @@ type CaseManagementRepository interface {
 	CreateAuditLog(c *gin.Context, log model.AuditLog) error
 }
 
-func New(caseManagementRepository CaseManagementRepository,
+func New(
+	caseManagementRepository CaseManagementRepository,
 	cache *redis.Client,
 	logger *slog.Logger,
-	storage *minio.Client) *UseCase {
+	storage *minio.Client,
+) *UseCase {
 	return &UseCase{
 		caseManagementRepository: caseManagementRepository,
 		Cache:                    cache,
