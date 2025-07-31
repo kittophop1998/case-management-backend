@@ -17,10 +17,10 @@ RUN go build -o app
 # ------------------------
 
 # Stage 2: Run
-FROM alpine:latest
+FROM debian:latest
 
 # ทำให้ container crash ถ้ามี error
-RUN apk --no-cache add ca-certificates
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # Set working directory in runtime container
 WORKDIR /root/
@@ -29,7 +29,7 @@ WORKDIR /root/
 COPY --from=builder /app/app .
 
 # บอกว่าต้องเปิดพอร์ตนี้
-EXPOSE 8080
+EXPOSE 8000
 
 # Command to run
 CMD ["./app"]

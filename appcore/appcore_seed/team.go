@@ -13,6 +13,12 @@ func SeedTeam(db *gorm.DB) map[string]uuid.UUID {
 
 	teams := []model.Team{
 		{Name: "Inbound"},
+		{Name: "CHD"},
+		{Name: "CHB"},
+		{Name: "Convince"},
+		{Name: "Tele"},
+		{Name: "JSJ"},
+		{Name: "EDP"},
 	}
 
 	for _, team := range teams {

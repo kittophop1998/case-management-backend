@@ -13,6 +13,9 @@ func SeedCenter(db *gorm.DB) map[string]uuid.UUID {
 
 	centers := []model.Center{
 		{Name: "BKK"},
+		{Name: "KK"},
+		{Name: "HY"},
+		{Name: "CM"},
 	}
 
 	for _, center := range centers {
