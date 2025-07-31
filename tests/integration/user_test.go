@@ -3,6 +3,7 @@ package integration
 import (
 	"case-management/handler"
 	"case-management/tests/integration/mock"
+	"log"
 	"strings"
 
 	"case-management/usecase"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/minio/minio-go"
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,9 +26,19 @@ func Setup() *gin.Engine {
 		Addr: "localhost:6379",
 	})
 
+	mockMinio, err := minio.New(
+		"localhost:9000",
+		"minioadmin",
+		"minioadmin",
+		false,
+	)
+	if err != nil {
+		log.Fatalf("failed to initialize minio client: %v", err)
+	}
+
 	logger := slog.Default()
 
-	u := usecase.New(mockRepo, mockRedis, logger)
+	u := usecase.New(mockRepo, mockRedis, logger, mockMinio)
 	h := handler.NewHandler(u, logger)
 
 	// Gin router

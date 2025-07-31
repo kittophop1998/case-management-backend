@@ -4,8 +4,10 @@ import (
 	"case-management/appcore/appcore_cache"
 	"case-management/model"
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
+	"math/big"
 	"strconv"
 	"strings"
 	"time"
@@ -111,4 +113,18 @@ func GetImportStatus(taskID string) model.ImportStatus {
 		return model.ImportStatus{}
 	}
 	return status
+}
+
+func RandStringRunes(n int) (string, error) {
+	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]rune, n)
+	for i := range b {
+		maxBigInt := big.NewInt(int64(len(letterRunes)))
+		num, err := rand.Int(rand.Reader, maxBigInt)
+		if err != nil {
+			return "", err
+		}
+		b[i] = letterRunes[num.Int64()]
+	}
+	return string(b), nil
 }

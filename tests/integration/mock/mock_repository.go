@@ -176,3 +176,11 @@ func (m *MockRepository) CountCasesWithFilter(c *gin.Context, filter model.CaseF
 func (m *MockRepository) CountPermissions(ctx *gin.Context) (int, error) {
 	return 0, nil
 }
+
+func (m *MockRepository) CreateAuditLog(c *gin.Context, log model.AuditLog) error {
+	return nil
+}
+
+func (m *MockRepository) UploadAttachment(c *gin.Context, caseID uuid.UUID, file model.Attachment) (uuid.UUID, error) {
+	return uuid.Nil, nil
+}

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/minio/minio-go"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
@@ -18,6 +19,7 @@ type UseCase struct {
 	Cache                    *redis.Client
 	Logger                   *slog.Logger
 	caseManagementRepository CaseManagementRepository
+	Storage                  *minio.Client
 }
 
 type CaseManagementRepository interface {
@@ -45,14 +47,22 @@ type CaseManagementRepository interface {
 	CreateCase(ctx *gin.Context, c *model.Cases) (uuid.UUID, error)
 	GetAllCases(c *gin.Context, limit, offset int, filter model.CaseFilter) ([]*model.Cases, error)
 	CountCasesWithFilter(c *gin.Context, filter model.CaseFilter) (int, error)
+
+	// Attachment
+	UploadAttachment(c *gin.Context, caseID uuid.UUID, file model.Attachment) (uuid.UUID, error)
+
+	// Audit Log
+	CreateAuditLog(c *gin.Context, log model.AuditLog) error
 }
 
 func New(caseManagementRepository CaseManagementRepository,
 	cache *redis.Client,
-	logger *slog.Logger) *UseCase {
+	logger *slog.Logger,
+	storage *minio.Client) *UseCase {
 	return &UseCase{
 		caseManagementRepository: caseManagementRepository,
 		Cache:                    cache,
 		Logger:                   logger,
+		Storage:                  storage,
 	}
 }
