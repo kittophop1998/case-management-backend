@@ -39,6 +39,13 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		// userRoutes.POST("/import", h.ImportCSV)
 	}
 
+	// Attachment routes
+	attachmentsRoutes := api.Group("/attachment")
+	attachmentsRoutes.Use(appcore_handler.MiddlewareCheckAccessToken())
+	{
+		attachmentsRoutes.POST("/:case_id", h.UploadAttachment)
+	}
+
 	caseManagementRoutes := api.Group("/cases")
 	{
 		caseManagementRoutes.POST("", h.CreateCase)
