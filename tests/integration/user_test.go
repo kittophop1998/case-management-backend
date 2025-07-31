@@ -105,8 +105,11 @@ func TestUpdateUser_ReturnSuccess(t *testing.T) {
 	updateJSON := `{
 		"name": "Updated Name",
 		"isActive": false,
-		"team": "Updated Team"
-	}`
+		"team": {
+		"id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+		"name": "Updated Team"
+	}
+}`
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("PUT", "/users/"+id.String(), strings.NewReader(updateJSON))

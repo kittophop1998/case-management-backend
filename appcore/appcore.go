@@ -7,6 +7,7 @@ import (
 	"case-management/appcore/appcore_internal/appcore_model"
 	"case-management/appcore/appcore_logger"
 	"case-management/appcore/appcore_router"
+	"case-management/appcore/appcore_storage"
 	"case-management/appcore/appcore_store"
 	"flag"
 
@@ -52,6 +53,7 @@ func init() {
 	appcore_logger.InitLogger()
 	appcore_store.InitPostgresDBStore(appcore_logger.Logger)
 	appcore_cache.InitCache(appcore_logger.Logger)
+	appcore_storage.InitStorage()
 
 	// appcore_audit_log.InitAuditLog(appcore_store.DBStore)
 
