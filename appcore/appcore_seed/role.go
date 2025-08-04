@@ -12,10 +12,10 @@ func SeedRole(db *gorm.DB) map[string]uuid.UUID {
 	roleMaps := make(map[string]uuid.UUID)
 
 	roles := []model.Role{
-		{Name: "Admin"},
-		{Name: "Agent"},
+		{Name: "Staff"},
+		{Name: "AsstManager Up"},
 		{Name: "Supervisor"},
-		{Name: "Manager"},
+		{Name: "Admin"},
 	}
 
 	for _, role := range roles {
