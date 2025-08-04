@@ -7,7 +7,14 @@ import (
 	"gorm.io/gorm"
 )
 
-func SeedUser(db *gorm.DB, roleMap, teamMap, centerMap, departmentMap map[string]uuid.UUID) {
+func SeedUser(
+	db *gorm.DB,
+	roleMap,
+	teamMap,
+	centerMap,
+	departmentMap map[string]uuid.UUID,
+	queueMap map[string]uuid.UUID,
+) {
 	isActive := true
 	users := []model.User{
 		{
@@ -15,6 +22,7 @@ func SeedUser(db *gorm.DB, roleMap, teamMap, centerMap, departmentMap map[string
 			TeamID:       teamMap["Inbound"],
 			CenterID:     centerMap["BKK"],
 			RoleID:       roleMap["Admin"],
+			QueueID:      queueMap["Inbound Agent Supervisor BKK Queue"],
 			AgentID:      1,
 			IsActive:     &isActive,
 			Name:         "admin",

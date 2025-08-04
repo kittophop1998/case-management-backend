@@ -31,6 +31,11 @@ type Team struct {
 	Name string    `gorm:"type:varchar(100)" json:"name"`
 }
 
+type Queue struct {
+	ID   uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
+	Name string    `gorm:"type:varchar(100)" json:"name"`
+}
+
 type Department struct {
 	ID   uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
 	Name string    `gorm:"type:varchar(100)" json:"name"`

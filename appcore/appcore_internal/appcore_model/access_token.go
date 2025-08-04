@@ -6,15 +6,11 @@ import (
 )
 
 type Metadata struct {
-	TokenId       string    `json:"tokenId"`
-	UserId        uuid.UUID `json:"userId"`
-	Email         string    `json:"email"`
-	PartnerID     uint      `json:"partner_id"`
-	ConsentStatus uint      `json:"consent_status"`
-	Username      string    `json:"username"`
-	Owner         string    `json:"owner"`
-	Permissions   []string  `json:"permissions"`
-	Roles         []string  `json:"roles"`
+	Username string    `json:"username"`
+	UserId   uuid.UUID `json:"userId"`
+	CenterId uuid.UUID `json:"centerId"`
+	TeamId   uuid.UUID `json:"teamId"`
+	QueueId  uuid.UUID `json:"queueId"`
 }
 
 type JwtClaims struct {

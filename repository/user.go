@@ -138,6 +138,8 @@ func (r *authRepo) GetUserByID(c *gin.Context, id uuid.UUID) (*model.User, error
 	if err := r.DB.WithContext(c).
 		Preload("Role").
 		Preload("Center").
+		Preload("Queue").
+		Preload("Department").
 		Preload("Role.Permissions").
 		Preload("Team").
 		Where("users.id = ?", id).
@@ -156,6 +158,7 @@ func (r *authRepo) GetUserByUserName(c *gin.Context, username string) (*model.Us
 		Preload("Center").
 		Preload("Role.Permissions").
 		Preload("Team").
+		Preload("Queue").
 		Where("username = ?", username).
 		First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -220,36 +223,6 @@ func (r *authRepo) UpdateUser(c *gin.Context, userID uuid.UUID, input model.User
 func (r *authRepo) BulkInsertUsers(c context.Context, users []model.User) error {
 	tx := r.DB.WithContext(c).Create(&users)
 	return tx.Error
-}
-
-func (r *authRepo) GetAllLookups(ctx *gin.Context) (map[string]interface{}, error) {
-	result := make(map[string]interface{})
-
-	var teams []model.Team
-	if err := r.DB.WithContext(ctx).Model(&model.Team{}).Find(&teams).Error; err != nil {
-		return nil, err
-	}
-	result["teams"] = teams
-
-	var roles []model.Role
-	if err := r.DB.WithContext(ctx).Preload("Permissions").Find(&roles).Error; err != nil {
-		return nil, err
-	}
-	result["roles"] = roles
-
-	var centers []model.Center
-	if err := r.DB.WithContext(ctx).Model(&model.Center{}).Find(&centers).Error; err != nil {
-		return nil, err
-	}
-	result["centers"] = centers
-
-	var permissions []model.Permission
-	if err := r.DB.WithContext(ctx).Model(&model.Permission{}).Find(&permissions).Error; err != nil {
-		return nil, err
-	}
-	result["permissions"] = permissions
-
-	return result, nil
 }
 
 func (r *authRepo) GetAllPermissionsWithRoles(ctx *gin.Context, limit, offset int) ([]model.PermissionWithRolesResponse, error) {
