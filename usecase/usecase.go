@@ -3,6 +3,7 @@ package usecase
 import (
 	"case-management/appcore/appcore_internal/appcore_model"
 	"case-management/model"
+	"case-management/services/mailer"
 	"context"
 	"log/slog"
 	"time"
@@ -20,6 +21,7 @@ type UseCase struct {
 	Logger                   *slog.Logger
 	caseManagementRepository CaseManagementRepository
 	Storage                  *minio.Client
+	Mail                     mailer.Email
 }
 
 type CaseManagementRepository interface {
@@ -60,11 +62,13 @@ func New(
 	cache *redis.Client,
 	logger *slog.Logger,
 	storage *minio.Client,
+	mail mailer.Email,
 ) *UseCase {
 	return &UseCase{
 		caseManagementRepository: caseManagementRepository,
 		Cache:                    cache,
 		Logger:                   logger,
 		Storage:                  storage,
+		Mail:                     mail,
 	}
 }

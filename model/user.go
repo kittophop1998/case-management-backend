@@ -9,18 +9,21 @@ import (
 
 type User struct {
 	Model
-	AgentID    uint      `json:"agentId"`
-	Username   string    `gorm:"type:varchar(50)" json:"username" example:"john.doe"`
-	Email      string    `gorm:"type:varchar(100)" json:"email" example:"user@example.com"`
-	Name       string    `gorm:"type:varchar(100)" json:"name"`
-	TeamID     uuid.UUID `json:"teamId"`
-	Team       Team      `gorm:"foreignKey:TeamID" json:"team"`
-	IsActive   *bool     `json:"isActive"`
-	CenterID   uuid.UUID `json:"centerId"`
-	Center     Center    `gorm:"foreignKey:CenterID" json:"center"`
-	RoleID     uuid.UUID `json:"roleId"`
-	Role       Role      `gorm:"foreignKey:RoleID" json:"role"`
-	OperatorID uint      `json:"operatorId"`
+	AgentID      uint       `json:"agentId"`
+	Username     string     `gorm:"type:varchar(50)" json:"username" example:"john.doe"`
+	DomainName   string     `gorm:"type:varchar(50)" json:"domainName" example:"user"`
+	Email        string     `gorm:"type:varchar(100)" json:"email" example:"user@example.com"`
+	Name         string     `gorm:"type:varchar(100)" json:"name"`
+	TeamID       uuid.UUID  `json:"teamId"`
+	Team         Team       `gorm:"foreignKey:TeamID" json:"team"`
+	IsActive     *bool      `json:"isActive"`
+	CenterID     uuid.UUID  `json:"centerId"`
+	Center       Center     `gorm:"foreignKey:CenterID" json:"center"`
+	RoleID       uuid.UUID  `json:"roleId"`
+	Role         Role       `gorm:"foreignKey:RoleID" json:"role"`
+	OperatorID   uint       `json:"operatorId"`
+	Department   Department `gorm:"foreignKey:DepartmentID" json:"department"`
+	DepartmentID uuid.UUID  `json:"departmentId"`
 }
 
 type UserFilter struct {
