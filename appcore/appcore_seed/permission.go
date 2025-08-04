@@ -12,11 +12,17 @@ func SeedPermission(db *gorm.DB) map[string]uuid.UUID {
 	permissionMap := make(map[string]uuid.UUID)
 
 	permissions := []model.Permission{
-		{Key: "case.create", Name: "Case Create"},
-		{Key: "case.view", Name: "Case View"},
-		{Key: "case.edit", Name: "Case Edit"},
-		{Key: "case.delete", Name: "Case Delete"},
-		{Key: "user.manage", Name: "User Management"},
+		{Key: "user.login", Name: "Login"},
+		{Key: "user.logout", Name: "Logout"},
+		{Key: "user.management", Name: "User Management"},
+		{Key: "user.profile", Name: "View profile"},
+		{Key: "user.assess", Name: "Assess Control"},
+		{Key: "user.customersearch", Name: "Customer Search"},
+		{Key: "user.verifycustomer", Name: "Verify Customer"},
+		{Key: "user.customerdashboard", Name: "Customer Dashboard"},
+		{Key: "case.management", Name: "Case Management"},
+		{Key: "case.exporthistorical", Name: "Export Case Historical"},
+		{Key: "case.standardreport", Name: "Standard Report"},
 	}
 
 	for _, p := range permissions {
