@@ -17,10 +17,9 @@ import (
 
 func (u *UseCase) UploadAttachment(c *gin.Context, files []*multipart.FileHeader, caseID, userID uuid.UUID) error {
 	for _, file := range files {
-		// ดึงนามสกุลไฟล์
+
 		extension := filepath.Ext(file.Filename)
 
-		// สุ่มชื่อไฟล์ใหม่
 		randomName, err := utils.RandStringRunes(10)
 		if err != nil {
 			return err
@@ -33,7 +32,6 @@ func (u *UseCase) UploadAttachment(c *gin.Context, files []*multipart.FileHeader
 		}
 		defer fileContent.Close()
 
-		// ข้อมูลการอัปโหลด
 		bucket := appcore_config.Config.MinioBucketName
 		fileSize := file.Size
 
@@ -70,7 +68,7 @@ func (u *UseCase) GetFile(c *gin.Context, objectName string) (*minio.Object, str
 	if err != nil {
 		return object, "", err
 	}
-	// Get object info to retrieve content type
+
 	objInfo, err := u.Storage.StatObject(bucketName, objectName, minio.StatObjectOptions{})
 	if err != nil {
 		return object, "", err
