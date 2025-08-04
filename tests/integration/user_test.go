@@ -39,7 +39,7 @@ func Setup() *gin.Engine {
 		log.Fatalf("failed to initialize minio client: %v", err)
 	}
 
-	mockeMail := mailer.NewMailtTrap(appcore_config.Config.SMTPHost,
+	mockeMail := mailer.NewMailTrap(appcore_config.Config.SMTPHost,
 		fmt.Sprintf("%s:%s", appcore_config.Config.SMTPHost, appcore_config.Config.SMTPPort),
 		appcore_config.Config.SMTPUser,
 		appcore_config.Config.SMTPPassword,

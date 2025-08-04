@@ -12,7 +12,7 @@ type MailTrap struct {
 	Password    string
 }
 
-func NewMailtTrap(server, addr, senderEmail, password string) Email {
+func NewMailTrap(server, addr, senderEmail, password string) Email {
 	return &MailTrap{
 		Server:      server,
 		Addr:        addr,
@@ -21,7 +21,7 @@ func NewMailtTrap(server, addr, senderEmail, password string) Email {
 	}
 }
 
-// func NewMailtTrap(host, port, username, password string) *Mailer {
+// func NewMailTrap(host, port, username, password string) *Mailer {
 // 	return &Mailer{
 // 		Server:      host,
 // 		Addr:        host + ":" + port,

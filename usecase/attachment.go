@@ -66,10 +66,14 @@ func (u *UseCase) UploadAttachment(c *gin.Context, files []*multipart.FileHeader
 
 func (u *UseCase) GetFile(c *gin.Context, objectName string) (*minio.Object, string, error) {
 	bucketName := appcore_config.Config.MinioBucketName
-	contentType := ""
 	object, err := u.Storage.GetObject(bucketName, objectName, minio.GetObjectOptions{})
 	if err != nil {
-		return object, contentType, err
+		return object, "", err
 	}
-	return object, contentType, nil
+	// Get object info to retrieve content type
+	objInfo, err := u.Storage.StatObject(bucketName, objectName, minio.StatObjectOptions{})
+	if err != nil {
+		return object, "", err
+	}
+	return object, objInfo.ContentType, nil
 }
