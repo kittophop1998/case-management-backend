@@ -1,8 +1,11 @@
 package integration
 
 import (
+	"case-management/appcore/appcore_config"
 	"case-management/handler"
+	"case-management/services/mailer"
 	"case-management/tests/integration/mock"
+	"fmt"
 	"log"
 	"strings"
 
@@ -36,9 +39,15 @@ func Setup() *gin.Engine {
 		log.Fatalf("failed to initialize minio client: %v", err)
 	}
 
+	mockeMail := mailer.NewMailtTrap(appcore_config.Config.SMTPHost,
+		fmt.Sprintf("%s:%s", appcore_config.Config.SMTPHost, appcore_config.Config.SMTPPort),
+		appcore_config.Config.SMTPUser,
+		appcore_config.Config.SMTPPassword,
+	)
+
 	logger := slog.Default()
 
-	u := usecase.New(mockRepo, mockRedis, logger, mockMinio)
+	u := usecase.New(mockRepo, mockRedis, logger, mockMinio, mockeMail)
 	h := handler.NewHandler(u, logger)
 
 	// Gin router

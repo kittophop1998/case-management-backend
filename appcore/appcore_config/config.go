@@ -37,6 +37,12 @@ type Configurations struct {
 	// JWT
 	SecretKey string
 
+	// Email
+	SMTPUser     string
+	SMTPPassword string
+	SMTPHost     string
+	SMTPPort     string
+
 	// CRON Scheduler
 	RunCronScheduler bool
 
@@ -68,12 +74,16 @@ func InitConfigurations() {
 	viper.SetDefault("MEMPHIS_HOST", "")
 	viper.SetDefault("MEMPHIS_USERNAME", "memphis")
 	viper.SetDefault("MEMPHIS_PASSWORD", "memphis")
-	viper.SetDefault("MINIO_URL", "localhost:9010")
+	viper.SetDefault("MINIO_URL", "localhost:9000")
 	viper.SetDefault("MINIO_SSL", false)
-	viper.SetDefault("MINIO_ACCESS_KEY", "minioadmin")
-	viper.SetDefault("MINIO_SECRET_KEY", "minioadmin")
+	viper.SetDefault("MINIO_ACCESS_KEY", "ROOTNAME")
+	viper.SetDefault("MINIO_SECRET_KEY", "CHANGEME123")
 	viper.SetDefault("MINIO_BUCKET_NAME", "miniobucket")
 	viper.SetDefault("SECRET_KEY", "case_management_secret_key")
+	viper.SetDefault("SMTP_USER", "")
+	viper.SetDefault("SMTP_PASSWORD", "")
+	viper.SetDefault("SMTP_HOST", "")
+	viper.SetDefault("SMTP_PORT", "")
 	viper.SetDefault("SYSTEM_I_URL", "")
 	viper.SetDefault("TREASURE_DATA_URL", "")
 	viper.SetDefault("LDAP_URL", "192.168.129.239:389")
@@ -94,6 +104,10 @@ func InitConfigurations() {
 		MinioBucketName:        viper.GetString("MINIO_BUCKET_NAME"),
 		SecretKey:              viper.GetString("SECRET_KEY"),
 		RunCronScheduler:       viper.GetBool("RUN_CRON_SCHEDULER"),
+		SMTPUser:               viper.GetString("SMTP_USER"),
+		SMTPPassword:           viper.GetString("SMTP_PASSWORD"),
+		SMTPHost:               viper.GetString("SMTP_HOST"),
+		SMTPPort:               viper.GetString("SMTP_PORT"),
 		IsObserve:              viper.GetBool("IS_OBSERVE"),
 		SystemIWebsiteURL:      viper.GetString("SYSTEM_I_URL"),
 		TreasureDataWebsiteURL: viper.GetString("TREASURE_DATA_URL"),

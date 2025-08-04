@@ -2,8 +2,11 @@ package handler
 
 import (
 	"case-management/appcore/appcore_handler"
+	"io"
 	"log/slog"
+	"mime"
 	"net/http"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -51,4 +54,31 @@ func (h Handler) UploadAttachment(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, appcore_handler.NewResponseCreated("File(s) uploaded successfully"))
+}
+
+func (h Handler) GetFile(c *gin.Context) {
+	objectName := c.Param("objectName")
+
+	object, _, err := h.UseCase.GetFile(c, objectName)
+	if err != nil {
+		h.Logger.Error("Failed to get file", "object", objectName, "error", err)
+		c.JSON(http.StatusNotFound, gin.H{"error": "Image not found"})
+		return
+	}
+	defer object.Close()
+
+	body, err := io.ReadAll(object)
+	if err != nil {
+		h.Logger.Error("Failed to read file content", "object", objectName, "error", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read file"})
+		return
+	}
+
+	ext := filepath.Ext(objectName)
+	mimeType := mime.TypeByExtension(ext)
+	if mimeType == "" {
+		mimeType = http.DetectContentType(body)
+	}
+
+	c.Data(http.StatusOK, mimeType, body)
 }

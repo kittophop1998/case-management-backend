@@ -18,6 +18,8 @@ func Migrate() error {
 		&model.RolePermission{},
 		&model.Team{},
 		&model.Cases{},
+		&model.Center{},
+		&model.Department{},
 		&model.NoteTypes{},
 		&model.CaseTypes{},
 		&model.CaseStatus{},

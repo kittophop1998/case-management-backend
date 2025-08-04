@@ -44,6 +44,7 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 	attachmentsRoutes.Use(appcore_handler.MiddlewareCheckAccessToken())
 	{
 		attachmentsRoutes.POST("/:case_id", h.UploadAttachment)
+		attachmentsRoutes.GET("/file/*objectName", h.GetFile)
 	}
 
 	caseManagementRoutes := api.Group("/cases")

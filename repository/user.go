@@ -20,6 +20,14 @@ func (a *authRepo) CreateUser(c *gin.Context, user *model.User) (uuid.UUID, erro
 		user.ID = uuid.New()
 	}
 
+	parts := strings.Split(user.Email, "@")
+	if len(parts) == 2 {
+		user.DomainName = parts[0]
+	} else {
+		a.Logger.Warn("Invalid email format", slog.String("email", user.Email))
+		user.DomainName = ""
+	}
+
 	if err := a.DB.Create(user).Error; err != nil {
 		a.Logger.Error("Failed to create user", slog.Any("error", err))
 		return uuid.Nil, err
