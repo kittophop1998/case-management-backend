@@ -18,6 +18,7 @@ package main
 import (
 	"case-management/appcore"
 	"case-management/appcore/appcore_cache"
+	"case-management/appcore/appcore_config"
 	"case-management/appcore/appcore_handler"
 	"case-management/appcore/appcore_logger"
 	"case-management/appcore/appcore_migration"
@@ -26,7 +27,9 @@ import (
 	"case-management/appcore/appcore_store"
 	"case-management/handler"
 	"case-management/repository"
+	"case-management/services/mailer"
 	"case-management/usecase"
+	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -54,11 +57,17 @@ func main() {
 		os.Exit(1)
 	}
 
+	mail := mailer.NewMailer(appcore_config.Config.SMTPHost,
+		fmt.Sprintf("%s:%s", appcore_config.Config.SMTPHost, appcore_config.Config.SMTPPort),
+		appcore_config.Config.SMTPUser,
+		appcore_config.Config.SMTPPassword,
+	)
+
 	// Seeder
 	appcore_seed.SeedAll(appcore_store.DBStore)
 
 	caseManagementRepo := repository.New(appcore_store.DBStore, appcore_logger.Logger, appcore_cache.Cache, appcore_storage.Storage)
-	caseManagementUseCase := usecase.New(caseManagementRepo, appcore_cache.Cache, appcore_logger.Logger, appcore_storage.Storage)
+	caseManagementUseCase := usecase.New(caseManagementRepo, appcore_cache.Cache, appcore_logger.Logger, appcore_storage.Storage, mail)
 	caseManagementHandler := handler.NewHandler(caseManagementUseCase, appcore_logger.Logger)
 
 	// สร้าง handler

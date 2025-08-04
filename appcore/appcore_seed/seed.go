@@ -17,11 +17,14 @@ func SeedAll(db *gorm.DB) {
 	// Seed teams
 	teamMap := SeedTeam(db)
 
+	// Seed Department
+	departmentMap := SeedDepartment(db)
+
 	// Seed permissions
 	SeedPermission(db)
 
 	// Seed users
-	SeedUser(db, roleMap, teamMap, centerMap)
+	SeedUser(db, roleMap, teamMap, centerMap, departmentMap)
 
 	// Seed role_permissions
 	if err := SeedRolePermission(db); err != nil {
