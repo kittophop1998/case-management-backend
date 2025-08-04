@@ -21,6 +21,8 @@ type User struct {
 	Center       Center     `gorm:"foreignKey:CenterID" json:"center"`
 	RoleID       uuid.UUID  `json:"roleId"`
 	Role         Role       `gorm:"foreignKey:RoleID" json:"role"`
+	QueueID      uuid.UUID  `json:"queueId"`
+	Queue        Queue      `gorm:"foreignKey:QueueID" json:"queue"`
 	OperatorID   uint       `json:"operatorId"`
 	Department   Department `gorm:"foreignKey:DepartmentID" json:"department"`
 	DepartmentID uuid.UUID  `json:"departmentId"`

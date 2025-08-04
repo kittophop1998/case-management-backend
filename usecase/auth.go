@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"gopkg.in/ldap.v2"
 )
 
@@ -31,7 +30,7 @@ func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.User, 
 		return nil, err
 	}
 
-	if err := u.generateAndSetTokens(ctx, user.ID, user.Username); err != nil {
+	if err := u.generateAndSetTokens(ctx, user); err != nil {
 		return nil, err
 	}
 
@@ -65,17 +64,20 @@ func (u *UseCase) loginAsAdmin(ctx *gin.Context, username string) (*model.User, 
 		return nil, err
 	}
 
-	if err := u.generateAndSetTokens(ctx, user.ID, username); err != nil {
+	if err := u.generateAndSetTokens(ctx, user); err != nil {
 		return nil, err
 	}
 
 	return user, nil
 }
 
-func (u *UseCase) generateAndSetTokens(ctx *gin.Context, userID uuid.UUID, username string) error {
+func (u *UseCase) generateAndSetTokens(ctx *gin.Context, user *model.User) error {
 	metadata := &appcore_model.Metadata{
-		UserId:   userID,
-		Username: username,
+		UserId:   user.ID,
+		Username: user.Username,
+		CenterId: user.Center.ID,
+		TeamId:   user.Team.ID,
+		QueueId:  user.Queue.ID,
 	}
 
 	accessToken, err := u.GenerateToken(24*time.Hour, metadata)
