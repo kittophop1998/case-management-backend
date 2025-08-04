@@ -68,7 +68,7 @@ func InitConfigurations() {
 	viper.AutomaticEnv()
 	viper.SetDefault("mode", "")
 	viper.SetDefault("GIN_IS_RELEASE_MODE", false)
-	viper.SetDefault("POSTGRES_URL", "host=127.0.0.1 user=postgres password=postgres dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Bangkok")
+	viper.SetDefault("POSTGRES_URL", "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Bangkok")
 	viper.SetDefault("REDIS_URL", "localhost:6379")
 	viper.SetDefault("REDIS_PASS", "password123")
 	viper.SetDefault("MEMPHIS_HOST", "")

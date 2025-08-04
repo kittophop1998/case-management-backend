@@ -225,34 +225,6 @@ func (r *authRepo) BulkInsertUsers(c context.Context, users []model.User) error 
 	return tx.Error
 }
 
-func (r *authRepo) GetAllPermissionsWithRoles(ctx *gin.Context, limit, offset int) ([]model.PermissionWithRolesResponse, error) {
-	var permissions []model.Permission
-
-	if err := r.DB.WithContext(ctx).
-		Preload("Roles").
-		Limit(limit).
-		Offset(offset).
-		Find(&permissions).Error; err != nil {
-		return nil, err
-	}
-
-	var result []model.PermissionWithRolesResponse
-	for _, p := range permissions {
-		var roleNames []string
-		for _, role := range p.Roles {
-			roleNames = append(roleNames, role.Name)
-		}
-
-		result = append(result, model.PermissionWithRolesResponse{
-			Permission: p.Key,
-			Label:      p.Name,
-			Roles:      roleNames,
-		})
-	}
-
-	return result, nil
-}
-
 func (r *authRepo) UpdatePermissionRoles(ctx *gin.Context, req model.UpdatePermissionRolesRequest) error {
 	var permission model.Permission
 	if err := r.DB.WithContext(ctx).Where("key = ?", req.Permission).First(&permission).Error; err != nil {
