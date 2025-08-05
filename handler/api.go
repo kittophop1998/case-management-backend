@@ -34,7 +34,7 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		userRoutes.POST("", h.CreateUser)
 		userRoutes.GET("", h.GetAllUsers)
 		userRoutes.GET("/:id", h.GetUserByID)
-		userRoutes.PUT("/:id", h.UpdateUser)
+		userRoutes.PUT("/:id", h.UpdateUserByID)
 		userRoutes.DELETE("/:id", h.DeleteUserByID)
 		// userRoutes.POST("/import", h.ImportCSV)
 	}

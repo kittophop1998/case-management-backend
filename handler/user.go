@@ -20,7 +20,7 @@ import (
 // @Success 201 {object} model.CreateUserResponse
 // @Router /users [post]
 func (h *Handler) CreateUser(c *gin.Context) {
-	var user model.User
+	var user model.CreateUserRequest
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(
 			err.Error(),
@@ -189,7 +189,7 @@ func (h *Handler) DeleteUserByID(c *gin.Context) {
 // @Param user body model.UserRequest true "User data"
 // @Success 200 {object} model.CreateUserResponse
 // @Router /users/{id} [put]
-func (h *Handler) UpdateUser(c *gin.Context) {
+func (h *Handler) UpdateUserByID(c *gin.Context) {
 	var input model.UserFilter
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(

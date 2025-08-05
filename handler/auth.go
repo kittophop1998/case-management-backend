@@ -9,6 +9,15 @@ import (
 	"github.com/google/uuid"
 )
 
+// Login godoc
+// @Summary      Login
+// @Description  User login endpoint
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        X-Request-ID  header  string  true  "Request ID"
+// @Param        body  body  model.LoginRequest  true  "Login request"
+// @Success      200  {object}  model.LoginResponse
 func (h *Handler) Login(c *gin.Context) {
 	var req model.LoginRequest
 

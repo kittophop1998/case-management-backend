@@ -16,7 +16,7 @@ type User struct {
 	Name         string     `gorm:"type:varchar(100)" json:"name"`
 	TeamID       uuid.UUID  `json:"teamId"`
 	Team         Team       `gorm:"foreignKey:TeamID" json:"team"`
-	IsActive     *bool      `json:"isActive"`
+	IsActive     *bool      `json:"isActive" gorm:"default:true"`
 	CenterID     uuid.UUID  `json:"centerId"`
 	Center       Center     `gorm:"foreignKey:CenterID" json:"center"`
 	RoleID       uuid.UUID  `json:"roleId"`
@@ -81,6 +81,26 @@ type ImportStatus struct {
 	Errors     []string `json:"errors"`
 	Total      int      `json:"total"`
 	Successful int      `json:"successful"`
+}
+
+// Struct For Create User
+type CreateUserRequest struct {
+	AgentID      uint      `json:"agentId" validate:"required" example:"12337"`
+	Username     string    `json:"username" validate:"required" example:"Janet Adebayo"`
+	Email        string    `json:"email" validate:"required" example:"Janet@exam.com"`
+	TeamID       uuid.UUID `json:"teamId" validate:"required" example:"b94eee08-8324-4d4f-b166-d82775553a7e"`
+	OperatorID   uint      `json:"operatorId" validate:"required" example:"1233"`
+	CenterID     uuid.UUID `json:"centerId" validate:"required" example:"b94eee08-8324-4d4f-b166-d82775553a7e"`
+	RoleID       uuid.UUID `json:"roleId" validate:"required" example:"538cd6c5-4cb3-4463-b7d5-ac6645815476"`
+	QueueID      uuid.UUID `json:"queueId" validate:"required" example:"b94eee08-8324-4d4f-b166-d82775553a7e"`
+	DepartmentID uuid.UUID `json:"departmentId" validate:"required" example:"b94eee08-8324-4d4f-b166-d82775553a7e"`
+	IsActive     bool      `json:"isActive" validate:"required" example:"true"`
+}
+
+type CreateUserResponse struct {
+	Data struct {
+		ID uuid.UUID `json:"id"`
+	} `json:"data"`
 }
 
 func (User) TableName() string {

@@ -26,7 +26,7 @@ type UseCase struct {
 
 type CaseManagementRepository interface {
 	// User
-	CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error)
+	CreateUser(c *gin.Context, user *model.CreateUserRequest) (uuid.UUID, error)
 	GetAllUsers(c *gin.Context, limit, offset int, filter model.UserFilter) ([]*model.User, error)
 	GetUserByID(c *gin.Context, id uuid.UUID) (*model.User, error)
 	DeleteUserByID(c *gin.Context, id string) error

@@ -5,6 +5,7 @@ import (
 	"case-management/model"
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"strings"
 
@@ -13,38 +14,52 @@ import (
 	"gorm.io/gorm"
 )
 
-func (a *authRepo) CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error) {
+func (a *authRepo) CreateUser(c *gin.Context, user *model.CreateUserRequest) (uuid.UUID, error) {
 	a.Logger.Info("Creating user", slog.String("username", user.Username))
 
-	if user.ID == uuid.Nil {
-		user.ID = uuid.New()
-	}
+	fmt.Println("create user repo", user)
+
+	var userToSave model.User
+	userToSave.Username = user.Username
+	userToSave.OperatorID = user.OperatorID
+	userToSave.TeamID = user.TeamID
+	userToSave.QueueID = user.QueueID
+	userToSave.CenterID = user.CenterID
+	userToSave.RoleID = user.RoleID
+	userToSave.DepartmentID = user.DepartmentID
+	userToSave.Email = user.Email
 
 	parts := strings.Split(user.Email, "@")
 	if len(parts) == 2 {
-		user.DomainName = parts[0]
+		userToSave.DomainName = parts[0]
 	} else {
 		a.Logger.Warn("Invalid email format", slog.String("email", user.Email))
-		user.DomainName = ""
+		userToSave.DomainName = ""
 	}
 
-	if err := a.DB.Create(user).Error; err != nil {
+	if err := a.DB.Create(&userToSave).Error; err != nil {
 		a.Logger.Error("Failed to create user", slog.Any("error", err))
 		return uuid.Nil, err
 	}
 
-	a.Logger.Info("User created successfully", slog.Any("user_id", user.ID))
-	return user.ID, nil
+	a.Logger.Info("User created successfully", slog.Any("user_id", userToSave.ID))
+	return userToSave.ID, nil
 }
 
 func (r *authRepo) GetAllUsers(c *gin.Context, limit, offset int, filter model.UserFilter) ([]*model.User, error) {
 	var users []*model.User
 
 	query := r.DB.WithContext(c).Model(&model.User{}).
-		Preload("Role").Preload("Center").Preload("Team").
+		Preload("Role").
+		Preload("Center").
+		Preload("Team").
+		Preload("Department").
+		Preload("Queue").
 		Joins("LEFT JOIN roles ON roles.id = users.role_id").
 		Joins("LEFT JOIN centers ON centers.id = users.center_id").
-		Joins("LEFT JOIN teams ON teams.id = users.team_id")
+		Joins("LEFT JOIN teams ON teams.id = users.team_id").
+		Joins("LEFT JOIN departments ON departments.id = users.department_id").
+		Joins("LEFT JOIN queues ON queues.id = users.queue_id")
 
 	if filter.Keyword != "" {
 		kw := "%" + strings.TrimSpace(filter.Keyword) + "%"
