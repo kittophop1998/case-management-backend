@@ -24,6 +24,11 @@ type Cases struct {
 	SLADate             time.Time `json:"sla_date"`
 }
 
+type CaseWithInitialDescriptions struct {
+	Cases
+	InitialDescriptions []string `json:"initial_descriptions"`
+}
+
 type CaseFilter struct {
 	Keyword     string     `form:"keyword" json:"keyword"`
 	StatusID    *uint      `form:"status_id" json:"status_id"`
@@ -34,8 +39,9 @@ type CaseFilter struct {
 }
 
 type NoteTypes struct {
-	ID   uuid.UUID `gorm:"primaryKey;default:uuid_generate_v4()" json:"id"`
-	Name string    `json:"name"`
+	ID          uuid.UUID `gorm:"primaryKey;default:uuid_generate_v4()" json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description" gorm:"type:text"`
 }
 
 type CaseTypes struct {
@@ -61,7 +67,7 @@ type CaseNotes struct {
 	ID          uuid.UUID `gorm:"primaryKey;default:uuid_generate_v4()" json:"id"`
 	CaseId      uuid.UUID `json:"case_id" gorm:"type:uuid;default:uuid_generate_v4()"`
 	UserId      uuid.UUID `json:"user_id" gorm:"type:uuid;default:uuid_generate_v4()"`
-	NoteTypesId uint      `json:"note_types_id"`
+	NoteTypesId uuid.UUID `json:"note_types_id"`
 	Content     string    `json:"content" gorm:"type:text"`
 	CreatedAt   time.Time `json:"created_at"`
 }

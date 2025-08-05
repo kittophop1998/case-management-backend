@@ -30,3 +30,11 @@ func (u *UseCase) GetAllCases(c *gin.Context, page, limit int, filter model.Case
 
 	return cases, total, nil
 }
+
+func (u *UseCase) CreateNoteType(c *gin.Context, note model.NoteTypes) (*model.NoteTypes, error) {
+	return u.caseManagementRepository.CreateNoteType(c, note)
+}
+
+func (u *UseCase) GetCaseByID(ctx *gin.Context, id string) (*model.CaseWithInitialDescriptions, error) {
+	return u.caseManagementRepository.GetCaseByID(ctx, id)
+}
