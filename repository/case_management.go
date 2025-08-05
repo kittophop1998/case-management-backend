@@ -100,3 +100,29 @@ func (r *authRepo) CountCasesWithFilter(c *gin.Context, filter model.CaseFilter)
 
 	return int(count), nil
 }
+
+func (r *authRepo) CreateNoteType(c *gin.Context, note model.NoteTypes) (*model.NoteTypes, error) {
+	if err := r.DB.WithContext(c).Create(&note).Error; err != nil {
+		return nil, err
+	}
+	return &note, nil
+}
+
+func (r *authRepo) GetCaseByID(c *gin.Context, id string) (*model.CaseWithInitialDescriptions, error) {
+	var selectedCase model.Cases
+	if err := r.DB.WithContext(c).First(&selectedCase, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+
+	var descriptions []string
+	if err := r.DB.WithContext(c).
+		Model(&model.Cases{}).
+		Pluck("initial_description", &descriptions).Error; err != nil {
+		return nil, err
+	}
+
+	return &model.CaseWithInitialDescriptions{
+		Cases:               selectedCase,
+		InitialDescriptions: descriptions,
+	}, nil
+}

@@ -86,3 +86,35 @@ func (h *Handler) GetAllCases(c *gin.Context) {
 	c.JSON(http.StatusOK, appcore_model.NewPaginatedResponse(cases, page, limit, total))
 
 }
+
+func (h *Handler) CreateNoteType(c *gin.Context) {
+	var note model.NoteTypes
+	if err := c.ShouldBindJSON(&note); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	result, err := h.UseCase.CreateNoteType(c, note)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot create note type"})
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
+}
+
+func (h *Handler) GetCaseByID(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing case ID"})
+		return
+	}
+
+	caseData, err := h.UseCase.GetCaseByID(c, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": caseData})
+}

@@ -26,6 +26,12 @@ func SeedAll(db *gorm.DB) {
 	// Seed permissions
 	SeedPermission(db)
 
+	// Seed Note
+	SeedNote(db)
+
+	// Seed Case Note
+	SeedCaseNotes(db)
+
 	// Seed users
 	SeedUser(db, roleMap, teamMap, centerMap, departmentMap, queueMap)
 

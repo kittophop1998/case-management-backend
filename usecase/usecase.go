@@ -49,6 +49,8 @@ type CaseManagementRepository interface {
 	CreateCase(ctx *gin.Context, c *model.Cases) (uuid.UUID, error)
 	GetAllCases(c *gin.Context, limit, offset int, filter model.CaseFilter) ([]*model.Cases, error)
 	CountCasesWithFilter(c *gin.Context, filter model.CaseFilter) (int, error)
+	CreateNoteType(c *gin.Context, note model.NoteTypes) (*model.NoteTypes, error)
+	GetCaseByID(c *gin.Context, id string) (*model.CaseWithInitialDescriptions, error)
 
 	// Attachment
 	UploadAttachment(c *gin.Context, caseID uuid.UUID, file model.Attachment) (uuid.UUID, error)
