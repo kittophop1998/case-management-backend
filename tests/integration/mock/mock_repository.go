@@ -189,6 +189,6 @@ func (m *MockRepository) CreateNoteType(c *gin.Context, note model.NoteTypes) (*
 	return nil, nil
 }
 
-func (m *MockRepository) GetCaseByID(c *gin.Context, id string) (*model.CaseWithInitialDescriptions, error) {
+func (m *MockRepository) GetCaseByID(c *gin.Context, id uuid.UUID) (*model.Cases, error) {
 	return nil, nil
 }

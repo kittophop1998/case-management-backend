@@ -108,21 +108,10 @@ func (r *authRepo) CreateNoteType(c *gin.Context, note model.NoteTypes) (*model.
 	return &note, nil
 }
 
-func (r *authRepo) GetCaseByID(c *gin.Context, id string) (*model.CaseWithInitialDescriptions, error) {
-	var selectedCase model.Cases
-	if err := r.DB.WithContext(c).First(&selectedCase, "id = ?", id).Error; err != nil {
+func (r *authRepo) GetCaseByID(c *gin.Context, id uuid.UUID) (*model.Cases, error) {
+	var cases model.Cases
+	if err := r.DB.WithContext(c).First(&cases, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
-
-	var descriptions []string
-	if err := r.DB.WithContext(c).
-		Model(&model.Cases{}).
-		Pluck("initial_description", &descriptions).Error; err != nil {
-		return nil, err
-	}
-
-	return &model.CaseWithInitialDescriptions{
-		Cases:               selectedCase,
-		InitialDescriptions: descriptions,
-	}, nil
+	return &cases, nil
 }
