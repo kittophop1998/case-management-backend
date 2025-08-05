@@ -4,6 +4,7 @@ import (
 	"case-management/appcore/appcore_internal/appcore_model"
 	"case-management/model"
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -79,6 +80,8 @@ func (m *MockRepository) CreateUser(c *gin.Context, user *model.CreateUserReques
 		TeamID:   user.TeamID,
 		IsActive: &user.IsActive,
 	}
+
+	fmt.Printf("Mock created user: %+v\n", mockUser)
 
 	return mockUser.ID, nil
 }
