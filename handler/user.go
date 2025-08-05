@@ -16,7 +16,7 @@ import (
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param user body model.UserRequest true "User data"
+// @Param user body model.CreateUserRequest true "User data"
 // @Success 201 {object} model.CreateUserResponse
 // @Router /users [post]
 func (h *Handler) CreateUser(c *gin.Context) {
@@ -116,7 +116,7 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 // @Tags         Users
 // @Accept       json
 // @Produce      json
-// @Param        id   path      int  true  "User ID"
+// @Param        id   path  string  true  "User ID"
 // @Success      200  {object}  model.User
 // @Router       /users/{id} [get]
 func (h *Handler) GetUserByID(c *gin.Context) {
@@ -186,7 +186,7 @@ func (h *Handler) DeleteUserByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path int true "User ID"
-// @Param user body model.UserRequest true "User data"
+// @Param user body model.CreateUserRequest true "User data"
 // @Success 200 {object} model.CreateUserResponse
 // @Router /users/{id} [put]
 func (h *Handler) UpdateUserByID(c *gin.Context) {

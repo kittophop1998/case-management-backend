@@ -10,14 +10,13 @@ import (
 )
 
 // Login godoc
-// @Summary      Login
-// @Description  User login endpoint
-// @Tags         Auth
-// @Accept       json
-// @Produce      json
-// @Param        X-Request-ID  header  string  true  "Request ID"
-// @Param        body  body  model.LoginRequest  true  "Login request"
-// @Success      200  {object}  model.LoginResponse
+// @Summary Login a user
+// @Description Login a user with the provided credentials
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} model.LoginResponse
+// @Router /auth/login [post]
 func (h *Handler) Login(c *gin.Context) {
 	var req model.LoginRequest
 
@@ -53,6 +52,14 @@ func (h *Handler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// Logout godoc
+// @Summary Logout a user
+// @Description Logout a user and clear session
+// @Tags Auth
+// @Success 200 {object} map[string]string
+// @Accept json
+// @Produce json
+// @Router /auth/logout [post]
 func (h *Handler) Logout(c *gin.Context) {
 	if err := h.UseCase.Logout(c); err != nil {
 		appcore_handler.HandleError(c, err)
@@ -62,6 +69,14 @@ func (h *Handler) Logout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }
 
+// Profile godoc
+// @Summary Get user profile
+// @Description Get the profile of the logged-in user
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} model.UserResponse
+// @Router /auth/profile [get]
 func (h *Handler) Profile(c *gin.Context) {
 	userId, exists := c.Get("userId")
 	if !exists {

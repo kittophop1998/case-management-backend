@@ -11,6 +11,50 @@ definitions:
       name:
         type: string
     type: object
+  model.CreateUserRequest:
+    properties:
+      agentId:
+        example: 12337
+        type: integer
+      centerId:
+        example: b94eee08-8324-4d4f-b166-d82775553a7e
+        type: string
+      departmentId:
+        example: b94eee08-8324-4d4f-b166-d82775553a7e
+        type: string
+      email:
+        example: Janet@exam.com
+        type: string
+      isActive:
+        example: true
+        type: boolean
+      operatorId:
+        example: 1233
+        type: integer
+      queueId:
+        example: b94eee08-8324-4d4f-b166-d82775553a7e
+        type: string
+      roleId:
+        example: 538cd6c5-4cb3-4463-b7d5-ac6645815476
+        type: string
+      teamId:
+        example: b94eee08-8324-4d4f-b166-d82775553a7e
+        type: string
+      username:
+        example: Janet Adebayo
+        type: string
+    required:
+    - agentId
+    - centerId
+    - departmentId
+    - email
+    - isActive
+    - operatorId
+    - queueId
+    - roleId
+    - teamId
+    - username
+    type: object
   model.CreateUserResponse:
     properties:
       data:
@@ -25,9 +69,18 @@ definitions:
         example: User deleted successfully
         type: string
     type: object
-  model.MessageResponse:
+  model.Department:
     properties:
-      message:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  model.LoginResponse:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
         type: string
     type: object
   model.Permission:
@@ -44,6 +97,13 @@ definitions:
         items:
           $ref: '#/definitions/model.Role'
         type: array
+    type: object
+  model.Queue:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
     type: object
   model.Role:
     properties:
@@ -73,6 +133,13 @@ definitions:
         type: string
       createdAt:
         type: string
+      department:
+        $ref: '#/definitions/model.Department'
+      departmentId:
+        type: string
+      domainName:
+        example: user
+        type: string
       email:
         example: user@example.com
         type: string
@@ -84,6 +151,10 @@ definitions:
         type: string
       operatorId:
         type: integer
+      queue:
+        $ref: '#/definitions/model.Queue'
+      queueId:
+        type: string
       role:
         $ref: '#/definitions/model.Role'
       roleId:
@@ -98,31 +169,13 @@ definitions:
         example: john.doe
         type: string
     type: object
-  model.UserRequest:
+  model.UserResponse:
     properties:
-      agentId:
-        example: "12337"
-        type: string
-      centerId:
-        example: b94eee08-8324-4d4f-b166-d82775553a7e
-        type: string
-      email:
-        example: Janet@exam.com
-        type: string
-      isActive:
-        example: true
-        type: boolean
-      operatorId:
-        example: "1233"
-        type: string
+      role:
+        $ref: '#/definitions/model.Role'
       roleId:
-        example: 538cd6c5-4cb3-4463-b7d5-ac6645815476
         type: string
-      team:
-        example: Inbound
-        type: string
-      userName:
-        example: Janet Adebayo
+      username:
         type: string
     type: object
 host: localhost:8000
@@ -139,21 +192,53 @@ info:
   title: Case Management API
   version: "1.0"
 paths:
-  /health:
-    get:
+  /auth/login:
+    post:
       consumes:
       - application/json
-      description: Get server health status
+      description: Login a user with the provided credentials
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.MessageResponse'
-      summary: Show the status of server
+            $ref: '#/definitions/model.LoginResponse'
+      summary: Login a user
       tags:
-      - Health
+      - Auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout a user and clear session
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Logout a user
+      tags:
+      - Auth
+  /auth/profile:
+    get:
+      consumes:
+      - application/json
+      description: Get the profile of the logged-in user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserResponse'
+      summary: Get user profile
+      tags:
+      - Auth
   /lookups:
     get:
       consumes:
@@ -196,7 +281,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/model.UserRequest'
+          $ref: '#/definitions/model.CreateUserRequest'
       produces:
       - application/json
       responses:
@@ -235,7 +320,7 @@ paths:
         in: path
         name: id
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -261,7 +346,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/model.UserRequest'
+          $ref: '#/definitions/model.CreateUserRequest'
       produces:
       - application/json
       responses:

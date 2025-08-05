@@ -64,16 +64,23 @@ func (m *MockRepository) GetUserByID(c *gin.Context, id uuid.UUID) (*model.User,
 	return mockUser, nil
 }
 
-func (m *MockRepository) CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error) {
-	if user.ID == uuid.Nil {
-		newID, err := uuid.NewUUID()
-		if err != nil {
-			return uuid.Nil, err
-		}
-		user.ID = newID
+func (m *MockRepository) CreateUser(c *gin.Context, user *model.CreateUserRequest) (uuid.UUID, error) {
+	newID, err := uuid.NewUUID()
+	if err != nil {
+		return uuid.Nil, err
 	}
 
-	return user.ID, nil
+	mockUser := &model.User{
+		Model: model.Model{
+			ID: newID,
+		},
+		Username: user.Username,
+		Email:    user.Email,
+		TeamID:   user.TeamID,
+		IsActive: &user.IsActive,
+	}
+
+	return mockUser.ID, nil
 }
 
 func (m *MockRepository) DeleteUserByID(c *gin.Context, id string) error {
