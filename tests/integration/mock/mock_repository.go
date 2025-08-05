@@ -184,3 +184,11 @@ func (m *MockRepository) CreateAuditLog(c *gin.Context, log model.AuditLog) erro
 func (m *MockRepository) UploadAttachment(c *gin.Context, caseID uuid.UUID, file model.Attachment) (uuid.UUID, error) {
 	return uuid.Nil, nil
 }
+
+func (m *MockRepository) CreateNoteType(c *gin.Context, note model.NoteTypes) (*model.NoteTypes, error) {
+	return nil, nil
+}
+
+func (m *MockRepository) GetCaseByID(c *gin.Context, id string) (*model.CaseWithInitialDescriptions, error) {
+	return nil, nil
+}
