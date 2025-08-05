@@ -7,7 +7,6 @@ type Permission struct {
 	Key   string    `gorm:"uniqueIndex;not null" json:"key"`
 	Name  string    `gorm:"uniqueIndex;not null" json:"name"`
 	Roles []Role    `gorm:"many2many:role_permissions"`
-	Label string    `json:"label"`
 }
 
 type Role struct {
