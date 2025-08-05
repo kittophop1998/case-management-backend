@@ -39,6 +39,12 @@ func (r *authRepo) GetAllLookups(ctx *gin.Context) (map[string]interface{}, erro
 	}
 	result["permissions"] = permissions
 
+	var departments []model.Department
+	if err := r.DB.WithContext(ctx).Model(&model.Department{}).Find(&departments).Error; err != nil {
+		return nil, err
+	}
+	result["departments"] = departments
+
 	return result, nil
 }
 
