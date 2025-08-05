@@ -55,7 +55,7 @@ func Setup() *gin.Engine {
 	router.GET("/users", h.GetAllUsers)
 	router.GET("/users/:id", h.GetUserByID)
 	router.POST("/users", h.CreateUser)
-	router.PUT("/users/:id", h.UpdateUser)
+	router.PUT("/users/:id", h.UpdateUserByID)
 	router.DELETE("/users/:id", h.DeleteUserByID)
 	router.GET("/lookups", h.GetAllLookups)
 

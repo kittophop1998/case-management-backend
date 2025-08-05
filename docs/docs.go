@@ -24,9 +24,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/health": {
-            "get": {
-                "description": "Get server health status",
+        "/auth/login": {
+            "post": {
+                "description": "Login a user with the provided credentials",
                 "consumes": [
                     "application/json"
                 ],
@@ -34,14 +34,63 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Health"
+                    "Auth"
                 ],
-                "summary": "Show the status of server",
+                "summary": "Login a user",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.MessageResponse"
+                            "$ref": "#/definitions/model.LoginResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "description": "Logout a user and clear session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout a user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/profile": {
+            "get": {
+                "description": "Get the profile of the logged-in user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get user profile",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.UserResponse"
                         }
                     }
                 }
@@ -114,7 +163,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.UserRequest"
+                            "$ref": "#/definitions/model.CreateUserRequest"
                         }
                     }
                 ],
@@ -143,7 +192,7 @@ const docTemplate = `{
                 "summary": "Get user by ID",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "User ID",
                         "name": "id",
                         "in": "path",
@@ -185,7 +234,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.UserRequest"
+                            "$ref": "#/definitions/model.CreateUserRequest"
                         }
                     }
                 ],
@@ -245,6 +294,63 @@ const docTemplate = `{
                 }
             }
         },
+        "model.CreateUserRequest": {
+            "type": "object",
+            "required": [
+                "agentId",
+                "centerId",
+                "departmentId",
+                "email",
+                "isActive",
+                "operatorId",
+                "queueId",
+                "roleId",
+                "teamId",
+                "username"
+            ],
+            "properties": {
+                "agentId": {
+                    "type": "integer",
+                    "example": 12337
+                },
+                "centerId": {
+                    "type": "string",
+                    "example": "b94eee08-8324-4d4f-b166-d82775553a7e"
+                },
+                "departmentId": {
+                    "type": "string",
+                    "example": "b94eee08-8324-4d4f-b166-d82775553a7e"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "Janet@exam.com"
+                },
+                "isActive": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "operatorId": {
+                    "type": "integer",
+                    "example": 1233
+                },
+                "queueId": {
+                    "type": "string",
+                    "example": "b94eee08-8324-4d4f-b166-d82775553a7e"
+                },
+                "roleId": {
+                    "type": "string",
+                    "example": "538cd6c5-4cb3-4463-b7d5-ac6645815476"
+                },
+                "teamId": {
+                    "type": "string",
+                    "example": "b94eee08-8324-4d4f-b166-d82775553a7e"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "Janet Adebayo"
+                }
+            }
+        },
         "model.CreateUserResponse": {
             "type": "object",
             "properties": {
@@ -267,10 +373,24 @@ const docTemplate = `{
                 }
             }
         },
-        "model.MessageResponse": {
+        "model.Department": {
             "type": "object",
             "properties": {
-                "message": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "refreshToken": {
                     "type": "string"
                 }
             }
@@ -295,6 +415,17 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/model.Role"
                     }
+                }
+            }
+        },
+        "model.Queue": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -341,6 +472,16 @@ const docTemplate = `{
                 "createdAt": {
                     "type": "string"
                 },
+                "department": {
+                    "$ref": "#/definitions/model.Department"
+                },
+                "departmentId": {
+                    "type": "string"
+                },
+                "domainName": {
+                    "type": "string",
+                    "example": "user"
+                },
                 "email": {
                     "type": "string",
                     "example": "user@example.com"
@@ -356,6 +497,12 @@ const docTemplate = `{
                 },
                 "operatorId": {
                     "type": "integer"
+                },
+                "queue": {
+                    "$ref": "#/definitions/model.Queue"
+                },
+                "queueId": {
+                    "type": "string"
                 },
                 "role": {
                     "$ref": "#/definitions/model.Role"
@@ -378,40 +525,17 @@ const docTemplate = `{
                 }
             }
         },
-        "model.UserRequest": {
+        "model.UserResponse": {
             "type": "object",
             "properties": {
-                "agentId": {
-                    "type": "string",
-                    "example": "12337"
-                },
-                "centerId": {
-                    "type": "string",
-                    "example": "b94eee08-8324-4d4f-b166-d82775553a7e"
-                },
-                "email": {
-                    "type": "string",
-                    "example": "Janet@exam.com"
-                },
-                "isActive": {
-                    "type": "boolean",
-                    "example": true
-                },
-                "operatorId": {
-                    "type": "string",
-                    "example": "1233"
+                "role": {
+                    "$ref": "#/definitions/model.Role"
                 },
                 "roleId": {
-                    "type": "string",
-                    "example": "538cd6c5-4cb3-4463-b7d5-ac6645815476"
+                    "type": "string"
                 },
-                "team": {
-                    "type": "string",
-                    "example": "Inbound"
-                },
-                "userName": {
-                    "type": "string",
-                    "example": "Janet Adebayo"
+                "username": {
+                    "type": "string"
                 }
             }
         }
