@@ -53,6 +53,7 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		caseManagementRoutes.GET("", h.GetAllCases)
 		caseManagementRoutes.POST("/note_type", h.CreateNoteType)
 		caseManagementRoutes.GET("/:id", h.GetCaseByID)
+		caseManagementRoutes.POST("/add-initial-description", h.AddInitialDescription)
 	}
 
 	// Refresh token api

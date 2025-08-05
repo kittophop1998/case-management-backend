@@ -2,11 +2,13 @@ package repository
 
 import (
 	"case-management/model"
+	"encoding/json"
 	"log/slog"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"gorm.io/datatypes"
 )
 
 func (a *authRepo) CreateCase(ctx *gin.Context, c *model.Cases) (uuid.UUID, error) {
@@ -114,4 +116,40 @@ func (r *authRepo) GetCaseByID(c *gin.Context, id uuid.UUID) (*model.Cases, erro
 		return nil, err
 	}
 	return &cases, nil
+}
+
+func (r *authRepo) AddInitialDescription(c *gin.Context, caseID uuid.UUID, newDescription string) error {
+	var caseRecord struct {
+		InitialDescriptions datatypes.JSON `gorm:"type:jsonb"`
+	}
+
+	err := r.DB.WithContext(c).
+		Model(&model.Cases{}).
+		Select("initial_descriptions").
+		Where("id = ?", caseID).
+		Take(&caseRecord).Error
+	if err != nil {
+		return err
+	}
+
+	var descriptions []string
+	if len(caseRecord.InitialDescriptions) > 0 {
+		if err := json.Unmarshal(caseRecord.InitialDescriptions, &descriptions); err != nil {
+			descriptions = []string{}
+		}
+	} else {
+		descriptions = []string{}
+	}
+
+	descriptions = append(descriptions, newDescription)
+
+	updatedJSON, err := json.Marshal(descriptions)
+	if err != nil {
+		return err
+	}
+
+	return r.DB.WithContext(c).
+		Model(&model.Cases{}).
+		Where("id = ?", caseID).
+		Update("initial_descriptions", datatypes.JSON(updatedJSON)).Error
 }

@@ -41,6 +41,11 @@ type Department struct {
 	Name string    `gorm:"type:varchar(100)" json:"name"`
 }
 
+type AddInitialDescriptionRequest struct {
+	CaseID      string `json:"case_id" binding:"required,uuid"`
+	Description string `json:"description" binding:"required"`
+}
+
 func (RolePermission) TableName() string {
 	return "role_permissions"
 }
