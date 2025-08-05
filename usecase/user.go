@@ -18,7 +18,7 @@ const (
 	ColName     = 6
 )
 
-func (u *UseCase) CreateUser(c *gin.Context, user *model.User) (uuid.UUID, error) {
+func (u *UseCase) CreateUser(c *gin.Context, user *model.CreateUserRequest) (uuid.UUID, error) {
 	id, err := u.caseManagementRepository.CreateUser(c, user)
 	if err != nil {
 		return uuid.Nil, err

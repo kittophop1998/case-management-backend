@@ -13,7 +13,7 @@ import (
 	"gopkg.in/ldap.v2"
 )
 
-func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.User, error) {
+func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.LoginResponse, error) {
 	// Check if it's a hardcoded admin login
 	if isAdminLogin(req) {
 		return u.loginAsAdmin(ctx, req.Username)
@@ -30,11 +30,37 @@ func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.User, 
 		return nil, err
 	}
 
-	if err := u.generateAndSetTokens(ctx, user); err != nil {
-		return nil, err
+	// TODO: Uncomment if you want to generate and set tokens in cookies
+	// if err := u.generateAndSetTokens(ctx, user); err != nil {
+	// 	return nil, err
+	// }
+
+	accessToken, err := u.GenerateToken(24*time.Hour, &appcore_model.Metadata{
+		UserId:   user.ID,
+		Username: user.Username,
+		CenterId: user.Center.ID,
+		TeamId:   user.Team.ID,
+		QueueId:  user.Queue.ID,
+	})
+	if err != nil {
+		return nil, appcore_handler.ErrInternalServer
 	}
 
-	return user, nil
+	refreshToken, err := u.GenerateToken(3*24*time.Hour, &appcore_model.Metadata{
+		UserId:   user.ID,
+		Username: user.Username,
+		CenterId: user.Center.ID,
+		TeamId:   user.Team.ID,
+		QueueId:  user.Queue.ID,
+	})
+	if err != nil {
+		return nil, appcore_handler.ErrInternalServer
+	}
+
+	return &model.LoginResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}, nil
 }
 
 func (u *UseCase) Logout(ctx *gin.Context) error {
@@ -58,17 +84,42 @@ func (u *UseCase) clearCookies(c *gin.Context, name string) {
 	})
 }
 
-func (u *UseCase) loginAsAdmin(ctx *gin.Context, username string) (*model.User, error) {
+func (u *UseCase) loginAsAdmin(ctx *gin.Context, username string) (*model.LoginResponse, error) {
 	user, err := u.caseManagementRepository.GetUserByUserName(ctx, username)
 	if err != nil {
 		return nil, err
+	}
+
+	accesstoken, err := u.GenerateToken(24*time.Hour, &appcore_model.Metadata{
+		UserId:   user.ID,
+		Username: user.Username,
+		CenterId: user.Center.ID,
+		TeamId:   user.Team.ID,
+		QueueId:  user.Queue.ID,
+	})
+	if err != nil {
+		return nil, appcore_handler.ErrInternalServer
+	}
+
+	refreshToken, err := u.GenerateToken(3*24*time.Hour, &appcore_model.Metadata{
+		UserId:   user.ID,
+		Username: user.Username,
+		CenterId: user.Center.ID,
+		TeamId:   user.Team.ID,
+		QueueId:  user.Queue.ID,
+	})
+	if err != nil {
+		return nil, appcore_handler.ErrInternalServer
 	}
 
 	if err := u.generateAndSetTokens(ctx, user); err != nil {
 		return nil, err
 	}
 
-	return user, nil
+	return &model.LoginResponse{
+		AccessToken:  accesstoken,
+		RefreshToken: refreshToken,
+	}, nil
 }
 
 func (u *UseCase) generateAndSetTokens(ctx *gin.Context, user *model.User) error {
