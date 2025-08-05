@@ -39,30 +39,42 @@ func parseToken(tokenString string) (*appcore_model.JwtClaims, error) {
 
 func MiddlewareCheckAccessToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token, err := c.Cookie("access_token")
-		if err != nil || token == "" {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": errorInvalidTokenMsg})
+		token, err := extractBearerToken(c)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
 		}
 
 		claims, err := parseToken(token)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid or expired token"})
 			return
 		}
 
-		// TODO: ตรวจสอบ token ใน Redis เพื่อเช็คว่า token นี้ยัง valid อยู่หรือถูก revoked หรือไม่
-		// ตัวอย่าง:
-		// exists, err := appcore_cache.Cache.Exists(c, token).Result()
-		// if err != nil || exists != 1 {
-		// 	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token revoked or invalid"})
-		// 	return
+		// Optional: Check Redis blacklist
+		// if isRevoked(token) {
+		//     c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token has been revoked"})
+		//     return
 		// }
 
 		c.Set("userId", claims.UserId)
 		c.Set("username", claims.Username)
 		c.Next()
 	}
+}
+
+func extractBearerToken(c *gin.Context) (string, error) {
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		return "", errors.New("Authorization header is required")
+	}
+
+	parts := strings.SplitN(authHeader, " ", 2)
+	if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
+		return "", errors.New("Authorization header format must be Bearer {token}")
+	}
+
+	return parts[1], nil
 }
 
 func MiddlewareCheckRefreshToken() gin.HandlerFunc {
