@@ -125,3 +125,24 @@ func (h *Handler) GetCaseByID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": caseData})
 }
+
+func (h *Handler) AddInitialDescription(c *gin.Context) {
+	var req model.AddInitialDescriptionRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	caseUUID, err := uuid.Parse(req.CaseID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid case ID"})
+		return
+	}
+
+	if err := h.UseCase.AddInitialDescription(c, caseUUID, req.Description); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "initial description added"})
+}

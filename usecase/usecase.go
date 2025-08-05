@@ -51,6 +51,7 @@ type CaseManagementRepository interface {
 	CountCasesWithFilter(c *gin.Context, filter model.CaseFilter) (int, error)
 	CreateNoteType(c *gin.Context, note model.NoteTypes) (*model.NoteTypes, error)
 	GetCaseByID(c *gin.Context, id uuid.UUID) (*model.Cases, error)
+	AddInitialDescription(c *gin.Context, caseID uuid.UUID, newDescription string) error
 
 	// Attachment
 	UploadAttachment(c *gin.Context, caseID uuid.UUID, file model.Attachment) (uuid.UUID, error)

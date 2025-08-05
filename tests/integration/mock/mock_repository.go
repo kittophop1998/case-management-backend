@@ -192,3 +192,7 @@ func (m *MockRepository) CreateNoteType(c *gin.Context, note model.NoteTypes) (*
 func (m *MockRepository) GetCaseByID(c *gin.Context, id uuid.UUID) (*model.Cases, error) {
 	return nil, nil
 }
+
+func (M *MockRepository) AddInitialDescription(c *gin.Context, caseID uuid.UUID, newDescription string) error {
+	return nil
+}

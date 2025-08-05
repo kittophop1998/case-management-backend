@@ -38,3 +38,7 @@ func (u *UseCase) CreateNoteType(c *gin.Context, note model.NoteTypes) (*model.N
 func (u *UseCase) GetCaseByID(ctx *gin.Context, id uuid.UUID) (*model.Cases, error) {
 	return u.caseManagementRepository.GetCaseByID(ctx, id)
 }
+
+func (u *UseCase) AddInitialDescription(c *gin.Context, caseID uuid.UUID, newDescription string) error {
+	return u.caseManagementRepository.AddInitialDescription(c, caseID, newDescription)
+}
