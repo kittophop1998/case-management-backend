@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func (h *Handler) CreateCase(c *gin.Context) {
@@ -104,9 +105,15 @@ func (h *Handler) CreateNoteType(c *gin.Context) {
 }
 
 func (h *Handler) GetCaseByID(c *gin.Context) {
-	id := c.Param("id")
-	if id == "" {
+	idParam := c.Param("id")
+	if idParam == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing case ID"})
+		return
+	}
+
+	id, err := uuid.Parse(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid UUID format"})
 		return
 	}
 

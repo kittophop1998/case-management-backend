@@ -5,28 +5,24 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/datatypes"
 )
 
 type Cases struct {
 	Model
-	Title               string    `json:"title"`
-	CustomerId          string    `json:"customer_id"`
-	CreditCardAccountId string    `json:"credit_card_account_id"`
-	LoanAccountId       string    `json:"loan_account_id"`
-	AssignedToUserId    uuid.UUID `json:"assigned_to_user_id" gorm:"type:uuid;default:uuid_generate_v4()"`
-	StatusId            uint      `json:"status_id"`
-	PriorityId          uint      `json:"priority_id"`
-	StartDate           time.Time `json:"start_date" gorm:"type:date"`
-	EndDate             time.Time `json:"end_date" gorm:"type:date"`
-	InitialDescription  string    `json:"initial_description" gorm:"type:text"`
-	Resolution          string    `json:"resolution" gorm:"type:text"`
-	CreatedBy           string    `json:"created_by"`
-	SLADate             time.Time `json:"sla_date"`
-}
-
-type CaseWithInitialDescriptions struct {
-	Cases
-	InitialDescriptions []string `json:"initial_descriptions"`
+	Title               string         `json:"title"`
+	CustomerId          string         `json:"customer_id"`
+	CreditCardAccountId string         `json:"credit_card_account_id"`
+	LoanAccountId       string         `json:"loan_account_id"`
+	AssignedToUserId    uuid.UUID      `json:"assigned_to_user_id" gorm:"type:uuid;default:uuid_generate_v4()"`
+	StatusId            uint           `json:"status_id"`
+	PriorityId          uint           `json:"priority_id"`
+	StartDate           time.Time      `json:"start_date" gorm:"type:date"`
+	EndDate             time.Time      `json:"end_date" gorm:"type:date"`
+	InitialDescriptions datatypes.JSON `json:"initial_descriptions" gorm:"type:jsonb"`
+	Resolution          string         `json:"resolution" gorm:"type:text"`
+	CreatedBy           string         `json:"created_by"`
+	SLADate             time.Time      `json:"sla_date"`
 }
 
 type CaseFilter struct {
