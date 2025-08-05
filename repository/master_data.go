@@ -72,7 +72,7 @@ func (r *authRepo) GetAllPermissionsWithRoles(ctx *gin.Context, limit, offset in
 
 		result = append(result, model.PermissionWithRolesResponse{
 			Permission: p.Key,
-			Label:      p.Name,
+			Name:       p.Name,
 			Roles:      roleNames,
 		})
 	}
