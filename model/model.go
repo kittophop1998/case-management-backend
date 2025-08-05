@@ -26,7 +26,7 @@ type UpdatePermissionRolesRequest struct {
 
 type PermissionWithRolesResponse struct {
 	Permission string   `json:"permission"`
-	Label      string   `json:"label"`
+	Name       string   `json:"name"`
 	Roles      []string `json:"roles"`
 }
 type FormFilter struct {
