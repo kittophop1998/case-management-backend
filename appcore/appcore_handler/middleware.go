@@ -66,12 +66,12 @@ func MiddlewareCheckAccessToken() gin.HandlerFunc {
 func extractBearerToken(c *gin.Context) (string, error) {
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
-		return "", errors.New("Authorization header is required")
+		return "", errors.New("authorization header is required")
 	}
 
 	parts := strings.SplitN(authHeader, " ", 2)
 	if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
-		return "", errors.New("Authorization header format must be Bearer {token}")
+		return "", errors.New("authorization header format must be Bearer {token}")
 	}
 
 	return parts[1], nil
