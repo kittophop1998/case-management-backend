@@ -145,9 +145,9 @@ func (h *Handler) DeleteUserByID(c *gin.Context) {
 	_, err := uuid.Parse(idParam)
 	if err != nil {
 		appcore_handler.HandleError(c, appcore_config.NewAppError(
-			"INVALID_USER_ID",
-			appcore_config.Message{Th: "รหัสผู้ใช้ไม่ถูกต้อง", En: "Invalid user ID"},
-			http.StatusBadRequest,
+			"USER_NOT_FOUND",
+			appcore_config.Message{Th: "ไม่พบผู้ใช้", En: "User not found"},
+			http.StatusNotFound,
 			nil,
 		))
 		return
@@ -158,8 +158,8 @@ func (h *Handler) DeleteUserByID(c *gin.Context) {
 		appcore_handler.HandleError(c, appcore_config.NewAppError(
 			"DELETE_USER_FAILED",
 			appcore_config.Message{Th: "ไม่สามารถลบผู้ใช้ได้", En: "Failed to delete user"},
-			http.StatusBadRequest,
-			nil,
+			http.StatusInternalServerError,
+			err,
 		))
 		return
 	}
@@ -196,7 +196,7 @@ func (h *Handler) UpdateUserByID(c *gin.Context) {
 			"INVALID_USER_ID",
 			appcore_config.Message{Th: "รหัสผู้ใช้ไม่ถูกต้อง", En: "Invalid user ID"},
 			http.StatusBadRequest,
-			nil,
+			err,
 		))
 		return
 	}
@@ -207,35 +207,12 @@ func (h *Handler) UpdateUserByID(c *gin.Context) {
 			"UPDATE_USER_FAILED",
 			appcore_config.Message{Th: "ไม่สามารถอัปเดตผู้ใช้ได้", En: "Failed to update user"},
 			http.StatusInternalServerError,
-			nil,
+			err,
 		))
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "user updated successfully"})
-}
-
-// GetAllLookups godoc
-// @Summary Get all lookup values
-// @Description Get all teams, roles, centers, and permissions
-// @Tags Users
-// @Accept json
-// @Produce json
-// @Success 200 {object} appcore_handler.ResponseObject
-// @Router /lookups [get]
-func (h *Handler) GetAllLookups(c *gin.Context) {
-	data, err := h.UseCase.GetAllLookups(c)
-	if err != nil {
-		appcore_handler.HandleError(c, appcore_config.NewAppError(
-			"LOOKUP_ERROR",
-			appcore_config.Message{Th: "ไม่สามารถดึงข้อมูล lookup ได้", En: "Failed to fetch lookup data"},
-			http.StatusInternalServerError,
-			nil,
-		))
-		return
-	}
-
-	c.JSON(http.StatusOK, appcore_handler.NewResponseObject(data))
 }
 
 // func (h *Handler) ImportCSV(c *gin.Context) {
