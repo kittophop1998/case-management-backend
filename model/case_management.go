@@ -115,3 +115,7 @@ func (CasePriorities) TableName() string {
 func (CaseNotes) TableName() string {
 	return "case_notes"
 }
+
+func (ApiLogs) TableName() string {
+	return "api_logs"
+}

@@ -206,3 +206,11 @@ func (m *MockRepository) GetCaseByID(c *gin.Context, id uuid.UUID) (*model.Cases
 func (M *MockRepository) AddInitialDescription(c *gin.Context, caseID uuid.UUID, newDescription string) error {
 	return nil
 }
+
+func (m *MockRepository) SaveLog(log *model.ApiLogs) error {
+	return nil
+}
+
+func (m *MockRepository) GetAllLogs(c *gin.Context) ([]model.ApiLogs, error) {
+	return nil, nil
+}

@@ -58,6 +58,10 @@ type CaseManagementRepository interface {
 
 	// Audit Log
 	CreateAuditLog(c *gin.Context, log model.AuditLog) error
+
+	// API Log
+	SaveLog(log *model.ApiLogs) error
+	GetAllLogs(c *gin.Context) ([]model.ApiLogs, error)
 }
 
 func New(
