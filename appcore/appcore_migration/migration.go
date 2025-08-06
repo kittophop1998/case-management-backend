@@ -28,6 +28,7 @@ func Migrate() error {
 		&model.Attachment{},
 		&model.AuditLog{},
 		&model.ApiLogs{},
+		&model.CustomerNote{},
 	); err != nil {
 		return err
 	}

@@ -65,14 +65,18 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 	}
 
 	caseManagementRoutes := api.Group("/cases")
-	caseManagementRoutes.Use(h.APILogger())
-
+	caseManagementRoutes.Use(
+		h.APILogger(),
+		appcore_handler.MiddlewareCheckAccessToken(),
+	)
 	{
 		caseManagementRoutes.POST("", h.CreateCase)
 		caseManagementRoutes.GET("", h.GetAllCases)
 		caseManagementRoutes.POST("/note_type", h.CreateNoteType)
 		caseManagementRoutes.GET("/:id", h.GetCaseByID)
 		caseManagementRoutes.POST("/add-initial-description", h.AddInitialDescription)
+		caseManagementRoutes.GET("/note_type/:id", h.GetNoteTypeById)
+		caseManagementRoutes.POST("/customer/note", h.CreateCustomerNote)
 	}
 
 	// Refresh token api

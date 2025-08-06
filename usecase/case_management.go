@@ -42,3 +42,24 @@ func (u *UseCase) GetCaseByID(ctx *gin.Context, id uuid.UUID) (*model.Cases, err
 func (u *UseCase) AddInitialDescription(c *gin.Context, caseID uuid.UUID, newDescription string) error {
 	return u.caseManagementRepository.AddInitialDescription(c, caseID, newDescription)
 }
+
+func (u *UseCase) GetNoteTypeById(c *gin.Context, noteTypeID uuid.UUID) (*model.NoteTypes, error) {
+	return u.caseManagementRepository.GetNoteTypeById(c, noteTypeID)
+}
+
+func (u *UseCase) CreateCustomerNote(c *gin.Context, customerID, noteTypeID uuid.UUID, noteText string) error {
+
+	_, err := u.caseManagementRepository.GetNoteTypeById(c, noteTypeID)
+	if err != nil {
+		return err
+	}
+
+	newNote := &model.CustomerNote{
+		CustomerID:  customerID,
+		NoteTypesId: noteTypeID,
+		Note:        noteText,
+	}
+
+	return u.caseManagementRepository.CreateCustomerNote(c, newNote)
+
+}

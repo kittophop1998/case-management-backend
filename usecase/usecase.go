@@ -52,6 +52,8 @@ type CaseManagementRepository interface {
 	CreateNoteType(c *gin.Context, note model.NoteTypes) (*model.NoteTypes, error)
 	GetCaseByID(c *gin.Context, id uuid.UUID) (*model.Cases, error)
 	AddInitialDescription(c *gin.Context, caseID uuid.UUID, newDescription string) error
+	GetNoteTypeById(c *gin.Context, noteTypeID uuid.UUID) (*model.NoteTypes, error)
+	CreateCustomerNote(c *gin.Context, note *model.CustomerNote) error
 
 	// Attachment
 	UploadAttachment(c *gin.Context, caseID uuid.UUID, file model.Attachment) (uuid.UUID, error)

@@ -92,6 +92,13 @@ type VerifyQuestionHistory struct {
 	CaseId           uuid.UUID `json:"case_id" gorm:"type:uuid;default:uuid_generate_v4()"`
 }
 
+type CustomerNote struct {
+	ID          uuid.UUID `json:"id" gorm:"type:uuid;default:uuid_generate_v4()"`
+	CustomerID  uuid.UUID `json:"customerId"`
+	NoteTypesId uuid.UUID `json:"noteTypeId"`
+	Note        string    `json:"note"`
+}
+
 func (Cases) TableName() string {
 	return "cases"
 }
@@ -118,4 +125,8 @@ func (CaseNotes) TableName() string {
 
 func (ApiLogs) TableName() string {
 	return "api_logs"
+}
+
+func (CustomerNote) TableName() string {
+	return "customers_note"
 }

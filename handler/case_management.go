@@ -146,3 +146,55 @@ func (h *Handler) AddInitialDescription(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "initial description added"})
 }
+
+func (h *Handler) GetNoteTypeById(c *gin.Context) {
+	noteTypeIDStr := c.Param("id")
+	noteTypeID, err := uuid.Parse(noteTypeIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError("Invalid UUID", "INVALID_ID"))
+		return
+	}
+
+	noteType, err := h.UseCase.GetNoteTypeById(c, noteTypeID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, appcore_handler.NewResponseError("NoteType not found", "NOT_FOUND"))
+		return
+	}
+
+	c.JSON(http.StatusOK, appcore_handler.NewResponseObject(noteType))
+}
+
+func (h *Handler) CreateCustomerNote(c *gin.Context) {
+	var req model.CreateNoteRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// ดึง customerID แบบ UUID โดยตรง
+	customerIDValue, exists := c.Get("userId")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "customer_id not found"})
+		return
+	}
+
+	customerID, ok := customerIDValue.(uuid.UUID)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "invalid customer_id type in context"})
+		return
+	}
+
+	noteTypeUUID, err := uuid.Parse(req.NoteTypeID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid noteTypeId"})
+		return
+	}
+
+	// ส่ง customerID เข้า usecase ด้วย
+	if err := h.UseCase.CreateCustomerNote(c, customerID, noteTypeUUID, req.Note); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "note created successfully"})
+}
