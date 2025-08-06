@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"case-management/appcore/appcore_config"
 	"case-management/appcore/appcore_handler"
 	"case-management/model"
 	"net/http"
@@ -22,18 +23,18 @@ func (h *Handler) Login(c *gin.Context) {
 
 	// Validate required header
 	if reqID := c.GetHeader("X-Request-ID"); reqID == "" {
-		appcore_handler.HandleError(c, appcore_handler.ErrFilterRequired)
+		appcore_handler.HandleError(c, appcore_config.ErrFilterRequired)
 		return
 	}
 
 	// Validate body
 	if err := c.ShouldBindJSON(&req); err != nil {
-		appcore_handler.HandleError(c, appcore_handler.ErrBadRequest)
+		appcore_handler.HandleError(c, appcore_config.ErrBadRequest)
 		return
 	}
 
 	if req.Username == "" || req.Password == "" {
-		appcore_handler.HandleError(c, appcore_handler.ErrRequiredParam)
+		appcore_handler.HandleError(c, appcore_config.ErrRequiredParam)
 		return
 	}
 
@@ -80,13 +81,13 @@ func (h *Handler) Logout(c *gin.Context) {
 func (h *Handler) Profile(c *gin.Context) {
 	userId, exists := c.Get("userId")
 	if !exists {
-		appcore_handler.HandleError(c, appcore_handler.ErrBadRequest)
+		appcore_handler.HandleError(c, appcore_config.ErrBadRequest)
 		return
 	}
 
 	uid, ok := userId.(uuid.UUID)
 	if !ok {
-		appcore_handler.HandleError(c, appcore_handler.ErrBadRequest)
+		appcore_handler.HandleError(c, appcore_config.ErrBadRequest)
 		return
 	}
 
