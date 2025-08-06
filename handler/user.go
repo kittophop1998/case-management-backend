@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"case-management/appcore/appcore_config"
 	"case-management/appcore/appcore_handler"
 	"case-management/appcore/appcore_internal/appcore_model"
 	"case-management/model"
@@ -22,19 +23,13 @@ import (
 func (h *Handler) CreateUser(c *gin.Context) {
 	var user model.CreateUserRequest
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(
-			err.Error(),
-			errorSystem,
-		))
+		appcore_handler.HandleError(c, appcore_config.ErrBadRequest)
 		return
 	}
 
 	id, err := h.UseCase.CreateUser(c, &user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, appcore_handler.NewResponseError(
-			err.Error(),
-			"error",
-		))
+		appcore_handler.HandleError(c, err)
 		return
 	}
 
@@ -52,13 +47,13 @@ func (h *Handler) CreateUser(c *gin.Context) {
 func (h *Handler) GetAllUsers(c *gin.Context) {
 	limit, err := getLimit(c)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(err.Error(), errorInvalidRequest))
+		appcore_handler.HandleError(c, appcore_config.ErrBadRequest)
 		return
 	}
 
 	page, err := getPage(c)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(err.Error(), errorInvalidRequest))
+		appcore_handler.HandleError(c, appcore_config.ErrBadRequest)
 		return
 	}
 
@@ -103,7 +98,7 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 
 	users, total, err := h.UseCase.GetAllUsers(c, page, limit, filter)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, appcore_handler.NewResponseError(err.Error(), errorSystem))
+		appcore_handler.HandleError(c, err)
 		return
 	}
 
@@ -123,19 +118,13 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 	idParam := c.Param("id")
 	uid, err := uuid.Parse(idParam)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(
-			"Invalid user ID format",
-			"invalid_uuid",
-		))
+		appcore_handler.HandleError(c, appcore_config.ErrBadRequest)
 		return
 	}
 
 	user, err := h.UseCase.GetUserByID(c, uid)
 	if err != nil {
-		c.JSON(http.StatusNotFound, appcore_handler.NewResponseError(
-			"User not found",
-			"user_not_found",
-		))
+		appcore_handler.HandleError(c, appcore_config.ErrNotFound)
 		return
 	}
 
@@ -155,18 +144,22 @@ func (h *Handler) DeleteUserByID(c *gin.Context) {
 	idParam := c.Param("id")
 	_, err := uuid.Parse(idParam)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(
-			"invalid UUID format",
-			errorInvalidRequest,
+		appcore_handler.HandleError(c, appcore_config.NewAppError(
+			"INVALID_USER_ID",
+			appcore_config.Message{Th: "รหัสผู้ใช้ไม่ถูกต้อง", En: "Invalid user ID"},
+			http.StatusBadRequest,
+			nil,
 		))
 		return
 	}
 
 	err = h.UseCase.DeleteUserByID(c, idParam)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, appcore_handler.NewResponseError(
-			err.Error(),
-			errorSystem,
+		appcore_handler.HandleError(c, appcore_config.NewAppError(
+			"DELETE_USER_FAILED",
+			appcore_config.Message{Th: "ไม่สามารถลบผู้ใช้ได้", En: "Failed to delete user"},
+			http.StatusBadRequest,
+			nil,
 		))
 		return
 	}
@@ -192,23 +185,30 @@ func (h *Handler) DeleteUserByID(c *gin.Context) {
 func (h *Handler) UpdateUserByID(c *gin.Context) {
 	var input model.UserFilter
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError(
-			err.Error(),
-			errorInvalidRequest,
-		))
+		appcore_handler.HandleError(c, appcore_config.ErrBadRequest)
 		return
 	}
 
 	idParam := c.Param("id")
 	userID, err := uuid.Parse(idParam)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, appcore_handler.NewResponseError("invalid user ID", "invalid_request"))
+		appcore_handler.HandleError(c, appcore_config.NewAppError(
+			"INVALID_USER_ID",
+			appcore_config.Message{Th: "รหัสผู้ใช้ไม่ถูกต้อง", En: "Invalid user ID"},
+			http.StatusBadRequest,
+			nil,
+		))
 		return
 	}
 
 	err = h.UseCase.UpdateUser(c, userID, input)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, appcore_handler.NewResponseError(err.Error(), "error"))
+		appcore_handler.HandleError(c, appcore_config.NewAppError(
+			"UPDATE_USER_FAILED",
+			appcore_config.Message{Th: "ไม่สามารถอัปเดตผู้ใช้ได้", En: "Failed to update user"},
+			http.StatusInternalServerError,
+			nil,
+		))
 		return
 	}
 
@@ -226,7 +226,12 @@ func (h *Handler) UpdateUserByID(c *gin.Context) {
 func (h *Handler) GetAllLookups(c *gin.Context) {
 	data, err := h.UseCase.GetAllLookups(c)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, appcore_handler.NewResponseError(err.Error(), "lookup_failed"))
+		appcore_handler.HandleError(c, appcore_config.NewAppError(
+			"LOOKUP_ERROR",
+			appcore_config.Message{Th: "ไม่สามารถดึงข้อมูล lookup ได้", En: "Failed to fetch lookup data"},
+			http.StatusInternalServerError,
+			nil,
+		))
 		return
 	}
 
