@@ -159,7 +159,12 @@ func isAdminLogin(req model.LoginRequest) bool {
 func (u *UseCase) authenticateWithLDAP(username, password string) error {
 	conn, err := ldap.Dial("tcp", appcore_config.Config.LdapURL)
 	if err != nil {
-		return appcore_handler.ErrInternalServer
+		return appcore_handler.NewAppError(
+			appcore_handler.ErrInternalServer.Code,
+			appcore_handler.ErrInternalServer.Message,
+			appcore_handler.ErrInternalServer.HTTPStatus,
+			map[string]string{"ldap": "ไม่สามารถเชื่อมต่อกับ LDAP ได้"},
+		)
 	}
 	defer conn.Close()
 

@@ -12,7 +12,10 @@ services:
   #   ports:
   #     - "8000:8000"
   #   depends_on:
-  #     - wait-for-postgres
+  #     - postgres
+  #     - redis
+  #   environment:
+  #     - POSTGRES_URL="host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Bangkok"
   #   restart: on-failure
 
   postgres:
