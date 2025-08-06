@@ -42,6 +42,7 @@ func NewResponseCreated(id any) ResponseCreated {
 	}
 }
 
+// TODO: maybe delete this function
 func NewResponseError(error, message string) ResponseError {
 	return ResponseError{
 		Error:   error,

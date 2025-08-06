@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"case-management/appcore/appcore_handler"
+	"case-management/appcore/appcore_config"
 	"case-management/model"
 	"context"
 	"errors"
@@ -180,16 +180,16 @@ func (r *authRepo) GetUserByUserName(c *gin.Context, username string) (*model.Us
 			details := map[string]string{
 				"db": "ไม่พบผู้ใช้ในระบบ",
 			}
-			appErr := appcore_handler.NewAppError(
-				appcore_handler.ErrNotFound.Code,
-				appcore_handler.ErrNotFound.Message,
-				appcore_handler.ErrNotFound.HTTPStatus,
+			appErr := appcore_config.NewAppError(
+				appcore_config.ErrNotFound.Code,
+				appcore_config.ErrNotFound.Message,
+				appcore_config.ErrNotFound.HTTPStatus,
 				details,
 			)
 			return nil, appErr
 		}
 
-		return nil, appcore_handler.ErrInternalServer
+		return nil, appcore_config.ErrInternalServer
 	}
 
 	return &user, nil

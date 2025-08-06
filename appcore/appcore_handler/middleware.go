@@ -20,13 +20,13 @@ func MiddlewareCheckAccessToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := extractBearerToken(c)
 		if err != nil {
-			HandleError(c, ErrBadRequest)
+			HandleError(c, appcore_config.ErrBadRequest)
 			return
 		}
 
 		claims, err := parseToken(token)
 		if err != nil {
-			HandleError(c, ErrBadRequest)
+			HandleError(c, appcore_config.ErrBadRequest)
 			return
 		}
 

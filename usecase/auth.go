@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"case-management/appcore/appcore_config"
-	"case-management/appcore/appcore_handler"
 	"case-management/appcore/appcore_internal/appcore_model"
 	"case-management/model"
 	"context"
@@ -43,7 +42,7 @@ func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.LoginR
 		QueueId:  user.Queue.ID,
 	})
 	if err != nil {
-		return nil, appcore_handler.ErrInternalServer
+		return nil, appcore_config.ErrInternalServer
 	}
 
 	refreshToken, err := u.GenerateToken(3*24*time.Hour, &appcore_model.Metadata{
@@ -54,7 +53,7 @@ func (u *UseCase) Login(ctx *gin.Context, req model.LoginRequest) (*model.LoginR
 		QueueId:  user.Queue.ID,
 	})
 	if err != nil {
-		return nil, appcore_handler.ErrInternalServer
+		return nil, appcore_config.ErrInternalServer
 	}
 
 	return &model.LoginResponse{
@@ -98,7 +97,7 @@ func (u *UseCase) loginAsAdmin(ctx *gin.Context, username string) (*model.LoginR
 		QueueId:  user.Queue.ID,
 	})
 	if err != nil {
-		return nil, appcore_handler.ErrInternalServer
+		return nil, appcore_config.ErrInternalServer
 	}
 
 	refreshToken, err := u.GenerateToken(3*24*time.Hour, &appcore_model.Metadata{
@@ -109,7 +108,7 @@ func (u *UseCase) loginAsAdmin(ctx *gin.Context, username string) (*model.LoginR
 		QueueId:  user.Queue.ID,
 	})
 	if err != nil {
-		return nil, appcore_handler.ErrInternalServer
+		return nil, appcore_config.ErrInternalServer
 	}
 
 	if err := u.generateAndSetTokens(ctx, user); err != nil {
@@ -159,20 +158,20 @@ func isAdminLogin(req model.LoginRequest) bool {
 func (u *UseCase) authenticateWithLDAP(username, password string) error {
 	conn, err := ldap.Dial("tcp", appcore_config.Config.LdapURL)
 	if err != nil {
-		return appcore_handler.NewAppError(
-			appcore_handler.ErrInternalServer.Code,
-			appcore_handler.ErrInternalServer.Message,
-			appcore_handler.ErrInternalServer.HTTPStatus,
+		return appcore_config.NewAppError(
+			appcore_config.ErrInternalServer.Code,
+			appcore_config.ErrInternalServer.Message,
+			appcore_config.ErrInternalServer.HTTPStatus,
 			map[string]string{"ldap": "ไม่สามารถเชื่อมต่อกับ LDAP ได้"},
 		)
 	}
 	defer conn.Close()
 
 	if err := conn.Bind("HEADOFFICE\\"+username, password); err != nil {
-		return appcore_handler.NewAppError(
-			appcore_handler.ErrNotFound.Code,
-			appcore_handler.ErrNotFound.Message,
-			appcore_handler.ErrNotFound.HTTPStatus,
+		return appcore_config.NewAppError(
+			appcore_config.ErrNotFound.Code,
+			appcore_config.ErrNotFound.Message,
+			appcore_config.ErrNotFound.HTTPStatus,
 			map[string]string{"ldap": "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"},
 		)
 	}
