@@ -16,6 +16,32 @@ const (
 	errorInvalidTokenMsg = "invalid token"
 )
 
+func MiddlewareCheckAccessToken() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, err := extractBearerToken(c)
+		if err != nil {
+			HandleError(c, ErrBadRequest)
+			return
+		}
+
+		claims, err := parseToken(token)
+		if err != nil {
+			HandleError(c, ErrBadRequest)
+			return
+		}
+
+		// Optional: Check Redis blacklist
+		// if isRevoked(token) {
+		//     c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token has been revoked"})
+		//     return
+		// }
+
+		c.Set("userId", claims.UserId)
+		c.Set("username", claims.Username)
+		c.Next()
+	}
+}
+
 func parseToken(tokenString string) (*appcore_model.JwtClaims, error) {
 	secretKey := appcore_config.Config.SecretKey
 	token, err := jwt.ParseWithClaims(tokenString, &appcore_model.JwtClaims{}, func(t *jwt.Token) (interface{}, error) {
@@ -35,32 +61,6 @@ func parseToken(tokenString string) (*appcore_model.JwtClaims, error) {
 	}
 
 	return claims, nil
-}
-
-func MiddlewareCheckAccessToken() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		token, err := extractBearerToken(c)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-			return
-		}
-
-		claims, err := parseToken(token)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid or expired token"})
-			return
-		}
-
-		// Optional: Check Redis blacklist
-		// if isRevoked(token) {
-		//     c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token has been revoked"})
-		//     return
-		// }
-
-		c.Set("userId", claims.UserId)
-		c.Set("username", claims.Username)
-		c.Next()
-	}
 }
 
 func extractBearerToken(c *gin.Context) (string, error) {
