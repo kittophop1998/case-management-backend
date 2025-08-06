@@ -153,3 +153,15 @@ func (r *authRepo) AddInitialDescription(c *gin.Context, caseID uuid.UUID, newDe
 		Where("id = ?", caseID).
 		Update("initial_descriptions", datatypes.JSON(updatedJSON)).Error
 }
+
+func (r *authRepo) GetNoteTypeById(c *gin.Context, noteTypeID uuid.UUID) (*model.NoteTypes, error) {
+	var noteType model.NoteTypes
+	if err := r.DB.WithContext(c).Where("id = ?", noteTypeID).First(&noteType).Error; err != nil {
+		return nil, err
+	}
+	return &noteType, nil
+}
+
+func (r *authRepo) CreateCustomerNote(c *gin.Context, note *model.CustomerNote) error {
+	return r.DB.WithContext(c).Create(note).Error
+}

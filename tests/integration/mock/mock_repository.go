@@ -214,3 +214,11 @@ func (m *MockRepository) SaveLog(log *model.ApiLogs) error {
 func (m *MockRepository) GetAllLogs(c *gin.Context) ([]model.ApiLogs, error) {
 	return nil, nil
 }
+
+func (m *MockRepository) GetNoteTypeById(c *gin.Context, id uuid.UUID) (*model.NoteTypes, error) {
+	return nil, nil
+}
+
+func (m *MockRepository) CreateCustomerNote(c *gin.Context, note *model.CustomerNote) error {
+	return nil
+}

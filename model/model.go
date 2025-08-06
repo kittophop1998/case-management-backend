@@ -36,6 +36,11 @@ type FormFilter struct {
 	Filter map[string]interface{} `json:"filter"`
 }
 
+type CreateNoteRequest struct {
+	NoteTypeID string `json:"noteTypeId" binding:"required"`
+	Note       string `json:"note" binding:"required"`
+}
+
 type Model struct {
 	ID        uuid.UUID      `gorm:"primaryKey;default:uuid_generate_v4()" json:"id"`
 	CreatedAt time.Time      `json:"createdAt"`
