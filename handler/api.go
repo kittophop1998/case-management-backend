@@ -10,18 +10,31 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 
 	// Auth routes
 	authRoutes := api.Group("/auth")
+	authRoutes.Use(h.APILogger())
+
 	{
 		authRoutes.POST("/login", h.Login)
 		authRoutes.GET("/profile", appcore_handler.MiddlewareCheckAccessToken(), h.Profile)
 		authRoutes.POST("/logout", appcore_handler.MiddlewareCheckAccessToken(), h.Logout)
 	}
 
+	// API Logs Routes
+	apiLogsRoutes := api.Group("api_logs")
+	{
+		apiLogsRoutes.GET("", h.GetAPILogs)
+	}
+
+	// Look Up Routes
 	userLookUpsRoutes := api.Group("/lookups")
+	userLookUpsRoutes.Use(h.APILogger())
+
 	{
 		userLookUpsRoutes.GET("", h.GetAllLookups)
 	}
 
+	// Permission Routes
 	permissionsWithRolesRoutes := api.Group("/permissions")
+	permissionsWithRolesRoutes.Use(h.APILogger())
 	{
 		permissionsWithRolesRoutes.GET("", h.GetPermissionsWithRoles)
 		permissionsWithRolesRoutes.PATCH("update", h.UpdatePermissionRoles)
@@ -29,7 +42,10 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 
 	// User routes
 	userRoutes := api.Group("/users")
-	userRoutes.Use(appcore_handler.MiddlewareCheckAccessToken())
+	userRoutes.Use(
+		h.APILogger(),
+		appcore_handler.MiddlewareCheckAccessToken(),
+	)
 	{
 		userRoutes.POST("", h.CreateUser)
 		userRoutes.GET("", h.GetAllUsers)
@@ -41,6 +57,7 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 
 	// Attachment routes
 	attachmentsRoutes := api.Group("/attachment")
+	attachmentsRoutes.Use(h.APILogger())
 	attachmentsRoutes.Use(appcore_handler.MiddlewareCheckAccessToken())
 	{
 		attachmentsRoutes.POST("/:case_id", h.UploadAttachment)
@@ -48,6 +65,8 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 	}
 
 	caseManagementRoutes := api.Group("/cases")
+	caseManagementRoutes.Use(h.APILogger())
+
 	{
 		caseManagementRoutes.POST("", h.CreateCase)
 		caseManagementRoutes.GET("", h.GetAllCases)
