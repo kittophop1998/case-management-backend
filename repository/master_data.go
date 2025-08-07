@@ -55,6 +55,7 @@ func (r *authRepo) GetAllPermissionsWithRoles(ctx *gin.Context, limit, offset in
 		Preload("Roles").
 		Limit(limit).
 		Offset(offset).
+		Order("name").
 		Find(&permissions).Error; err != nil {
 		return nil, err
 	}
