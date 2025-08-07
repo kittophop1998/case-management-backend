@@ -18,8 +18,12 @@ func InitPostgresDBStore(logger *slog.Logger) {
 	logger.Info("Init DB Store")
 	logger.Info("Connecting to database")
 
-	// dsn := appcore_config.Config.ProdPostgresURL
-	dsn := appcore_config.Config.PostgresConnString
+	var dsn string
+	if appcore_config.Config.Mode == "development" {
+		dsn = appcore_config.Config.PostgresRailwayURL
+	} else {
+		dsn = appcore_config.Config.PostgresConnString
+	}
 
 	// ✅ Parse the config using pgx/v5
 	cfg, err := pgx.ParseConfig(dsn)

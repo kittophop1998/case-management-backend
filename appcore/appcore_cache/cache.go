@@ -12,9 +12,20 @@ var Cache *redis.Client
 
 func InitCache(logger *slog.Logger) {
 	logger.Info("Init Cache")
+
+	var addr string
+	var pass string
+	if appcore_config.Config.Mode == "development" {
+		addr = appcore_config.Config.RedisRailwayURL
+		pass = appcore_config.Config.RedisRailwayPassword
+	} else {
+		addr = appcore_config.Config.RedisUrl
+		pass = appcore_config.Config.RedisPass
+	}
+
 	Cache = redis.NewClient(&redis.Options{
-		Addr:     appcore_config.Config.RedisUrl,
-		Password: appcore_config.Config.RedisPass,
+		Addr:     addr,
+		Password: pass,
 		DB:       0,
 	})
 
