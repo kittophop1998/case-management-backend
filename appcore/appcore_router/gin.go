@@ -20,7 +20,7 @@ func New() *Router {
 	r := gin.New()
 	//config := cors.DefaultConfig()
 	config := cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "https://case-management-front.railway.internal"},
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization", "X-Time-Zone"},
 		AllowCredentials: true,

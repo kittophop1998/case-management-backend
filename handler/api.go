@@ -79,6 +79,16 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		caseManagementRoutes.POST("/customer/note", h.CreateCustomerNote)
 	}
 
+	customerRoutes := api.Group("/customers")
+	customerRoutes.Use(
+		h.APILogger(),
+		appcore_handler.MiddlewareCheckAccessToken(),
+	)
+	// {
+	// 	customerRoutes.POST("/note", h.CreateCustomer)
+	// 	customerRoutes.GET("/search", h.GetAllCustomers)
+	// }
+
 	// Refresh token api
 	// refreshTokenAPI := api.Group("/")
 	// refreshTokenAPI.Use(normalRateLimiter, h.MiddlewareCheckRefreshToken())
