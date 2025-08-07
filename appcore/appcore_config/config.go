@@ -71,7 +71,7 @@ type Configurations struct {
 func InitConfigurations() {
 	_ = godotenv.Load()
 	viper.AutomaticEnv()
-	viper.SetDefault("mode", "")
+	viper.SetDefault("MODE", "")
 	viper.SetDefault("GIN_IS_RELEASE_MODE", false)
 	viper.SetDefault("POSTGRES_URL", "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Bangkok")
 	viper.SetDefault("REDIS_URL", "localhost:6379")
@@ -94,7 +94,7 @@ func InitConfigurations() {
 	viper.SetDefault("LDAP_URL", "192.168.129.239:389")
 
 	Config = &Configurations{
-		Mode:                   viper.GetString("mode"),
+		Mode:                   viper.GetString("MODE"),
 		GinIsReleaseMode:       viper.GetBool("GIN_IS_RELEASE_MODE"),
 		PostgresConnString:     viper.GetString("POSTGRES_URL"),
 		RedisUrl:               viper.GetString("REDIS_URL"),
