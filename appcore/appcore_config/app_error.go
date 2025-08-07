@@ -43,3 +43,21 @@ var (
 func newAppError(code string, th string, en string, status int) *AppError {
 	return NewAppError(code, Message{Th: th, En: en}, status, nil)
 }
+
+func (e *AppError) WithDetails(details interface{}) *AppError {
+	return &AppError{
+		Code:       e.Code,
+		Message:    e.Message,
+		HTTPStatus: e.HTTPStatus,
+		Details:    details,
+	}
+}
+
+func (e *AppError) WithMessage(message Message) *AppError {
+	return &AppError{
+		Code:       e.Code,
+		Message:    message,
+		HTTPStatus: e.HTTPStatus,
+		Details:    e.Details,
+	}
+}

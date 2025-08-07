@@ -144,23 +144,19 @@ func (h *Handler) DeleteUserByID(c *gin.Context) {
 	idParam := c.Param("id")
 	_, err := uuid.Parse(idParam)
 	if err != nil {
-		appcore_handler.HandleError(c, appcore_config.NewAppError(
-			"USER_NOT_FOUND",
-			appcore_config.Message{Th: "ไม่พบผู้ใช้", En: "User not found"},
-			http.StatusNotFound,
-			nil,
-		))
+		appcore_handler.HandleError(c, appcore_config.ErrBadRequest.WithMessage(appcore_config.Message{
+			Th: "รหัสผู้ใช้ไม่ถูกต้อง",
+			En: "Invalid user ID",
+		}))
 		return
 	}
 
 	err = h.UseCase.DeleteUserByID(c, idParam)
 	if err != nil {
-		appcore_handler.HandleError(c, appcore_config.NewAppError(
-			"DELETE_USER_FAILED",
-			appcore_config.Message{Th: "ไม่สามารถลบผู้ใช้ได้", En: "Failed to delete user"},
-			http.StatusInternalServerError,
-			err,
-		))
+		appcore_handler.HandleError(c, appcore_config.ErrInternalServer.WithMessage(appcore_config.Message{
+			Th: "ไม่สามารถลบผู้ใช้ได้",
+			En: "Failed to delete user",
+		}))
 		return
 	}
 
@@ -192,23 +188,19 @@ func (h *Handler) UpdateUserByID(c *gin.Context) {
 	idParam := c.Param("id")
 	userID, err := uuid.Parse(idParam)
 	if err != nil {
-		appcore_handler.HandleError(c, appcore_config.NewAppError(
-			"INVALID_USER_ID",
-			appcore_config.Message{Th: "รหัสผู้ใช้ไม่ถูกต้อง", En: "Invalid user ID"},
-			http.StatusBadRequest,
-			err,
-		))
+		appcore_handler.HandleError(c, appcore_config.ErrBadRequest.WithMessage(appcore_config.Message{
+			Th: "รหัสผู้ใช้ไม่ถูกต้อง",
+			En: "Invalid user ID",
+		}))
 		return
 	}
 
 	err = h.UseCase.UpdateUser(c, userID, input)
 	if err != nil {
-		appcore_handler.HandleError(c, appcore_config.NewAppError(
-			"UPDATE_USER_FAILED",
-			appcore_config.Message{Th: "ไม่สามารถอัปเดตผู้ใช้ได้", En: "Failed to update user"},
-			http.StatusInternalServerError,
-			err,
-		))
+		appcore_handler.HandleError(c, appcore_config.ErrInternalServer.WithMessage(appcore_config.Message{
+			Th: "ไม่สามารถอัปเดตผู้ใช้ได้",
+			En: "Failed to update user",
+		}))
 		return
 	}
 

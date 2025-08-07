@@ -22,10 +22,10 @@ func (h *Handler) Login(c *gin.Context) {
 	var req model.LoginRequest
 
 	// Validate required header
-	if reqID := c.GetHeader("X-Request-ID"); reqID == "" {
-		appcore_handler.HandleError(c, appcore_config.ErrFilterRequired)
-		return
-	}
+	// if reqID := c.GetHeader("X-Request-ID"); reqID == "" {
+	// 	appcore_handler.HandleError(c, appcore_config.ErrFilterRequired)
+	// 	return
+	// }
 
 	// Validate body
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -34,7 +34,10 @@ func (h *Handler) Login(c *gin.Context) {
 	}
 
 	if req.Username == "" || req.Password == "" {
-		appcore_handler.HandleError(c, appcore_config.ErrRequiredParam)
+		appcore_handler.HandleError(c, appcore_config.ErrBadRequest.WithDetails(appcore_config.Message{
+			Th: "กรุณาระบุชื่อผู้ใช้และรหัสผ่าน",
+			En: "Please provide username and password",
+		}))
 		return
 	}
 
@@ -46,7 +49,10 @@ func (h *Handler) Login(c *gin.Context) {
 	_ = h.UseCase.SaveAccessLog(c.Request.Context(), req.Username, success)
 
 	if err != nil {
-		appcore_handler.HandleError(c, err)
+		appcore_handler.HandleError(c, appcore_config.ErrInternalServer.WithMessage(appcore_config.Message{
+			Th: "ไม่สามารถเข้าสู่ระบบได้",
+			En: "Failed to login",
+		}))
 		return
 	}
 
@@ -63,7 +69,10 @@ func (h *Handler) Login(c *gin.Context) {
 // @Router /auth/logout [post]
 func (h *Handler) Logout(c *gin.Context) {
 	if err := h.UseCase.Logout(c); err != nil {
-		appcore_handler.HandleError(c, err)
+		appcore_handler.HandleError(c, appcore_config.ErrInternalServer.WithMessage(appcore_config.Message{
+			Th: "ไม่สามารถออกจากระบบได้",
+			En: "Failed to logout",
+		}))
 		return
 	}
 
@@ -93,7 +102,10 @@ func (h *Handler) Profile(c *gin.Context) {
 
 	resp, err := h.UseCase.GetUserByID(c, uid)
 	if err != nil {
-		appcore_handler.HandleError(c, err)
+		appcore_handler.HandleError(c, appcore_config.ErrNotFound.WithMessage(appcore_config.Message{
+			Th: "ไม่พบข้อมูลผู้ใช้",
+			En: "User not found",
+		}))
 		return
 	}
 

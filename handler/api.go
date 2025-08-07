@@ -84,10 +84,10 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		h.APILogger(),
 		appcore_handler.MiddlewareCheckAccessToken(),
 	)
-	// {
-	// 	customerRoutes.POST("/note", h.CreateCustomer)
-	// 	customerRoutes.GET("/search", h.GetAllCustomers)
-	// }
+	{
+		customerRoutes.GET("/search", h.CustomerSearch)
+		// customerRoutes.POST("/note", h.CreateCustomer)
+	}
 
 	// Refresh token api
 	// refreshTokenAPI := api.Group("/")
