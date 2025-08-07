@@ -1,23 +1,4 @@
 services:
-  # wait-for-postgres:
-  #   image: wait4x/wait4x
-  #   command: tcp postgres:5432 --timeout 30s --strict -- echo "Postgres is ready"
-  #   depends_on:
-  #     - postgres
-  #     - redis
-  # app:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     - postgres
-  #     - redis
-  #   environment:
-  #     - POSTGRES_URL="host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Bangkok"
-  #   restart: on-failure
-
   postgres:
     image: postgres:latest
     ports:
