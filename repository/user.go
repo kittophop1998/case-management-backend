@@ -79,6 +79,7 @@ func (a *authRepo) CreateUser(c *gin.Context, user *model.CreateUserRequest) (uu
 	userToSave.RoleID = user.RoleID
 	userToSave.DepartmentID = user.DepartmentID
 	userToSave.Email = user.Email
+	userToSave.IsActive = &user.IsActive
 
 	// แยก domain name จาก email
 	parts := strings.Split(user.Email, "@")
