@@ -4,6 +4,7 @@ import (
 	"case-management/appcore/appcore_config"
 	"context"
 	"log/slog"
+	"strconv"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -19,8 +20,8 @@ func InitCache(logger *slog.Logger) {
 		addr = appcore_config.Config.RedisRailwayURL
 		pass = appcore_config.Config.RedisRailwayPassword
 	} else {
-		addr = appcore_config.Config.RedisUrl
-		pass = appcore_config.Config.RedisPass
+		addr = appcore_config.Config.RedisHost + ":" + strconv.Itoa(appcore_config.Config.RedisPort)
+		pass = appcore_config.Config.RedisPassword
 	}
 
 	Cache = redis.NewClient(&redis.Options{

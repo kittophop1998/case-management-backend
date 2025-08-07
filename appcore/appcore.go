@@ -117,7 +117,7 @@ func (s *Service) Stop() {
 }
 
 func initGinAPI(h *appcore_handler.ApiHandler) *http.Server {
-	if appcore_config.Config.GinIsReleaseMode {
+	if appcore_config.Config.GinMode == "release" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 

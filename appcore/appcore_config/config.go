@@ -1,125 +1,128 @@
 package appcore_config
 
 import (
+	"log"
+
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
 var Config *Configurations
 
-// Configurations wraps all the config variables required by the service
 type Configurations struct {
-	// Development or Production
-	Mode string
+	// App
+	AppName    string
+	AppVersion string
+	Mode       string
+	SecretKey  string
 
-	// Gin Mode
-	GinIsReleaseMode bool
+	// Server
+	GinMode    string
+	ServerPort int
+	LogLevel   string
 
 	// Database
-	PostgresConnString string
+	PostgresHost     string
+	PostgresPort     int
+	PostgresUser     string
+	PostgresPassword string
+	PostgresDBName   string
+	PostgresSSLMode  string
+	PostgresTimezone string
 
 	// Redis
-	RedisUrl  string
-	RedisPass string
+	RedisHost     string
+	RedisPort     int
+	RedisPassword string
 
-	// Message Broker
-	MemphisHost     string
-	MemphisUsername string
-	MemphisPassword string
-
-	// Storage
+	// MinIO
 	MinioURL        string
 	MinioSSL        bool
 	MinioAccessKey  string
 	MinioSecretKey  string
 	MinioBucketName string
 
-	// JWT
-	SecretKey string
+	// Memphis
+	MemphisHost     string
+	MemphisUsername string
+	MemphisPassword string
 
-	// Email
+	// Email SMTP
 	SMTPUser     string
 	SMTPPassword string
 	SMTPHost     string
 	SMTPPort     string
 
-	// CRON Scheduler
-	RunCronScheduler bool
-
-	// System-i
-	SystemIWebsiteURL string
-
-	// Treasure Data
+	// System Integration
+	SystemIWebsiteURL      string
 	TreasureDataWebsiteURL string
+	LdapURL                string
 
-	// Otel
-	IsObserve bool
-
-	// LDAP URL
-	LdapURL string
-
-	// DB Cloud
-	ProdPostgresURL string
-
-	// Setting For Railway
+	// Optional (future extensions)
+	RunCronScheduler     bool
+	IsObserve            bool
+	ProdPostgresURL      string
 	PostgresRailwayURL   string
 	RedisRailwayURL      string
 	RedisRailwayPassword string
 }
 
-// NewConfigurations returns a new Configuration object
 func InitConfigurations() {
+	// Load .env if exists
 	_ = godotenv.Load()
-	viper.AutomaticEnv()
-	viper.SetDefault("MODE", "")
-	viper.SetDefault("GIN_IS_RELEASE_MODE", false)
-	viper.SetDefault("POSTGRES_URL", "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Bangkok")
-	viper.SetDefault("REDIS_URL", "localhost:6379")
-	viper.SetDefault("REDIS_PASS", "password123")
-	viper.SetDefault("MEMPHIS_HOST", "")
-	viper.SetDefault("MEMPHIS_USERNAME", "memphis")
-	viper.SetDefault("MEMPHIS_PASSWORD", "memphis")
-	viper.SetDefault("MINIO_URL", "localhost:9000")
-	viper.SetDefault("MINIO_SSL", false)
-	viper.SetDefault("MINIO_ACCESS_KEY", "ROOTNAME")
-	viper.SetDefault("MINIO_SECRET_KEY", "CHANGEME123")
-	viper.SetDefault("MINIO_BUCKET_NAME", "miniobucket")
-	viper.SetDefault("SECRET_KEY", "case_management_secret_key")
-	viper.SetDefault("SMTP_USER", "")
-	viper.SetDefault("SMTP_PASSWORD", "")
-	viper.SetDefault("SMTP_HOST", "")
-	viper.SetDefault("SMTP_PORT", "")
-	viper.SetDefault("SYSTEM_I_URL", "")
-	viper.SetDefault("TREASURE_DATA_URL", "")
-	viper.SetDefault("LDAP_URL", "192.168.129.239:389")
+
+	// Set up Viper for config.yaml
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath("appcore/appcore_config")
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("Error reading config file: %v", err)
+	}
+
+	viper.AutomaticEnv() // also read from environment variables if set
 
 	Config = &Configurations{
-		Mode:                   viper.GetString("MODE"),
-		GinIsReleaseMode:       viper.GetBool("GIN_IS_RELEASE_MODE"),
-		PostgresConnString:     viper.GetString("POSTGRES_URL"),
-		RedisUrl:               viper.GetString("REDIS_URL"),
-		RedisPass:              viper.GetString("REDIS_PASS"),
-		MemphisHost:            viper.GetString("MEMPHIS_HOST"),
-		MemphisUsername:        viper.GetString("MEMPHIS_USERNAME"),
-		MemphisPassword:        viper.GetString("MEMPHIS_PASSWORD"),
-		MinioURL:               viper.GetString("MINIO_URL"),
-		MinioSSL:               viper.GetBool("MINIO_SSL"),
-		MinioAccessKey:         viper.GetString("MINIO_ACCESS_KEY"),
-		MinioSecretKey:         viper.GetString("MINIO_SECRET_KEY"),
-		MinioBucketName:        viper.GetString("MINIO_BUCKET_NAME"),
-		SecretKey:              viper.GetString("SECRET_KEY"),
-		RunCronScheduler:       viper.GetBool("RUN_CRON_SCHEDULER"),
-		SMTPUser:               viper.GetString("SMTP_USER"),
-		SMTPPassword:           viper.GetString("SMTP_PASSWORD"),
-		SMTPHost:               viper.GetString("SMTP_HOST"),
-		SMTPPort:               viper.GetString("SMTP_PORT"),
-		IsObserve:              viper.GetBool("IS_OBSERVE"),
-		SystemIWebsiteURL:      viper.GetString("SYSTEM_I_URL"),
-		TreasureDataWebsiteURL: viper.GetString("TREASURE_DATA_URL"),
-		LdapURL:                viper.GetString("LDAP_URL"),
-		ProdPostgresURL:        viper.GetString("PROD_POSTGRES_URL"),
+		AppName:    viper.GetString("app.name"),
+		AppVersion: viper.GetString("app.version"),
+		Mode:       viper.GetString("app.mode"),
+		SecretKey:  viper.GetString("app.secret_key"),
 
-		// Get Form Railway
+		GinMode:    viper.GetString("server.gin_mode"),
+		ServerPort: viper.GetInt("server.port"),
+		LogLevel:   viper.GetString("server.log_level"),
+
+		PostgresHost:     viper.GetString("database.host"),
+		PostgresPort:     viper.GetInt("database.port"),
+		PostgresUser:     viper.GetString("database.user"),
+		PostgresPassword: viper.GetString("database.password"),
+		PostgresDBName:   viper.GetString("database.dbname"),
+		PostgresSSLMode:  viper.GetString("database.sslmode"),
+		PostgresTimezone: viper.GetString("database.timezone"),
+
+		RedisHost:     viper.GetString("redis.host"),
+		RedisPort:     viper.GetInt("redis.port"),
+		RedisPassword: viper.GetString("redis.password"),
+
+		MinioURL:        viper.GetString("minio.url"),
+		MinioSSL:        viper.GetBool("minio.ssl"),
+		MinioAccessKey:  viper.GetString("minio.access_key"),
+		MinioSecretKey:  viper.GetString("minio.secret_key"),
+		MinioBucketName: viper.GetString("minio.bucket_name"),
+
+		MemphisHost:     viper.GetString("memphis.host"),
+		MemphisUsername: viper.GetString("memphis.username"),
+		MemphisPassword: viper.GetString("memphis.password"),
+
+		SMTPHost:     viper.GetString("smtp.host"),
+		SMTPPort:     viper.GetString("smtp.port"),
+		SMTPUser:     viper.GetString("smtp.user"),
+		SMTPPassword: viper.GetString("smtp.password"),
+
+		SystemIWebsiteURL:      viper.GetString("systems.system_i_url"),
+		TreasureDataWebsiteURL: viper.GetString("systems.treasure_data_url"),
+		LdapURL:                viper.GetString("systems.ldap_url"),
+
 		PostgresRailwayURL:   viper.GetString("POSTGRES_RAILWAY_URL"),
 		RedisRailwayURL:      viper.GetString("REDIS_RAILWAY_URL"),
 		RedisRailwayPassword: viper.GetString("REDIS_RAILWAY_PASSWORD"),

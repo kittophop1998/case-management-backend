@@ -1,0 +1,55 @@
+# Application Configuration
+app:
+  name: "Case Management"
+  version: "1.0.0"
+  mode: ""  # Custom app mode if needed
+  secret_key: "case_management_secret_key"
+
+# Server Configuration
+server:
+  port: 8080
+  gin_mode: "debug"  # Use "release" if GIN_IS_RELEASE_MODE=true
+  log_level: "info"
+
+# Database Configuration (PostgreSQL)
+database:
+  host: "localhost"
+  port: 5432
+  user: "postgres"
+  password: "postgres"
+  dbname: "postgres"
+  sslmode: "disable"
+  timezone: "Asia/Bangkok"
+
+# Redis Configuration
+redis:
+  host: "localhost"
+  port: 6379
+  password: "password123"
+
+# MinIO Configuration
+minio:
+  url: "localhost:9000"
+  ssl: false
+  access_key: "ROOTNAME"
+  secret_key: "CHANGEME123"
+  bucket_name: "miniobucket"
+
+# Memphis Configuration
+memphis:
+  host: ""
+  username: "memphis"
+  password: "memphis"
+
+# SMTP Email Configuration
+smtp:
+  host: ""
+  port: ""
+  user: ""
+  password: ""
+
+# External Systems
+systems:
+  system_i_url: ""
+  treasure_data_url: ""
+  ldap_url: "192.168.129.239:389"
