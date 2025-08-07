@@ -28,6 +28,14 @@ func (a *authRepo) CreateUser(c *gin.Context, user *model.CreateUserRequest) (uu
 		return uuid.Nil, err
 	}
 
+	if err := a.DB.Where("operator_id = ?", user.OperatorID).First(&existingUser).Error; err == nil {
+		a.Logger.Warn("OperatorID already exists", slog.Any("operator_id", user.OperatorID))
+		return uuid.Nil, fmt.Errorf("operatorId %d already exists", user.OperatorID)
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		a.Logger.Error("Error checking for existing OperatorID", slog.Any("error", err))
+		return uuid.Nil, err
+	}
+
 	var userToSave model.User
 	userToSave.AgentID = user.AgentID
 	userToSave.Username = user.Username
