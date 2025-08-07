@@ -85,7 +85,7 @@ type ImportStatus struct {
 
 // Struct For Create User
 type CreateUserRequest struct {
-	AgentID      uint      `json:"agentId" validate:"required" example:"12337"`
+	AgentID      uint      `gorm:"uniqueIndex" json:"agentId" validate:"required" example:"12337"`
 	Username     string    `json:"username" validate:"required" example:"Janet Adebayo"`
 	Email        string    `json:"email" validate:"required" example:"Janet@exam.com"`
 	TeamID       uuid.UUID `json:"teamId" validate:"required" example:"b94eee08-8324-4d4f-b166-d82775553a7e"`

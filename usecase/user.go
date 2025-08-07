@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"case-management/model"
+	"log/slog"
 
 	"github.com/google/uuid"
 
@@ -21,6 +22,7 @@ const (
 func (u *UseCase) CreateUser(c *gin.Context, user *model.CreateUserRequest) (uuid.UUID, error) {
 	id, err := u.caseManagementRepository.CreateUser(c, user)
 	if err != nil {
+		u.Logger.Error("CreateUser failed", slog.Any("error", err))
 		return uuid.Nil, err
 	}
 	return id, nil
