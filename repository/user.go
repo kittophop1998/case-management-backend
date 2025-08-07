@@ -14,47 +14,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// func (a *authRepo) CreateUser(c *gin.Context, user *model.CreateUserRequest) (uuid.UUID, error) {
-// 	a.Logger.Info("Creating user", slog.String("username", user.Username))
-
-// 	fmt.Println("create user repo", user)
-
-// 	var existingUser model.User
-// 	if err := a.DB.Where("agent_id = ?", user.AgentID).First(&existingUser).Error; err == nil {
-// 		a.Logger.Warn("AgentID already exists", slog.Any("agent_id", user.AgentID))
-// 		return uuid.Nil, fmt.Errorf("agentId %d already exists", user.AgentID)
-// 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
-// 		a.Logger.Error("Error checking for existing AgentID", slog.Any("error", err))
-// 		return uuid.Nil, err
-// 	}
-
-// 	var userToSave model.User
-// 	userToSave.Username = user.Username
-// 	userToSave.OperatorID = user.OperatorID
-// 	userToSave.TeamID = user.TeamID
-// 	userToSave.QueueID = user.QueueID
-// 	userToSave.CenterID = user.CenterID
-// 	userToSave.RoleID = user.RoleID
-// 	userToSave.DepartmentID = user.DepartmentID
-// 	userToSave.Email = user.Email
-
-// 	parts := strings.Split(user.Email, "@")
-// 	if len(parts) == 2 {
-// 		userToSave.DomainName = parts[0]
-// 	} else {
-// 		a.Logger.Warn("Invalid email format", slog.String("email", user.Email))
-// 		userToSave.DomainName = ""
-// 	}
-
-// 	if err := a.DB.Debug().Create(&userToSave).Error; err != nil {
-// 		a.Logger.Error("Failed to create user", slog.Any("error", err))
-// 		return uuid.Nil, err
-// 	}
-
-// 	a.Logger.Info("User created successfully", slog.Any("user_id", userToSave.ID))
-// 	return userToSave.ID, nil
-// }
-
 func (a *authRepo) CreateUser(c *gin.Context, user *model.CreateUserRequest) (uuid.UUID, error) {
 	a.Logger.Info("Creating user", slog.String("username", user.Username))
 
@@ -148,10 +107,6 @@ func (r *authRepo) GetAllUsers(c *gin.Context, limit, offset int, filter model.U
 
 	if filter.Sort != "" {
 		query = query.Order(filter.Sort)
-	}
-
-	if filter.IsActive != nil {
-		query = query.Where("users.is_active = ?", *filter.IsActive)
 	}
 
 	if err := query.Limit(limit).Offset(offset).Find(&users).Error; err != nil {
