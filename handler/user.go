@@ -29,7 +29,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 
 	id, err := h.UseCase.CreateUser(c, &user)
 	if err != nil {
-		appcore_handler.HandleError(c, err)
+		appcore_handler.HandleError(c, appcore_config.ErrInternalServer.WithDetails(err.Error()))
 		return
 	}
 
