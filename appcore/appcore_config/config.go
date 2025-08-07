@@ -60,6 +60,11 @@ type Configurations struct {
 
 	// DB Cloud
 	ProdPostgresURL string
+
+	// Setting For Railway
+	PostgresRailwayURL   string
+	RedisRailwayURL      string
+	RedisRailwayPassword string
 }
 
 // NewConfigurations returns a new Configuration object
@@ -113,5 +118,10 @@ func InitConfigurations() {
 		TreasureDataWebsiteURL: viper.GetString("TREASURE_DATA_URL"),
 		LdapURL:                viper.GetString("LDAP_URL"),
 		ProdPostgresURL:        viper.GetString("PROD_POSTGRES_URL"),
+
+		// Get Form Railway
+		PostgresRailwayURL:   viper.GetString("POSTGRES_RAILWAY_URL"),
+		RedisRailwayURL:      viper.GetString("REDIS_RAILWAY_URL"),
+		RedisRailwayPassword: viper.GetString("REDIS_RAILWAY_PASSWORD"),
 	}
 }
