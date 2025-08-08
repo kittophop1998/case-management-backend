@@ -1,8 +1,14 @@
 package handler
 
 import (
+	"case-management/appcore/appcore_config"
 	"case-management/appcore/appcore_handler"
 	"case-management/appcore/appcore_router"
+	"encoding/json"
+	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (h *Handler) ModuleAPI(r *appcore_router.Router) {
@@ -63,7 +69,6 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		attachmentsRoutes.POST("/:case_id", h.UploadAttachment)
 		attachmentsRoutes.GET("/file/*objectName", h.GetFile)
 	}
-
 	caseManagementRoutes := api.Group("/cases")
 	caseManagementRoutes.Use(
 		h.APILogger(),
@@ -78,7 +83,6 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		caseManagementRoutes.GET("/note_type/:id", h.GetNoteTypeById)
 		caseManagementRoutes.POST("/customer/note", h.CreateCustomerNote)
 	}
-
 	customerRoutes := api.Group("/customers")
 	customerRoutes.Use(
 		h.APILogger(),
@@ -88,6 +92,31 @@ func (h *Handler) ModuleAPI(r *appcore_router.Router) {
 		customerRoutes.GET("/search", h.CustomerSearch)
 		// customerRoutes.POST("/note", h.CreateCustomer)
 	}
+	api.GET("/mock/*any", func(c *gin.Context) {
+        if c.Query("isError") != "" && c.Query("isError") != "false" {
+            time.Sleep(2 * time.Second)
+			appcore_handler.HandleError(c, appcore_config.ErrInternalServer.WithMessage(appcore_config.Message{
+				Th: "มีบางสิ่งผิดพลาด",
+				En: "something went wrong",
+			}))
+            return
+        }
+        datamock := c.Query("datamock")
+        var parsedData map[string]interface{}
+        if err := json.Unmarshal([]byte(datamock), &parsedData); err != nil {
+			appcore_handler.HandleError(c, appcore_config.ErrInternalServer.WithMessage(appcore_config.Message{
+				Th: "Invalid datamock JSON",
+				En: "Invalid datamock JSON",
+			}))
+            return
+        }
+        time.Sleep(2 * time.Second)
+        c.JSON(http.StatusOK, gin.H{
+            "data": parsedData,
+        })
+    })
+
+
 
 	// Refresh token api
 	// refreshTokenAPI := api.Group("/")
