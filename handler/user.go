@@ -57,7 +57,7 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 		return
 	}
 
-	sort := c.DefaultQuery("sort", "created_at desc")
+	sort := c.DefaultQuery("sort", "is_active desc")
 	keyword := c.Query("keyword")
 	roleIDStr := c.Query("roleId")
 	teamIDStr := c.Query("teamId")
