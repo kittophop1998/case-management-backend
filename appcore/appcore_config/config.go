@@ -74,7 +74,8 @@ func InitConfigurations() {
 	// Set up Viper for config.yaml
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("appcore/appcore_config")
+	// viper.AddConfigPath("appcore/appcore_config")
+	viper.AddConfigPath("/root/appcore/appcore_config")
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file: %v", err)
