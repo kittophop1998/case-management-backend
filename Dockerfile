@@ -40,7 +40,7 @@ WORKDIR /root/
 COPY --from=builder /app/cmd/server/server .
 
 # (Optional) Copy configs if needed
-COPY appcore/appcore_config/ /root/configs/
+COPY appcore/appcore_config/ /root/appcore/appcore_config/
 
 # Expose port
 EXPOSE 8000
