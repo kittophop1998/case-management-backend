@@ -1,35 +1,49 @@
-# Stage 1: Build
-FROM golang:1.23 AS builder
+# ---------------------------------------------------------
+# Stage 1: Build Go binary
+# ---------------------------------------------------------
+FROM golang:1.23.8-alpine AS builder
 
-# Set working directory
+# Set workdir
 WORKDIR /app
 
-# Copy go.mod and go.sum files
+# Copy go.mod/go.sum and download dependencies
 COPY go.mod go.sum ./
-RUN go mod download
+RUN go mod download && go mod verify
 
-# Copy rest of the source code
+# Copy project files
 COPY . .
 
-# Build the Go app (binary will be named 'app')
-RUN go build -o app
+# Move to working dir for main.go
+WORKDIR /app/cmd/server
 
-# ------------------------
+# Build Go binary
+RUN go build -o server .
 
-# Stage 2: Run
-FROM debian:latest
+# ---------------------------------------------------------
+# Stage 2: Run with Google Chrome
+# ---------------------------------------------------------
+FROM debian:stable-slim
 
-# ทำให้ container crash ถ้ามี error
-RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+# ติดตั้ง google-chrome + thai font
+# RUN apt-get update && \
+#     apt-get install -y wget gnupg ca-certificates fonts-thai-tlwg && \
+#     wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+#     sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list' && \
+#     apt-get update && \
+#     apt-get install -y google-chrome-stable && \
+#     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set working directory in runtime container
+# Set workdir
 WORKDIR /root/
 
-# Copy binary from builder stage
-COPY --from=builder /app/app .
+# Copy binary from builder
+COPY --from=builder /app/cmd/server/server .
 
-# บอกว่าต้องเปิดพอร์ตนี้
+# (Optional) Copy configs if needed
+COPY appcore/appcore_config/ /root/configs/
+
+# Expose port
 EXPOSE 8000
 
-# Command to run
-CMD ["./app"]
+# Command
+CMD ["./server"]
